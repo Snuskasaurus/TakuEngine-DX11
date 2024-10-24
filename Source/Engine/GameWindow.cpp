@@ -12,6 +12,8 @@ constexpr int DefaultPositionY = 150;
 constexpr int DefaultSizeX = 1280;
 constexpr int DefaultSizeY = 720;
 
+float rr, gg, bb = 0.0f;
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 HWND GameWindow;
@@ -80,12 +82,18 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             PostQuitMessage(1);
         }
         break;
+    case WM_CHAR:
+        {
+        }
     case WM_KEYDOWN:
         {
             if (wParam == VK_ESCAPE)
             {
                 PostQuitMessage(1);
             }
+            if (wParam == 'R') rr > 0.0f ? rr = 0.0f : rr = 1.0f;
+            if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
+            if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
         }
         break;
     case WM_LBUTTONUP:
@@ -161,6 +169,7 @@ void ClearBuffer(float r, float g, float b)
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void JuProject::DoFrame()
 {
-    ClearBuffer(1.0f, 0.0f, 0.0f);
+    //ClearBuffer(1.0f, 0.0f, 0.0f);
+    ClearBuffer(rr, gg, bb);
     EndFrame();
 }
