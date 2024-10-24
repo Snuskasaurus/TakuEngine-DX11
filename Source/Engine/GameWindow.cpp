@@ -70,16 +70,18 @@ void JuProject::DestroyGameWindow()
     DestroyWindow(InternalHwnd);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-int JuProject::HandleGameWindowMessage()
+TExitReason JuProject::HandleGameWindowMessage()
 {
     MSG msg;
-    BOOL gResult;
-    do
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
     {
-        gResult = GetMessage(&msg, nullptr, 0, 0);
+        if (msg.message == WM_QUIT)
+        {
+            return { true, (int)msg.wParam };
+        }
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-    } while (gResult > 0);
-    return gResult == -1 ? -1 : (int)msg.wParam;
+    }
+    return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
