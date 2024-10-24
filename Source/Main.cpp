@@ -7,8 +7,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 
 	while (true)
 	{
+		JuProject::DoFrame();
 		const JuProject::SExitResult ExitResult = JuProject::HandleGameWindowMessage();
-		if (ExitResult.Exiting == true)
-			return ExitResult.Reason;
+		if (ExitResult.Exiting == true) return ExitResult.Reason; // Exit application
 	}
 }

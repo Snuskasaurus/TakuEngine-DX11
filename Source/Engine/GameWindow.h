@@ -13,5 +13,8 @@ namespace JuProject
     void CreateGameWindow(const HINSTANCE hInstance);
     void DestroyGameWindow();
     SExitResult HandleGameWindowMessage();
+
+    void DoFrame();
+    void EndFrame();
 }
 

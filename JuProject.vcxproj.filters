@@ -9,16 +9,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="GameWindow.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GameWindow.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
+    <ClCompile Include="Source\Engine\GameWindow.cpp" />
+    <ClCompile Include="Source\Main.cpp" />
   </ItemGroup>
 </Project>
