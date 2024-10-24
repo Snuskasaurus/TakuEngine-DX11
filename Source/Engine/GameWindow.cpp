@@ -47,9 +47,6 @@ void InitializeDirectX11()
                                                                 0, nullptr, 0,D3D11_SDK_VERSION,
                                                                 &SwapChainDesc, &DXSwapChain, &DXDevice,nullptr, &DXImmediateContext);
     assert(Result_D3D11CreateDeviceAndSwapChain >= 0);
-    assert(DXSwapChain != nullptr);
-    assert(DXDevice != nullptr);
-    assert(DXImmediateContext != nullptr);
 
     // Create Render target view from back buffer
     ID3D11Resource* DXBackBuffer = nullptr;
