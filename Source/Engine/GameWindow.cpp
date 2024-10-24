@@ -11,12 +11,16 @@ constexpr int DefaultPositionX = 320;
 constexpr int DefaultPositionY = 150;
 constexpr int DefaultSizeX = 1280;
 constexpr int DefaultSizeY = 720;
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-HWND InternalHwnd;
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+HWND GameWindow;
+
 ID3D11Device* DXDevice = nullptr;
 ID3D11DeviceContext* DXImmediateContext = nullptr;
 IDXGISwapChain* DXSwapChain = nullptr;
+ID3D11RenderTargetView* DXRenderTargetView = nullptr;
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
@@ -32,19 +36,26 @@ void InitializeDirectX11()
     SwapChainDesc.SampleDesc.Quality = 0;
     SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     SwapChainDesc.BufferCount = 1;
-    SwapChainDesc.OutputWindow = InternalHwnd;
+    SwapChainDesc.OutputWindow = GameWindow;
     SwapChainDesc.Windowed = TRUE;
     SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     SwapChainDesc.Flags = 0;
-    
-    HRESULT ResultD3D11CreateDeviceAndSwapChain = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
-        0, nullptr, 0,D3D11_SDK_VERSION, &SwapChainDesc, &DXSwapChain, &DXDevice,
-        nullptr, &DXImmediateContext);
 
-    assert(ResultD3D11CreateDeviceAndSwapChain >= 0);
+    const HRESULT Result_D3D11CreateDeviceAndSwapChain = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
+                                                                0, nullptr, 0,D3D11_SDK_VERSION,
+                                                                &SwapChainDesc, &DXSwapChain, &DXDevice,nullptr, &DXImmediateContext);
+    assert(Result_D3D11CreateDeviceAndSwapChain >= 0);
     assert(DXSwapChain != nullptr);
     assert(DXDevice != nullptr);
     assert(DXImmediateContext != nullptr);
+
+    // Create Render target view from back buffer
+    ID3D11Resource* DXBackBuffer = nullptr;
+    const HRESULT Result_DXSwapChain_GetBuffer = DXSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&DXBackBuffer));
+    assert(Result_DXSwapChain_GetBuffer >= 0);
+    const HRESULT Result_DXDevice_CreateRenderTargetView =  DXDevice->CreateRenderTargetView(DXBackBuffer, nullptr, &DXRenderTargetView);
+    assert(Result_DXDevice_CreateRenderTargetView >= 0);
+    DXBackBuffer->Release();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void UninitializeDirectX11()
@@ -104,22 +115,22 @@ void JuProject::CreateGameWindow(const HINSTANCE hInstance)
     wc.lpszClassName = GameClassName;
     RegisterClassEx(&wc);
 	
-    InternalHwnd = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
+    GameWindow = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
         DefaultPositionX, DefaultPositionY, DefaultSizeX, DefaultSizeY,
         nullptr, nullptr, hInstance, nullptr);
     
-    ShowWindow(InternalHwnd, SW_SHOW);
+    ShowWindow(GameWindow, SW_SHOW);
     
     InitializeDirectX11();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void JuProject::DestroyGameWindow()
 {
-    assert(InternalHwnd != nullptr);
+    assert(GameWindow != nullptr);
     
     UninitializeDirectX11();
     
-    DestroyWindow(InternalHwnd);
+    DestroyWindow(GameWindow);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 JuProject::SExitResult JuProject::HandleGameWindowMessage()
@@ -137,12 +148,19 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void JuProject::DoFrame()
-{
-    EndFrame();
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-void JuProject::EndFrame()
+void EndFrame()
 {
     DXSwapChain->Present(1u, 0u);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+void ClearBuffer(float r, float g, float b)
+{
+    const float color[] = { r, g, b, 1.0f };
+    DXImmediateContext->ClearRenderTargetView(DXRenderTargetView, color);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+void JuProject::DoFrame()
+{
+    ClearBuffer(1.0f, 0.0f, 0.0f);
+    EndFrame();
 }

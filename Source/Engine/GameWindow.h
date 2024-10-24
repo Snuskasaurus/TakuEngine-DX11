@@ -15,6 +15,5 @@ namespace JuProject
     SExitResult HandleGameWindowMessage();
 
     void DoFrame();
-    void EndFrame();
 }
 
