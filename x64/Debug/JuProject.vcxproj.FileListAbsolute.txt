@@ -1,1 +1,2 @@
 D:\JuProject\x64\Debug\JuProject.exe
+D:\Projects\JuProject\x64\Debug\JuProject.exe
