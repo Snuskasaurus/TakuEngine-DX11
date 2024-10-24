@@ -2,16 +2,16 @@
 
 #include <Windows.h>
 
-struct TExitReason
-{
-    bool Exist = false;
-    int Reason = -1;
-};
-
 namespace JuProject
 {
+    struct SExitResult
+    {
+        bool Exiting = false;
+        int Reason = -1;
+    };
+
     void CreateGameWindow(const HINSTANCE hInstance);
     void DestroyGameWindow();
-    TExitReason HandleGameWindowMessage();
+    SExitResult HandleGameWindowMessage();
 }
 

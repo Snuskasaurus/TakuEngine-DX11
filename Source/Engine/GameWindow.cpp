@@ -70,7 +70,7 @@ void JuProject::DestroyGameWindow()
     DestroyWindow(InternalHwnd);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-TExitReason JuProject::HandleGameWindowMessage()
+JuProject::SExitResult JuProject::HandleGameWindowMessage()
 {
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
