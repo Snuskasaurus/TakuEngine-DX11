@@ -6,18 +6,16 @@
 const wchar_t* G_GameClassName = L"JuProject";
 const wchar_t* G_WindowName = L"JuProject";
 constexpr DWORD G_WindowDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
-constexpr int G_WindowPositionX = 640;
-constexpr int G_WindowPositionY = 360;
+constexpr int G_WindowPositionX = 320;
+constexpr int G_WindowPositionY = 150;
 constexpr int G_WindowSizeX = 1280;
 constexpr int G_WindowSizeY = 720;
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_DESTROY:
-		PostQuitMessage(88);
-		break;
+		case WM_DESTROY: PostQuitMessage(1); break;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -27,7 +25,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC;
-	wc.lpfnWndProc = WndProc;
+	wc.lpfnWndProc = GameWindowProcedure;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
@@ -53,12 +51,5 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	} while (gResult > 0);
-	if (gResult == -1)
-	{
-		return -1;
-	}
-	else
-	{
-		return (int)msg.wParam;
-	}
+	return gResult == -1 ? -1 : (int)msg.wParam;
 }
