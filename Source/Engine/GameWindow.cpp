@@ -159,8 +159,17 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void DrawTestTriangle()
 {
-    struct SVertex { float x, y; };
-    constexpr SVertex vertices[] = {{-0.5f, 0.0f},{0.3f, 0.8f},{ 0.3f, -0.8f}};
+    struct SVertex
+    {
+        float x, y; // Position
+        float r, g, b; // Color
+    };
+    constexpr SVertex vertices[] = {
+        {-0.5f, 0.0f, 1.0f, 0.0f, 0.0f},
+        {0.5f, 0.5f, 0.0f, 1.0f, 0.0f},
+        {0.5f, -0.5f, 0.0f, 0.0f, 1.0f},
+    };
+    UINT sizeVertices = 3u; 
     
     // Create VertexBuffer and bind it to the pipeline
     {
@@ -197,9 +206,11 @@ void DrawTestTriangle()
             ID3D11InputLayout* inputLayout;
             constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
             {
-                { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u,D3D11_INPUT_PER_VERTEX_DATA, 0u }
+                { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u,D3D11_INPUT_PER_VERTEX_DATA, 0u },
+                { "Color", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 8u,D3D11_INPUT_PER_VERTEX_DATA, 0u }
             };
-            CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, 1u, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
+            UINT sizeInputElementDesc = 2u;
+            CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, sizeInputElementDesc, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
             DXImmediateContext->IASetInputLayout(inputLayout);
             inputLayout->Release();
         }
@@ -218,7 +229,7 @@ void DrawTestTriangle()
     }
  
     // Set primitive topology to triangle list
-    DXImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     
     // Configure Viewport
     {
@@ -233,7 +244,7 @@ void DrawTestTriangle()
     }
 
     DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, nullptr);
-    DXImmediateContext->Draw(3u, 0u);
+    DXImmediateContext->Draw(sizeVertices, 0u);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
