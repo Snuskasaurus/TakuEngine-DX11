@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+#Folders
+x64/
+Binaries/
+.idea/
+.vs/
