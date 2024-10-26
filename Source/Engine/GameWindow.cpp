@@ -2,15 +2,19 @@
 
 #include <cassert>
 #include <d3d11.h>
+#include <d3dcompiler.h>
+
+HRESULT HRESULT_HOLDER;
+#define CHECK_HRESULT(func) HRESULT_HOLDER = func; assert(HRESULT_HOLDER >= 0)
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 const wchar_t* GameClassName = L"JuProject";
 const wchar_t* WindowName = L"JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
-constexpr int DefaultPositionX = 320;
-constexpr int DefaultPositionY = 150;
-constexpr int DefaultSizeX = 1280;
-constexpr int DefaultSizeY = 720;
+constexpr int DefaultWindowPositionX = 320;
+constexpr int DefaultWindowPositionY = 150;
+constexpr int WindowSizeX = 1280;
+constexpr int WindowSizeY = 720;
 
 float rr, gg, bb = 0.0f;
 
@@ -43,17 +47,17 @@ void InitializeDirectX11()
     SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     SwapChainDesc.Flags = 0;
 
-    const HRESULT Result_D3D11CreateDeviceAndSwapChain = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
-                                                                0, nullptr, 0,D3D11_SDK_VERSION,
-                                                                &SwapChainDesc, &DXSwapChain, &DXDevice,nullptr, &DXImmediateContext);
-    assert(Result_D3D11CreateDeviceAndSwapChain >= 0);
+    UINT CreateDeviceAndSwapChainFlags = 0u;
+#ifdef _DEBUG
+    CreateDeviceAndSwapChainFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+    
+    CHECK_HRESULT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, CreateDeviceAndSwapChainFlags, nullptr, 0,D3D11_SDK_VERSION, &SwapChainDesc, &DXSwapChain, &DXDevice,nullptr, &DXImmediateContext));
 
     // Create Render target view from back buffer
     ID3D11Resource* DXBackBuffer = nullptr;
-    const HRESULT Result_DXSwapChain_GetBuffer = DXSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&DXBackBuffer));
-    assert(Result_DXSwapChain_GetBuffer >= 0);
-    const HRESULT Result_DXDevice_CreateRenderTargetView =  DXDevice->CreateRenderTargetView(DXBackBuffer, nullptr, &DXRenderTargetView);
-    assert(Result_DXDevice_CreateRenderTargetView >= 0);
+    CHECK_HRESULT(DXSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&DXBackBuffer)));
+    CHECK_HRESULT(DXDevice->CreateRenderTargetView(DXBackBuffer, nullptr, &DXRenderTargetView));
     DXBackBuffer->Release();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -121,7 +125,7 @@ void JuProject::CreateGameWindow(const HINSTANCE hInstance)
     RegisterClassEx(&wc);
 	
     GameWindow = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
-        DefaultPositionX, DefaultPositionY, DefaultSizeX, DefaultSizeY,
+        DefaultWindowPositionX, DefaultWindowPositionY, WindowSizeX, WindowSizeY,
         nullptr, nullptr, hInstance, nullptr);
     
     ShowWindow(GameWindow, SW_SHOW);
@@ -153,9 +157,89 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+void DrawTestTriangle()
+{
+    struct SVertex { float x, y; };
+    constexpr SVertex vertices[] = {{0.0f, 0.0f},{0.5f, -0.5f},{ -0.5f, -0.5f}};
+    
+    // Create VertexBuffer and bind it to the pipeline
+    {
+        D3D11_BUFFER_DESC bufferDesc = {};
+        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        bufferDesc.CPUAccessFlags = 0u;
+        bufferDesc.MiscFlags = 0u;
+        bufferDesc.ByteWidth = sizeof(vertices);
+        bufferDesc.StructureByteStride = sizeof(SVertex);
+
+        D3D11_SUBRESOURCE_DATA subResourceData = {};
+        subResourceData.pSysMem = vertices;
+
+        ID3D11Buffer* vertexBuffer = nullptr;
+        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &vertexBuffer));
+        constexpr UINT stride = sizeof(SVertex);
+        constexpr UINT offset = 0u;
+        DXImmediateContext->IASetVertexBuffers(0u, 1u, &vertexBuffer, &stride, &offset);
+        vertexBuffer->Release();
+    }
+    
+    // Create VertexShader and bind it to the pipeline
+    ID3DBlob* vsBlob = nullptr;
+    {
+        CHECK_HRESULT(D3DReadFileToBlob(L"VertexShader.cso", &vsBlob));
+        ID3D11VertexShader* vertexShader = nullptr;
+        CHECK_HRESULT(DXDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShader));
+        DXImmediateContext->VSSetShader(vertexShader, nullptr, 0u);
+        vertexShader->Release();
+    }
+
+    // Input Layout for 2d vertex
+    {
+        ID3D11InputLayout* inputLayout;
+        constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+        {
+            { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u,D3D11_INPUT_PER_VERTEX_DATA, 0u }
+        };
+        CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, 1u, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
+        DXImmediateContext->IASetInputLayout(inputLayout);
+        inputLayout->Release();
+    }
+    vsBlob->Release();
+
+    
+    // Create PixelShader and bind it to the pipeline
+    {
+        ID3DBlob* psBlob = nullptr;
+        CHECK_HRESULT(D3DReadFileToBlob(L"PixelShader.cso", &psBlob));
+        ID3D11PixelShader* pixelShader = nullptr;
+        CHECK_HRESULT(DXDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pixelShader));
+        psBlob->Release();
+        DXImmediateContext->PSSetShader(pixelShader, nullptr, 0u);
+        pixelShader->Release();
+    }
+ 
+    // Set primitive topology to triangle list
+    DXImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    
+    // Configure Viewport
+    {
+        D3D11_VIEWPORT viewport;
+        viewport.Width = WindowSizeX;
+        viewport.Height = WindowSizeY;
+        viewport.TopLeftX = 0.0f;
+        viewport.TopLeftY = 0.0f;
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
+        DXImmediateContext->RSSetViewports(1u, &viewport);
+    }
+
+    DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, nullptr);
+    DXImmediateContext->Draw(3u, 0u);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
 {
-    DXSwapChain->Present(1u, 0u);
+    CHECK_HRESULT(DXSwapChain->Present(1u, 0u));
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void ClearBuffer(float r, float g, float b)
@@ -166,7 +250,10 @@ void ClearBuffer(float r, float g, float b)
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void JuProject::DoFrame()
 {
-    //ClearBuffer(1.0f, 0.0f, 0.0f);
     ClearBuffer(rr, gg, bb);
+
+    DrawTestTriangle();
+    
     EndFrame();
 }
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
