@@ -4,6 +4,8 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
+#include "Color.h"
+
 HRESULT HRESULT_HOLDER;
 #define CHECK_HRESULT(func) HRESULT_HOLDER = func; assert(HRESULT_HOLDER >= 0)
 
@@ -162,12 +164,13 @@ void DrawTestTriangle()
     struct SVertex
     {
         float x, y; // Position
-        float r, g, b; // Color
+        SColor color;
     };
-    constexpr SVertex vertices[] = {
-        {-0.5f, 0.0f, 1.0f, 0.0f, 0.0f},
-        {0.5f, 0.5f, 0.0f, 1.0f, 0.0f},
-        {0.5f, -0.5f, 0.0f, 0.0f, 1.0f},
+    
+    const SVertex vertices[] = {
+        {-0.5f, 0.0f, SColor::Red},
+        {0.5f, 0.5f, SColor::Green},
+        {0.5f, -0.5f, SColor::Blue}
     };
     UINT sizeVertices = 3u; 
     
@@ -206,8 +209,8 @@ void DrawTestTriangle()
             ID3D11InputLayout* inputLayout;
             constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
             {
-                { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u,D3D11_INPUT_PER_VERTEX_DATA, 0u },
-                { "Color", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 8u,D3D11_INPUT_PER_VERTEX_DATA, 0u }
+                { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u },
+                { "Color", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u }
             };
             UINT sizeInputElementDesc = 2u;
             CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, sizeInputElementDesc, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
