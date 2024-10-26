@@ -160,7 +160,7 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
 void DrawTestTriangle()
 {
     struct SVertex { float x, y; };
-    constexpr SVertex vertices[] = {{0.0f, 0.0f},{0.5f, -0.5f},{ -0.5f, -0.5f}};
+    constexpr SVertex vertices[] = {{-0.5f, 0.0f},{0.3f, 0.8f},{ 0.3f, -0.8f}};
     
     // Create VertexBuffer and bind it to the pipeline
     {
@@ -184,28 +184,27 @@ void DrawTestTriangle()
     }
     
     // Create VertexShader and bind it to the pipeline
-    ID3DBlob* vsBlob = nullptr;
     {
+        ID3DBlob* vsBlob = nullptr;
         CHECK_HRESULT(D3DReadFileToBlob(L"VertexShader.cso", &vsBlob));
         ID3D11VertexShader* vertexShader = nullptr;
         CHECK_HRESULT(DXDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShader));
         DXImmediateContext->VSSetShader(vertexShader, nullptr, 0u);
         vertexShader->Release();
-    }
 
-    // Input Layout for 2d vertex
-    {
-        ID3D11InputLayout* inputLayout;
-        constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+        // Input Layout for 2d vertex
         {
-            { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u,D3D11_INPUT_PER_VERTEX_DATA, 0u }
-        };
-        CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, 1u, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
-        DXImmediateContext->IASetInputLayout(inputLayout);
-        inputLayout->Release();
+            ID3D11InputLayout* inputLayout;
+            constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+            {
+                { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u,D3D11_INPUT_PER_VERTEX_DATA, 0u }
+            };
+            CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, 1u, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
+            DXImmediateContext->IASetInputLayout(inputLayout);
+            inputLayout->Release();
+        }
+        vsBlob->Release();
     }
-    vsBlob->Release();
-
     
     // Create PixelShader and bind it to the pipeline
     {
