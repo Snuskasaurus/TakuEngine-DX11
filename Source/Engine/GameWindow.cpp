@@ -169,9 +169,9 @@ void DrawTestTriangle()
     
     const SVertex vertices[] = {
         {-0.5f, 0.5f, SColor::Red},
-        {0.0f, 0.5f, SColor::Magenta},
-        {0.0f, 0.0f, SColor::Green},
-        {-0.5f, 0.0f, SColor::White},
+        {0.5f, 0.5f, SColor::Magenta},
+        {0.5f, -0.5f, SColor::Green},
+        {-0.5f, -0.5f, SColor::White},
     };
     UINT sizeVertices = 4u;
     
