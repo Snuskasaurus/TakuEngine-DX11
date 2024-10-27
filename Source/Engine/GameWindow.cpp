@@ -169,15 +169,20 @@ void DrawTestTriangle()
     
     const SVertex vertices[] = {
         {-0.5f, 0.5f, SColor::Red},
+        {0.0f, 0.5f, SColor::Blue},
         {0.0f, 0.0f, SColor::Green},
         {-0.5f, 0.0f, SColor::Blue},
-        {-0.5f, 0.5f, SColor::Red},
-        {0.0f, 0.0f, SColor::Green},
-        {0.0f, 0.5f, SColor::Blue},
     };
-    UINT sizeVertices = 6u; 
+    UINT sizeVertices = 4u;
     
-    // Create VertexBuffer and bind it to the pipeline
+    const USHORT indices[] = 
+    {
+        0, 2, 3,
+        0, 2, 1,
+    };
+    UINT sizeindices = 6u;
+    
+    // Create Vertex Buffer and bind it to the pipeline
     {
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -196,6 +201,25 @@ void DrawTestTriangle()
         constexpr UINT offset = 0u;
         DXImmediateContext->IASetVertexBuffers(0u, 1u, &vertexBuffer, &stride, &offset);
         vertexBuffer->Release();
+    }
+    
+    // Create Index Buffer and bind it to the pipeline
+    {
+        D3D11_BUFFER_DESC bufferDesc = {};
+        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        bufferDesc.CPUAccessFlags = 0u;
+        bufferDesc.MiscFlags = 0u;
+        bufferDesc.ByteWidth = sizeof(indices);
+        bufferDesc.StructureByteStride = sizeof(USHORT);
+        
+        D3D11_SUBRESOURCE_DATA subResourceData = {};
+        subResourceData.pSysMem = indices;
+        
+        ID3D11Buffer* indexBuffer = nullptr;
+        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &indexBuffer));
+        DXImmediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0u);
+        indexBuffer->Release();
     }
     
     // Create VertexShader and bind it to the pipeline
@@ -250,7 +274,10 @@ void DrawTestTriangle()
     }
 
     DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, nullptr);
-    DXImmediateContext->Draw(sizeVertices, 0u);
+    
+    UINT StartIndexLocation = 0u;
+    INT BaseVertexLocation = 0;
+    DXImmediateContext->DrawIndexed(sizeindices, StartIndexLocation, BaseVertexLocation);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
