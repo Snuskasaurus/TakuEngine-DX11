@@ -14,6 +14,6 @@ namespace JuProject
     void DestroyGameWindow();
     SExitResult HandleGameWindowMessage();
 
-    void DoFrame();
+    void DoFrame(const float dt);
 }
 

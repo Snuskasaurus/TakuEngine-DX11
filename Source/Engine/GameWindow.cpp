@@ -3,6 +3,7 @@
 #include <cassert>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <valarray>
 
 #include "Color.h"
 
@@ -159,28 +160,32 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawTestTriangle()
+void DrawTestTriangle(const float Angle)
 {
     struct SVertex
     {
         float x, y; // Position
-        SColor color;
+        SColor Color;
     };
     
-    const SVertex vertices[] = {
-        {-0.5f, 0.5f, SColor::Red},
-        {0.5f, 0.5f, SColor::Magenta},
-        {0.5f, -0.5f, SColor::Green},
-        {-0.5f, -0.5f, SColor::White},
+    const SVertex vertexBufferData[] = {
+        {0.0f, 0.5f, SColor::Red},
+        {0.5f, -0.5f, SColor::Magenta},
+        {-0.5f, -0.5f, SColor::Green},
+        {-0.3f, 0.3f, SColor::Blue},
+        {0.3f, 0.3f, SColor::Yellow},
+        {0.0f, -0.8f, SColor::Cyan},
     };
-    UINT sizeVertices = 4u;
+    constexpr UINT sizeVertexBufferData = (UINT)std::size(vertexBufferData);
     
-    const USHORT indices[] = 
+    const USHORT indexBufferData[] = 
     {
+        0, 1, 2,
         0, 2, 3,
-        0, 2, 1,
+        0, 4, 1,
+        2, 1, 5,
     };
-    UINT sizeindices = 6u;
+    constexpr UINT sizeIndexBufferData = (UINT)std::size(indexBufferData);
     
     // Create Vertex Buffer and bind it to the pipeline
     {
@@ -189,11 +194,11 @@ void DrawTestTriangle()
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(vertices);
+        bufferDesc.ByteWidth = sizeof(vertexBufferData);
         bufferDesc.StructureByteStride = sizeof(SVertex);
 
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = vertices;
+        subResourceData.pSysMem = vertexBufferData;
 
         ID3D11Buffer* vertexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &vertexBuffer));
@@ -210,17 +215,52 @@ void DrawTestTriangle()
         bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(indices);
+        bufferDesc.ByteWidth = sizeof(indexBufferData);
         bufferDesc.StructureByteStride = sizeof(USHORT);
         
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = indices;
+        subResourceData.pSysMem = indexBufferData;
         
         ID3D11Buffer* indexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &indexBuffer));
         DXImmediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0u);
         indexBuffer->Release();
     }
+
+   // Create a constant buffer with the transformation matrix and bind it to the pipeline
+   {
+
+       struct SMatrix
+       {
+           float values[4][4];
+       };
+       struct SConstantBuffer
+       {
+           SMatrix tranform;
+       } constantBufferData =
+       {
+            std::cos(Angle), std::sin(Angle), 0.0f, 0.0f,
+            -std::sin(Angle), std::cos(Angle), 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+       };
+   
+       D3D11_BUFFER_DESC bufferDesc = {};
+       bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+       bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+       bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+       bufferDesc.MiscFlags = 0u;
+       bufferDesc.ByteWidth = sizeof(constantBufferData);
+       bufferDesc.StructureByteStride = 0u;
+       
+       D3D11_SUBRESOURCE_DATA subResourceData = {};
+       subResourceData.pSysMem = &constantBufferData;
+       
+       ID3D11Buffer* constantBuffer = nullptr;
+       CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &constantBuffer));
+       DXImmediateContext->VSSetConstantBuffers(0u, 1u, &constantBuffer);
+       constantBuffer->Release();
+   }
     
     // Create VertexShader and bind it to the pipeline
     {
@@ -259,7 +299,7 @@ void DrawTestTriangle()
     }
  
     // Set primitive topology to triangle list
-    DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     
     // Configure Viewport
     {
@@ -274,10 +314,7 @@ void DrawTestTriangle()
     }
 
     DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, nullptr);
-    
-    UINT StartIndexLocation = 0u;
-    INT BaseVertexLocation = 0;
-    DXImmediateContext->DrawIndexed(sizeindices, StartIndexLocation, BaseVertexLocation);
+    DXImmediateContext->DrawIndexed(sizeIndexBufferData,  0u, 0);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
@@ -291,11 +328,14 @@ void ClearBuffer(float r, float g, float b)
     DXImmediateContext->ClearRenderTargetView(DXRenderTargetView, color);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void JuProject::DoFrame()
+
+void JuProject::DoFrame(const float dt)
 {
     ClearBuffer(rr, gg, bb);
 
-    DrawTestTriangle();
+    static float TriangleAngle = 0.0f;
+    TriangleAngle += 0.5f * dt;
+    DrawTestTriangle(TriangleAngle);
     
     EndFrame();
 }
