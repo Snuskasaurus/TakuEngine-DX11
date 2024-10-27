@@ -1,9 +1,15 @@
 ﻿#include "GameWindow.h"
 
+#include <Windows.h>
+#include <Windowsx.h>
 #include <cassert>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <valarray>
+#include <cmath>
+#include <DirectXMath.h>
+
+namespace dx = DirectX;
 
 #include "Color.h"
 
@@ -11,6 +17,9 @@ HRESULT HRESULT_HOLDER;
 #define CHECK_HRESULT(func) HRESULT_HOLDER = func; assert(HRESULT_HOLDER >= 0)
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+// Window
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+HWND GameWindow;
 const wchar_t* GameClassName = L"JuProject";
 const wchar_t* WindowName = L"JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
@@ -18,20 +27,19 @@ constexpr int DefaultWindowPositionX = 320;
 constexpr int DefaultWindowPositionY = 150;
 constexpr int WindowSizeX = 1680;
 constexpr int WindowSizeY = 600;
-
-float ScreenRatio =  (float)WindowSizeY / (float)WindowSizeX;
-
-float rr, gg, bb = 0.0f;
-
+float ScreenRatio = (float)WindowSizeY / (float)WindowSizeX;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-HWND GameWindow;
-
+// DirectX
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
 ID3D11Device* DXDevice = nullptr;
 ID3D11DeviceContext* DXImmediateContext = nullptr;
 IDXGISwapChain* DXSwapChain = nullptr;
 ID3D11RenderTargetView* DXRenderTargetView = nullptr;
-
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+// Others
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+float rr, gg, bb = 0.0f;
+float XPositionCursor, YPositionCursor = 0.0f;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
@@ -90,6 +98,14 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         break;
     case WM_CHAR:
         {
+            
+        }
+    case WM_MOUSEMOVE:
+        {
+            short xPos = GET_X_LPARAM(lParam); 
+            short yPos = GET_Y_LPARAM(lParam);
+            XPositionCursor = (float) xPos;
+            YPositionCursor = (float) yPos;
         }
     case WM_KEYDOWN:
         {
@@ -162,7 +178,7 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawTestTriangle(const float Angle)
+void DrawTestTriangle(const float xOffset, const float yOffset, const float Angle)
 {
     struct SVertex
     {
@@ -231,20 +247,19 @@ void DrawTestTriangle(const float Angle)
 
    // Create a constant buffer with the transformation matrix and bind it to the pipeline
    {
-
        struct SMatrix
        {
            float values[4][4];
        };
        struct SConstantBuffer
        {
-           SMatrix tranform;
+           dx::XMMATRIX transform; 
        } constantBufferData =
        {
-            ScreenRatio * std::cos(Angle), std::sin(Angle), 0.0f, 0.0f,
-            ScreenRatio * -std::sin(Angle), std::cos(Angle), 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
+           dx::XMMatrixTranspose(
+               dx::XMMatrixRotationZ(Angle)
+               * dx::XMMatrixScaling(ScreenRatio * 0.45f, 0.45f, 1.0f)
+               * dx::XMMatrixTranslation(xOffset, yOffset, 0.0f))
        };
    
        D3D11_BUFFER_DESC bufferDesc = {};
@@ -334,7 +349,11 @@ void JuProject::DoFrame(const float dt)
 
     static float TriangleAngle = 0.0f;
     TriangleAngle += 0.5f * dt;
-    DrawTestTriangle(TriangleAngle);
+    
+    DrawTestTriangle(
+        (XPositionCursor / WindowSizeX * 2.0f) - 1.0f,
+        -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f,
+        TriangleAngle);
     
     EndFrame();
 }
