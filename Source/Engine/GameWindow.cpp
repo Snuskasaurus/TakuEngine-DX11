@@ -16,8 +16,10 @@ const wchar_t* WindowName = L"JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 constexpr int DefaultWindowPositionX = 320;
 constexpr int DefaultWindowPositionY = 150;
-constexpr int WindowSizeX = 1280;
-constexpr int WindowSizeY = 720;
+constexpr int WindowSizeX = 1680;
+constexpr int WindowSizeY = 600;
+
+float ScreenRatio =  (float)WindowSizeY / (float)WindowSizeX;
 
 float rr, gg, bb = 0.0f;
 
@@ -239,8 +241,8 @@ void DrawTestTriangle(const float Angle)
            SMatrix tranform;
        } constantBufferData =
        {
-            std::cos(Angle), std::sin(Angle), 0.0f, 0.0f,
-            -std::sin(Angle), std::cos(Angle), 0.0f, 0.0f,
+            ScreenRatio * std::cos(Angle), std::sin(Angle), 0.0f, 0.0f,
+            ScreenRatio * -std::sin(Angle), std::cos(Angle), 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
        };
@@ -297,9 +299,6 @@ void DrawTestTriangle(const float Angle)
         DXImmediateContext->PSSetShader(pixelShader, nullptr, 0u);
         pixelShader->Release();
     }
- 
-    // Set primitive topology to triangle list
-    DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     
     // Configure Viewport
     {
@@ -313,6 +312,7 @@ void DrawTestTriangle(const float Angle)
         DXImmediateContext->RSSetViewports(1u, &viewport);
     }
 
+    DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, nullptr);
     DXImmediateContext->DrawIndexed(sizeIndexBufferData,  0u, 0);
 }
@@ -328,7 +328,6 @@ void ClearBuffer(float r, float g, float b)
     DXImmediateContext->ClearRenderTargetView(DXRenderTargetView, color);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void JuProject::DoFrame(const float dt)
 {
     ClearBuffer(rr, gg, bb);
