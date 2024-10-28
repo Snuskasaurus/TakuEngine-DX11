@@ -94,19 +94,18 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     case WM_DESTROY:
         {
             PostQuitMessage(1);
-        }
-        break;
+        } break;
     case WM_CHAR:
         {
             
-        }
+        } break;
     case WM_MOUSEMOVE:
         {
             short xPos = GET_X_LPARAM(lParam); 
             short yPos = GET_Y_LPARAM(lParam);
             XPositionCursor = (float) xPos;
             YPositionCursor = (float) yPos;
-        }
+        } break;
     case WM_KEYDOWN:
         {
             if (wParam == VK_ESCAPE)
@@ -116,14 +115,7 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             if (wParam == 'R') rr > 0.0f ? rr = 0.0f : rr = 1.0f;
             if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
             if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
-        }
-        break;
-    case WM_LBUTTONUP:
-    case WM_LBUTTONDOWN:
-        {
-            const POINTS pt = MAKEPOINTS(lParam);	
-        }
-        break;
+        } break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
