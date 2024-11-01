@@ -178,30 +178,34 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawTestTriangle(const float xOffset, const float yOffset, const float Angle)
+void DrawCube(const float xOffset, const float yOffset, const float Angle)
 {
     struct SVertex
     {
-        float x, y; // Position
+        float x, y, z; // Position
         SColor Color;
     };
     
     const SVertex vertexBufferData[] = {
-        {0.0f, 0.5f, SColor::Red},
-        {0.5f, -0.5f, SColor::Magenta},
-        {-0.5f, -0.5f, SColor::Green},
-        {-0.3f, 0.3f, SColor::Blue},
-        {0.3f, 0.3f, SColor::Yellow},
-        {0.0f, -0.8f, SColor::Cyan},
+        {-1.0f, -1.0f, -1.0f, SColor::Red},
+        {1.0f, -1.0f, -1.0f, SColor::Green},
+        {-1.0f, 1.0f, -1.0f, SColor::Blue},
+        {1.0f, 1.0f, -1.0f, SColor::Cyan},
+        {-1.0f, -1.0f, 1.0f, SColor::White},
+        {1.0f, -1.0f, 1.0f, SColor::Yellow},
+        {-1.0f, 1.0f, 1.0f, SColor::Magenta},
+        {1.0f, 1.0f, 1.0f, SColor::Yellow},
     };
     constexpr UINT sizeVertexBufferData = (UINT)std::size(vertexBufferData);
     
     const USHORT indexBufferData[] = 
     {
-        0, 1, 2,
-        0, 2, 3,
-        0, 4, 1,
-        2, 1, 5,
+        0,2,1, 2,3,1,
+        1,3,5, 3,7,5,
+        2,6,3, 3,6,7,
+        4,5,7, 4,7,6,
+        0,4,2, 2,4,6,
+        0,1,4, 1,5,4,
     };
     constexpr UINT sizeIndexBufferData = (UINT)std::size(indexBufferData);
     
@@ -244,8 +248,8 @@ void DrawTestTriangle(const float xOffset, const float yOffset, const float Angl
         DXImmediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0u);
         indexBuffer->Release();
     }
-
-   // Create a constant buffer with the transformation matrix and bind it to the pipeline
+    
+   // Create a vertex shader constant buffer with the transformation matrix and bind it to the pipeline
    {
        struct SMatrix
        {
@@ -257,9 +261,12 @@ void DrawTestTriangle(const float xOffset, const float yOffset, const float Angl
        } constantBufferData =
        {
            dx::XMMatrixTranspose(
-               dx::XMMatrixRotationZ(Angle)
-               * dx::XMMatrixScaling(ScreenRatio * 0.45f, 0.45f, 1.0f)
-               * dx::XMMatrixTranslation(xOffset, yOffset, 0.0f))
+               dx::XMMatrixRotationZ(Angle) 
+               * dx::XMMatrixRotationX(Angle)
+               * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
+               * dx::XMMatrixTranslation(xOffset, yOffset, 4.0f)
+               * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 10.0f)
+               )
        };
    
        D3D11_BUFFER_DESC bufferDesc = {};
@@ -293,7 +300,7 @@ void DrawTestTriangle(const float xOffset, const float yOffset, const float Angl
             ID3D11InputLayout* inputLayout;
             constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
             {
-                { "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u },
+                { "Position", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u },
                 { "Color", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u }
             };
             UINT sizeInputElementDesc = 2u;
@@ -347,13 +354,9 @@ void JuProject::DoFrame(const float dt)
 {
     ClearBuffer(rr, gg, bb);
 
-    static float TriangleAngle = 0.0f;
-    TriangleAngle += 0.5f * dt;
-    
-    DrawTestTriangle(
-        (XPositionCursor / WindowSizeX * 2.0f) - 1.0f,
-        -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f,
-        TriangleAngle);
+    static float AngleShape = 0.0f;
+    AngleShape += 0.85f * dt;
+    DrawCube((XPositionCursor / WindowSizeX * 2.0f) - 1.0f, -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f, AngleShape);
     
     EndFrame();
 }
