@@ -40,7 +40,7 @@ ID3D11RenderTargetView* DXRenderTargetView = nullptr;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 float rr, gg, bb = 0.0f;
 float XPositionCursor, YPositionCursor = 0.0f;
-float YPositionCube = 0.0f;
+float ZPositionCube = 0.0f;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
@@ -120,7 +120,7 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     case WM_MOUSEWHEEL:
         {
             short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-            YPositionCube += (float)zDelta * 0.0025f;
+            ZPositionCube += (float)zDelta * 0.0025f;
         } break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -261,8 +261,8 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
                dx::XMMatrixRotationZ(Angle) 
                * dx::XMMatrixRotationX(Angle)
                * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
-               * dx::XMMatrixTranslation(xOffset, yOffset, zOffset + 4.0f)
-               * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 10.0f)
+               * dx::XMMatrixTranslation(xOffset, yOffset, zOffset)
+               * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 1000.0f)
                )
        };
    
@@ -386,9 +386,13 @@ void JuProject::DoFrame(const float dt)
     ClearBuffer(rr, gg, bb);
 
     static float AngleShape = 0.0f;
-    AngleShape += 0.85f * dt;
-    DrawCube((XPositionCursor / WindowSizeX * 2.0f) - 1.0f, -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f, YPositionCube, AngleShape);
-    DrawCube(0.0f, 0.0f, 0.0f, AngleShape);
+    AngleShape += 0.25f * dt;
+    
+    DrawCube(0.0f, 0.0f, 4.0f, AngleShape + 20.0f);
+
+    float XPositionCube = (XPositionCursor / WindowSizeX * 2.0f) - 1.0f;
+    float YPositionCube = -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f;
+    DrawCube(XPositionCube, YPositionCube, 4.0f + ZPositionCube, AngleShape);
     
     EndFrame();
 }
