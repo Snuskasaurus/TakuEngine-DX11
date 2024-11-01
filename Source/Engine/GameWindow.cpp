@@ -174,19 +174,18 @@ void DrawCube(const float xOffset, const float yOffset, const float Angle)
 {
     struct SVertex
     {
-        float x, y, z; // Position
-        SColor Color;
+        float x, y, z;
     };
     
     const SVertex vertexBufferData[] = {
-        {-1.0f, -1.0f, -1.0f, SColor::Red},
-        {1.0f, -1.0f, -1.0f, SColor::Green},
-        {-1.0f, 1.0f, -1.0f, SColor::Blue},
-        {1.0f, 1.0f, -1.0f, SColor::Cyan},
-        {-1.0f, -1.0f, 1.0f, SColor::White},
-        {1.0f, -1.0f, 1.0f, SColor::Yellow},
-        {-1.0f, 1.0f, 1.0f, SColor::Magenta},
-        {1.0f, 1.0f, 1.0f, SColor::Yellow},
+        {-1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {1.0f, -1.0f, 1.0f},
+        {-1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
     };
     constexpr UINT sizeVertexBufferData = (UINT)std::size(vertexBufferData);
     
@@ -301,6 +300,40 @@ void DrawCube(const float xOffset, const float yOffset, const float Angle)
             inputLayout->Release();
         }
         vsBlob->Release();
+    }
+    
+    // Create a pixel shader constant buffer with the face colors
+    {
+        struct SConstantBufferPixelShader
+        {
+            SColorFloat FaceColors[6];
+        };
+
+        SConstantBufferPixelShader ConstantBufferPixelShader =
+        {
+            SColor::Red.ToFloat(),
+            SColor::Green.ToFloat(),
+            SColor::Blue.ToFloat(),
+            SColor::Magenta.ToFloat(),
+            SColor::Yellow.ToFloat(),
+            SColor::Cyan.ToFloat(),
+        };
+
+        D3D11_BUFFER_DESC bufferDesc = {};
+        bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        bufferDesc.MiscFlags = 0u;
+        bufferDesc.ByteWidth = sizeof(ConstantBufferPixelShader);
+        bufferDesc.StructureByteStride = 0u;
+       
+        D3D11_SUBRESOURCE_DATA subResourceData = {};
+        subResourceData.pSysMem = &ConstantBufferPixelShader;
+       
+        ID3D11Buffer* constantBuffer = nullptr;
+        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &constantBuffer));
+        DXImmediateContext->PSSetConstantBuffers(0u, 1u, &constantBuffer);
+        constantBuffer->Release();
     }
     
     // Create PixelShader and bind it to the pipeline
