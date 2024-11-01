@@ -40,6 +40,7 @@ ID3D11RenderTargetView* DXRenderTargetView = nullptr;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 float rr, gg, bb = 0.0f;
 float XPositionCursor, YPositionCursor = 0.0f;
+float YPositionCube = 0.0f;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
@@ -116,6 +117,11 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
             if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
         } break;
+    case WM_MOUSEWHEEL:
+        {
+            short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+            YPositionCube += (float)zDelta * 0.0025f;
+        } break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -170,7 +176,7 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawCube(const float xOffset, const float yOffset, const float Angle)
+void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
 {
     struct SVertex
     {
@@ -255,7 +261,7 @@ void DrawCube(const float xOffset, const float yOffset, const float Angle)
                dx::XMMatrixRotationZ(Angle) 
                * dx::XMMatrixRotationX(Angle)
                * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
-               * dx::XMMatrixTranslation(xOffset, yOffset, 4.0f)
+               * dx::XMMatrixTranslation(xOffset, yOffset, zOffset + 4.0f)
                * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 10.0f)
                )
        };
@@ -381,7 +387,8 @@ void JuProject::DoFrame(const float dt)
 
     static float AngleShape = 0.0f;
     AngleShape += 0.85f * dt;
-    DrawCube((XPositionCursor / WindowSizeX * 2.0f) - 1.0f, -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f, AngleShape);
+    DrawCube((XPositionCursor / WindowSizeX * 2.0f) - 1.0f, -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f, YPositionCube, AngleShape);
+    DrawCube(0.0f, 0.0f, 0.0f, AngleShape);
     
     EndFrame();
 }
