@@ -35,6 +35,7 @@ ID3D11Device* DXDevice = nullptr;
 ID3D11DeviceContext* DXImmediateContext = nullptr;
 IDXGISwapChain* DXSwapChain = nullptr;
 ID3D11RenderTargetView* DXRenderTargetView = nullptr;
+ID3D11DepthStencilView* DXDepthStencilView = nullptr;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Others
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -69,14 +70,67 @@ void InitializeDirectX11()
     CHECK_HRESULT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, CreateDeviceAndSwapChainFlags, nullptr, 0,D3D11_SDK_VERSION, &SwapChainDesc, &DXSwapChain, &DXDevice,nullptr, &DXImmediateContext));
 
     // Create Render target view from back buffer
-    ID3D11Resource* DXBackBuffer = nullptr;
-    CHECK_HRESULT(DXSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&DXBackBuffer)));
-    CHECK_HRESULT(DXDevice->CreateRenderTargetView(DXBackBuffer, nullptr, &DXRenderTargetView));
-    DXBackBuffer->Release();
+    {
+        ID3D11Resource* DXBackBuffer = nullptr;
+        CHECK_HRESULT(DXSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&DXBackBuffer)));
+        CHECK_HRESULT(DXDevice->CreateRenderTargetView(DXBackBuffer, nullptr, &DXRenderTargetView));
+        DXBackBuffer->Release();
+    }
+
+    // Create Stencil buffer and the Z buffer
+    {
+        // Create depth stencil state and bind it to the pipeline
+        {
+            D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
+            depthStencilDesc.DepthEnable = true;
+            depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+            depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+        
+            ID3D11DepthStencilState* depthStencilState = nullptr;
+            CHECK_HRESULT(DXDevice->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
+            DXImmediateContext->OMSetDepthStencilState(depthStencilState, 1u);
+            depthStencilState->Release();
+        }
+        // Create depth stencil texture
+        ID3D11Texture2D* depthStencilTexture = nullptr;
+        {
+            D3D11_TEXTURE2D_DESC depthStencilTextureDesc;
+            depthStencilTextureDesc.Width = WindowSizeX;
+            depthStencilTextureDesc.Height = WindowSizeY;
+            depthStencilTextureDesc.MipLevels = 1u;
+            depthStencilTextureDesc.ArraySize = 1u;
+            depthStencilTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            depthStencilTextureDesc.SampleDesc.Count = 1u;
+            depthStencilTextureDesc.SampleDesc.Quality = 0u;
+            depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+            depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            depthStencilTextureDesc.CPUAccessFlags = 0u;
+            depthStencilTextureDesc.MiscFlags = 0u;
+            CHECK_HRESULT(DXDevice->CreateTexture2D(&depthStencilTextureDesc, nullptr, &depthStencilTexture));
+        }
+        // Create view of depth stencil texture
+        {
+            D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+            depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+            depthStencilViewDesc.Texture2D.MipSlice = 0u;
+            CHECK_HRESULT(DXDevice->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &DXDepthStencilView));
+        }
+
+        DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, DXDepthStencilView);
+
+        depthStencilTexture->Release();
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void UninitializeDirectX11()
 {
+    DXDepthStencilView->Release();
+    DXDepthStencilView = nullptr;
+    
+    DXRenderTargetView->Release();
+    DXRenderTargetView = nullptr;
+    
     DXDevice->Release();
     DXDevice = nullptr;
     
@@ -366,7 +420,6 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     }
 
     DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    DXImmediateContext->OMSetRenderTargets(1u, &DXRenderTargetView, nullptr);
     DXImmediateContext->DrawIndexed(sizeIndexBufferData,  0u, 0);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -379,6 +432,7 @@ void ClearBuffer(float r, float g, float b)
 {
     const float color[] = { r, g, b, 1.0f };
     DXImmediateContext->ClearRenderTargetView(DXRenderTargetView, color);
+    DXImmediateContext->ClearDepthStencilView(DXDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void JuProject::DoFrame(const float dt)
