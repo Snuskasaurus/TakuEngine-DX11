@@ -15,6 +15,7 @@
     <ClCompile Include="Source\Engine\GameWindow.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Engine\Color.cpp" />
+    <ClCompile Include="Source\Engine\HResultHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\VertexShader.hlsl">
@@ -26,5 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\Color.h" />
+    <ClInclude Include="Source\Engine\HResultHandler.h" />
   </ItemGroup>
 </Project>

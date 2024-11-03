@@ -2,19 +2,18 @@
 
 #include <Windows.h>
 #include <Windowsx.h>
-#include <cassert>
+#include <wincodec.h>
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <valarray>
-#include <cmath>
 #include <DirectXMath.h>
-
-namespace dx = DirectX;
+#include <dxgiformat.h>
+#include <iterator>
 
 #include "Color.h"
+#include "HResultHandler.h"
 
-HRESULT HRESULT_HOLDER;
-#define CHECK_HRESULT(func) HRESULT_HOLDER = func; assert(HRESULT_HOLDER >= 0)
+namespace dx = DirectX;
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
@@ -46,8 +45,8 @@ float ZPositionCube = 0.0f;
 void InitializeDirectX11()
 {
     DXGI_SWAP_CHAIN_DESC SwapChainDesc;
-    SwapChainDesc.BufferDesc.Width = 0;
-    SwapChainDesc.BufferDesc.Height = 0;
+    SwapChainDesc.BufferDesc.Width = WindowSizeX;
+    SwapChainDesc.BufferDesc.Height = WindowSizeY;
     SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
     SwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
