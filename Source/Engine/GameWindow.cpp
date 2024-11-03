@@ -229,51 +229,6 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-ID3D11Texture2D* CreateDirectXTextureFromFile(_In_z_ const wchar_t* FileName)
-{
-    // Create imaging factory
-    static IWICImagingFactory* imagingFactory = nullptr;
-    CHECK_HRESULT(CoCreateInstance(CLSID_WICImagingFactory,nullptr, CLSCTX_INPROC_SERVER,__uuidof(IWICImagingFactory), (LPVOID*)&imagingFactory));
-
-    IWICBitmapDecoder* bitmapDecoder = nullptr;
-    CHECK_HRESULT(imagingFactory->CreateDecoderFromFilename(FileName, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &bitmapDecoder));
-
-    IWICBitmapFrameDecode* bitmapFrameDecode;
-    
-    CHECK_HRESULT(bitmapDecoder->GetFrame(0, &bitmapFrameDecode));
-
-    WICPixelFormatGUID pixelFormat;
-    CHECK_HRESULT(bitmapFrameDecode->GetPixelFormat(&pixelFormat));
-
-    WICPixelFormatGUID pixelFormatConverted;
-    memcpy(&pixelFormatConverted, &pixelFormat, sizeof(WICPixelFormatGUID));
-    
-    // Create DirectX texture
-    ID3D11Texture2D* texture = nullptr;
-    {
-        // D3D11_TEXTURE2D_DESC textureDesc = {};
-        // textureDesc.Width = 400u;
-        // textureDesc.Height = 400u;
-        // textureDesc.MipLevels = 1;
-        // textureDesc.ArraySize = 1;
-        // textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        // textureDesc.SampleDesc.Count = 1;
-        // textureDesc.SampleDesc.Quality = 0;
-        // textureDesc.Usage = D3D11_USAGE_DEFAULT;
-        // textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        // textureDesc.CPUAccessFlags = 0;
-        // textureDesc.MiscFlags = 0;
-        //
-        // D3D11_SUBRESOURCE_DATA subresourceData = {};
-        // subresourceData.pSysMem = temp.get();
-        // subresourceData.SysMemPitch = static_cast<UINT>( rowPitch );
-        // subresourceData.SysMemSlicePitch = static_cast<UINT>( imageSize );
-        //
-        // CHECK_HRESULT(DXDevice->CreateTexture2D(&textureDesc, &subresourceData, &texture));
-    }
-    return texture;
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
 void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
 {
     struct SVertex
@@ -451,7 +406,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         pixelShader->Release();
     }
 
-    CreateDirectXTextureFromFile(L"D:/Projects/JuProject/Game/Data/TextureTest.dds");
+    CreateDirectXTextureFromFile(L"D:/Projects/JuProject/Game/Data/TextureTest.bmp");
     
     // Configure Viewport
     {

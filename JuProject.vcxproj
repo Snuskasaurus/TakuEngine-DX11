@@ -246,6 +246,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source\Engine\HResultHandler.cpp" />
+    <ClCompile Include="Source\Engine\Texture.cpp" />
     <ClCompile Include="Source\Main.cpp">
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
@@ -326,6 +327,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Engine\Color.h" />
     <ClInclude Include="Source\Engine\HResultHandler.h" />
+    <ClInclude Include="Source\Engine\Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
