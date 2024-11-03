@@ -300,42 +300,42 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         indexBuffer->Release();
     }
     
-   // Create a vertex shader constant buffer with the transformation matrix and bind it to the pipeline
-   {
-       struct SMatrix
-       {
-           float values[4][4];
-       };
-       struct SConstantBuffer
-       {
-           dx::XMMATRIX transform; 
-       } constantBufferData =
-       {
-           dx::XMMatrixTranspose(
-               dx::XMMatrixRotationZ(Angle) 
-               * dx::XMMatrixRotationX(Angle)
-               * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
-               * dx::XMMatrixTranslation(xOffset, yOffset, zOffset)
-               * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 1000.0f)
-               )
-       };
-   
-       D3D11_BUFFER_DESC bufferDesc = {};
-       bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-       bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-       bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-       bufferDesc.MiscFlags = 0u;
-       bufferDesc.ByteWidth = sizeof(constantBufferData);
-       bufferDesc.StructureByteStride = 0u;
-       
-       D3D11_SUBRESOURCE_DATA subResourceData = {};
-       subResourceData.pSysMem = &constantBufferData;
-       
-       ID3D11Buffer* constantBuffer = nullptr;
-       CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &constantBuffer));
-       DXImmediateContext->VSSetConstantBuffers(0u, 1u, &constantBuffer);
-       constantBuffer->Release();
-   }
+    // Create a vertex shader constant buffer with the transformation matrix and bind it to the pipeline
+    {
+        struct SMatrix
+        {
+            float values[4][4];
+        };
+        struct SConstantBuffer
+        {
+            dx::XMMATRIX transform; 
+        } constantBufferData =
+        {
+            dx::XMMatrixTranspose(
+                dx::XMMatrixRotationZ(Angle) 
+                * dx::XMMatrixRotationX(Angle)
+                * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
+                * dx::XMMatrixTranslation(xOffset, yOffset, zOffset)
+                * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 1000.0f)
+                )
+        };
+    
+        D3D11_BUFFER_DESC bufferDesc = {};
+        bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        bufferDesc.MiscFlags = 0u;
+        bufferDesc.ByteWidth = sizeof(constantBufferData);
+        bufferDesc.StructureByteStride = 0u;
+        
+        D3D11_SUBRESOURCE_DATA subResourceData = {};
+        subResourceData.pSysMem = &constantBufferData;
+        
+        ID3D11Buffer* constantBuffer = nullptr;
+        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &constantBuffer));
+        DXImmediateContext->VSSetConstantBuffers(0u, 1u, &constantBuffer);
+        constantBuffer->Release();
+    }
     
     // Create VertexShader and bind it to the pipeline
     {
