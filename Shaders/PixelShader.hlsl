@@ -1,9 +1,9 @@
-cbuffer CBuffer
-{
-    float4 faceColors[6];
-}
+Texture2D texColor : register(t0);
 
-float4 main(uint VertexIndex : SV_PrimitiveID) : SV_Target
+SamplerState samplerState;
+
+float4 main(float2 tc : TexCoord) : SV_Target
 {
-    return faceColors[VertexIndex / 2];
+    //return float4(tc, 0.0f, 1.0f);
+    return texColor.Sample(samplerState, tc);
 }

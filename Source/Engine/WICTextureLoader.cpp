@@ -465,15 +465,15 @@ static HRESULT CreateTextureFromWIC( _In_ ID3D11Device* d3dDevice,
 
     // See if format is supported for auto-gen mipmaps (varies by feature level)
     bool autogen = false;
-    if ( d3dContext != 0 && textureView != 0 ) // Must have context and shader-view to auto generate mipmaps
-    {
-        UINT fmtSupport = 0;
-        hr = d3dDevice->CheckFormatSupport( format, &fmtSupport );
-        if ( SUCCEEDED(hr) && ( fmtSupport & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN ) )
-        {
-            autogen = true;
-        }
-    }
+    // if ( d3dContext != 0 && textureView != 0 ) // Must have context and shader-view to auto generate mipmaps
+    // {
+    //     UINT fmtSupport = 0;
+    //     hr = d3dDevice->CheckFormatSupport( format, &fmtSupport );
+    //     if ( SUCCEEDED(hr) && ( fmtSupport & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN ) )
+    //     {
+    //         autogen = true;
+    //     }
+    // }
 
     // Create texture
     D3D11_TEXTURE2D_DESC desc;

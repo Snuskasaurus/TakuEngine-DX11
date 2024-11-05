@@ -232,22 +232,38 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
 {
-    struct SVertex
+    struct float3
     {
         float x, y, z;
     };
+    struct float2
+    {
+        float x, y;
+    };
     
-    const SVertex vertexBufferData[] = {
-        {-1.0f, -1.0f, -1.0f},
-        {1.0f, -1.0f, -1.0f},
-        {-1.0f, 1.0f, -1.0f},
-        {1.0f, 1.0f, -1.0f},
-        {-1.0f, -1.0f, 1.0f},
-        {1.0f, -1.0f, 1.0f},
-        {-1.0f, 1.0f, 1.0f},
-        {1.0f, 1.0f, 1.0f},
+    struct SVertex
+    {
+        float3 Position;
+        float2 TexCoord;
+    };
+    
+    SVertex vertexBufferData[] = {
+        {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
+        {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
+        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+        {{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{0.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+        {{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
     };
     constexpr UINT sizeVertexBufferData = (UINT)std::size(vertexBufferData);
+
+    // for (int i = 0; i < sizeVertexBufferData; ++i)
+    // {
+    //     vertexBufferData->TexCoord.x *= 10.f;
+    //     vertexBufferData->TexCoord.y *= 10.f;
+    // }
     
     const USHORT indexBufferData[] = 
     {
@@ -352,7 +368,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
             constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
             {
                 { "Position", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u },
-                { "Color", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u }
+                { "TexCoord",0,DXGI_FORMAT_R32G32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0 },
             };
             UINT sizeInputElementDesc = 2u;
             CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, sizeInputElementDesc, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
@@ -406,10 +422,30 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         DXImmediateContext->PSSetShader(pixelShader, nullptr, 0u);
         pixelShader->Release();
     }
+    
+    // Import, Create and Bind texture to the pixel shader
+    {
+        // TODO Julien Rogel (03/11/2024): Extract init of texture & textureView out of CreateWICTextureFromFile
+        
+        ID3D11Resource* texture = nullptr;
+        ID3D11ShaderResourceView* textureView = nullptr;
+        CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, L"D:/Projects/JuProject/Game/Data/TextureTest.bmp", &texture, &textureView, 0));
+        texture->Release();
+        DXImmediateContext->PSSetShaderResources(0u, 1u, &textureView);
+    }
 
-    ID3D11Resource* texture = nullptr;
-    ID3D11ShaderResourceView* textureView = nullptr;
-    CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, L"D:/Projects/JuProject/Game/Data/TextureTest.bmp", &texture, &textureView, 0));
+    // Create and bind sampler state to the pixel shader
+    {
+        D3D11_SAMPLER_DESC samplerDesc = {};
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        
+        ID3D11SamplerState* samplerState = nullptr;
+        CHECK_HRESULT(DXDevice->CreateSamplerState(&samplerDesc, &samplerState));
+        DXImmediateContext->PSSetSamplers(0, 1, &samplerState);
+    }
     
     // Configure Viewport
     {

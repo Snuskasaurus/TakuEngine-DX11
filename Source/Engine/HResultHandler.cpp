@@ -1,5 +1,6 @@
 ﻿#include "HResultHandler.h"
 
+#include <assert.h>
 #include <string>
 #include <system_error>
 #include <codecvt>
@@ -24,5 +25,4 @@ void HandleHResultError(const int line, const char* filename, const HRESULT HRes
     delete[] FilenameWideChar;
 
     MessageBox(nullptr, StringErrorWideChar,L"JuProject HResultError Handler" ,MB_OK | MB_ICONEXCLAMATION);
-
 }
