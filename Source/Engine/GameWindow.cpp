@@ -12,6 +12,7 @@
 
 #include "Color.h"
 #include "HResultHandler.h"
+#include "Texture.h"
 
 namespace dx = DirectX;
 

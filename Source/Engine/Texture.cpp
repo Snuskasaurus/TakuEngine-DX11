@@ -1,7 +1,6 @@
 ﻿#include "Texture.h"
 
 #include <cassert>
-#include <d3d11.h>
 #include <wincodec.h>
 
 #include "HResultHandler.h"
@@ -89,7 +88,7 @@ IWICImagingFactory* GetImagingFactoryInstance()
     return imagingFactory;
 }
 
-static DXGI_FORMAT _WICToDXGI(const GUID& guid)
+static DXGI_FORMAT ConvertWICFormatToDXGIFormat(const GUID& guid)
 {
     for( size_t i=0; i < _countof(g_WICFormats); ++i )
     {
@@ -128,7 +127,7 @@ static size_t _WICBitsPerPixel( REFGUID targetGuid )
     return bpp;
 }
 
-ID3D11Texture2D* CreateDirectXTextureFromFile(_In_z_ const wchar_t* FileName)
+ID3D11Texture2D* CreateDirectXTextureFromFile(const wchar_t* FileName, ID3D11Device* DXDevice)
 {
     static IWICImagingFactory* imagingFactory = GetImagingFactoryInstance();
 
@@ -136,63 +135,51 @@ ID3D11Texture2D* CreateDirectXTextureFromFile(_In_z_ const wchar_t* FileName)
     CHECK_HRESULT(imagingFactory->CreateDecoderFromFilename(FileName, nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &bitmapDecoder));
 
     IWICBitmapFrameDecode* bitmapFrameDecode;
-    
     CHECK_HRESULT(bitmapDecoder->GetFrame(0, &bitmapFrameDecode));
 
-    WICPixelFormatGUID pixelFormat;
-    CHECK_HRESULT(bitmapFrameDecode->GetPixelFormat(&pixelFormat));
+    WICPixelFormatGUID WICFormat;
+    CHECK_HRESULT(bitmapFrameDecode->GetPixelFormat(&WICFormat));
+    DXGI_FORMAT format = ConvertWICFormatToDXGIFormat(WICFormat);
+    assert(format != DXGI_FORMAT_UNKNOWN);
 
-    WICPixelFormatGUID pixelFormatConverted;
-    memcpy(&pixelFormatConverted, &pixelFormat, sizeof(WICPixelFormatGUID));
+    // Verify our target format is supported by the current device
+    // (handles WDDM 1.0 or WDDM 1.1 device driver cases as well as DirectX 11.0 Runtime without 16bpp format support)
+    UINT formatSupport = 0;
+    CHECK_HRESULT(DXDevice->CheckFormatSupport(format, &formatSupport));
+    if (formatSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D)
+    {
+        // Fallback to RGBA 32-bit format which is supported by all devices
+        memcpy(&WICFormat, &GUID_WICPixelFormat32bppRGBA, sizeof(WICPixelFormatGUID));
+        format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        bpp = 32;
+    }
+
+    // Allocate temporary memory for image
+    size_t rowPitch = ( twidth * bpp + 7 ) / 8;
+    size_t imageSize = rowPitch * theight;
     
-    size_t BitsPerPixel = 0;
-    DXGI_FORMAT format = _WICToDXGI( pixelFormat );
-    if ( format == DXGI_FORMAT_UNKNOWN )
-    {
-        for(size_t i=0; i < _countof(g_WICConvert); ++i)
-        {
-            if ( memcmp( &g_WICConvert[i].source, &pixelFormat, sizeof(WICPixelFormatGUID) ) == 0 )
-            {
-                memcpy( &pixelFormatConverted, &g_WICConvert[i].target, sizeof(WICPixelFormatGUID) );
-
-                format = _WICToDXGI( g_WICConvert[i].target );
-                assert(format != DXGI_FORMAT_UNKNOWN);
-                BitsPerPixel = _WICBitsPerPixel( convertGUID );
-                break;
-            }
-        }
-
-        if ( format == DXGI_FORMAT_UNKNOWN )
-            return HRESULT_FROM_WIN32( ERROR_NOT_SUPPORTED );
-    }
-    else
-    {
-        BitsPerPixel = _WICBitsPerPixel( pixelFormat );
-    }
-
-    
-    // Create DirectX texture
-    ID3D11Texture2D* texture = nullptr;
-    {
-        D3D11_TEXTURE2D_DESC textureDesc = {};
-        textureDesc.Width = 400u;
-        textureDesc.Height = 400u;
-        textureDesc.MipLevels = 1;
-        textureDesc.ArraySize = 1;
-        textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        textureDesc.SampleDesc.Count = 1;
-        textureDesc.SampleDesc.Quality = 0;
-        textureDesc.Usage = D3D11_USAGE_DEFAULT;
-        textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        textureDesc.CPUAccessFlags = 0;
-        textureDesc.MiscFlags = 0;
-        
-        D3D11_SUBRESOURCE_DATA subresourceData = {};
-        subresourceData.pSysMem = temp.get();
-        subresourceData.SysMemPitch = static_cast<UINT>( rowPitch );
-        subresourceData.SysMemSlicePitch = static_cast<UINT>( imageSize );
-        
-        CHECK_HRESULT(DXDevice->CreateTexture2D(&textureDesc, &subresourceData, &texture));
-    }
-    return texture;
+   // Create DirectX texture
+   ID3D11Texture2D* texture = nullptr;
+   // {
+   //     D3D11_TEXTURE2D_DESC textureDesc = {};
+   //     textureDesc.Width = 400u;
+   //     textureDesc.Height = 400u;
+   //     textureDesc.MipLevels = 1;
+   //     textureDesc.ArraySize = 1;
+   //     textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+   //     textureDesc.SampleDesc.Count = 1;
+   //     textureDesc.SampleDesc.Quality = 0;
+   //     textureDesc.Usage = D3D11_USAGE_DEFAULT;
+   //     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+   //     textureDesc.CPUAccessFlags = 0;
+   //     textureDesc.MiscFlags = 0;
+   //     
+   //     D3D11_SUBRESOURCE_DATA subresourceData = {};
+   //     subresourceData.pSysMem = temp.get();
+   //     subresourceData.SysMemPitch = static_cast<UINT>( rowPitch );
+   //     subresourceData.SysMemSlicePitch = static_cast<UINT>( imageSize );
+   //     
+   //     CHECK_HRESULT(DXDevice->CreateTexture2D(&textureDesc, &subresourceData, &texture));
+   // }
+   return texture;
 }
