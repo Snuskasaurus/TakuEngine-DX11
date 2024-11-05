@@ -327,7 +327,6 @@
   <ItemGroup>
     <ClInclude Include="Source\Engine\Color.h" />
     <ClInclude Include="Source\Engine\HResultHandler.h" />
-    <ClInclude Include="Source\Engine\Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,7 +12,6 @@
 
 #include "Color.h"
 #include "HResultHandler.h"
-#include "Texture.h"
 
 namespace dx = DirectX;
 
@@ -406,8 +405,6 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         DXImmediateContext->PSSetShader(pixelShader, nullptr, 0u);
         pixelShader->Release();
     }
-
-    CreateDirectXTextureFromFile(L"D:/Projects/JuProject/Game/Data/TextureTest.bmp");
     
     // Configure Viewport
     {
