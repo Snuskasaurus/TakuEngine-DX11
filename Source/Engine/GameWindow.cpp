@@ -12,6 +12,7 @@
 
 #include "Color.h"
 #include "HResultHandler.h"
+#include "WICTextureLoader.h"
 
 namespace dx = DirectX;
 
@@ -405,6 +406,10 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         DXImmediateContext->PSSetShader(pixelShader, nullptr, 0u);
         pixelShader->Release();
     }
+
+    ID3D11Resource* texture = nullptr;
+    ID3D11ShaderResourceView* textureView = nullptr;
+    CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, L"D:/Projects/JuProject/Game/Data/TextureTest.bmp", &texture, &textureView, 0));
     
     // Configure Viewport
     {
