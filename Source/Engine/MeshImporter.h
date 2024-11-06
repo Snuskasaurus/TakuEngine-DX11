@@ -2,6 +2,9 @@
 
 #include <sal.h>
 
+#define MAX_VERTEX_BUFFER_VERTICES 1024
+#define MAX_INDEX_BUFFER_INDEXES 4096
+
 using TVertexIndex = unsigned short;
 
 struct float2
@@ -25,12 +28,12 @@ struct SVertex
 
 struct SVertexBuffer
 {
-    SVertex Vertices[1024];
+    SVertex Vertices[MAX_VERTEX_BUFFER_VERTICES];
 };
 
 struct IndexBuffer
 {
-    TVertexIndex Indexes[1024];
+    TVertexIndex Indexes[MAX_INDEX_BUFFER_INDEXES];
 };
 
 struct SMeshInfo

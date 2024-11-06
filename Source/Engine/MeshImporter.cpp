@@ -20,15 +20,15 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
     }
     
     int nbVertexPos = 0;
-    float3 tempVertexPos[1024] = {};
+    float3 tempVertexPos[MAX_VERTEX_BUFFER_VERTICES] = {};
     
     int nbTexCoord = 0;
-    float2 tempTexCoord[1024] = {};
+    float2 tempTexCoord[MAX_VERTEX_BUFFER_VERTICES] = {};
     
     int nbFace = 0;
-    TVertexIndex tempVertexIndex[1024] = {};
-    TVertexIndex tempUVIndex[1024] = {};
-    TVertexIndex tempNormalIndex[1024] = {};
+    TVertexIndex tempVertexIndex[MAX_INDEX_BUFFER_INDEXES] = {};
+    TVertexIndex tempUVIndex[MAX_INDEX_BUFFER_INDEXES] = {};
+    TVertexIndex tempNormalIndex[MAX_INDEX_BUFFER_INDEXES] = {};
 
     bool ReadingFile = true;
     while(ReadingFile)
@@ -47,6 +47,11 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
                 &tempVertexPos[nbVertexPos].y,
                 &tempVertexPos[nbVertexPos].z);
             nbVertexPos++;
+            if (nbVertexPos >= MAX_VERTEX_BUFFER_VERTICES)
+            {
+                TRIGGER_ERROR();
+                return false;
+            }
         }
         else if (strcmp(lineHeader, "vt") == 0) // Read texture coordinates
         {
@@ -67,6 +72,11 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
                 return false;
             }
             nbFace++;
+            if (nbFace * 3 >= MAX_INDEX_BUFFER_INDEXES)
+            {
+                TRIGGER_ERROR();
+                return false;
+            }
         }
     }
 
@@ -77,12 +87,6 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
         return false;
     }
     
-    // if (nbVertexPos != nbTexCoord)
-    // {
-    //     TRIGGER_ERROR(); // Nb Vertex and Nb Tex Coordinate doest not match
-    //     return false;
-    // }
-
     // Copy vertex buffer
     for (int iVertex = 0; iVertex < nbVertexPos; ++iVertex)
     {

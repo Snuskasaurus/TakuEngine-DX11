@@ -234,7 +234,7 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
 void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
 {
     SMeshInfo meshInfoCube = {};
-    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(L"D:/Projects/JuProject/Game/Data/Cube.obj",&meshInfoCube);
+    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(L"D:/Projects/JuProject/Game/Data/Suzanne.obj",&meshInfoCube);
     assert(successImportingMesh);
  
     // Create Vertex Buffer and bind it to the pipeline
