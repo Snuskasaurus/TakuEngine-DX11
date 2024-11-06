@@ -12,6 +12,7 @@
 
 #include "Color.h"
 #include "HResultHandler.h"
+#include "MeshImporter.h"
 #include "WICTextureLoader.h"
 
 namespace dx = DirectX;
@@ -232,50 +233,10 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
 {
-    struct float3
-    {
-        float x, y, z;
-    };
-    struct float2
-    {
-        float x, y;
-    };
-    
-    struct SVertex
-    {
-        float3 Position;
-        float2 TexCoord;
-    };
-    
-    SVertex vertexBufferData[] = {
-        {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
-        {{1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
-        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
-        {{0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-        {{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{0.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-        {{1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-    };
-    constexpr UINT sizeVertexBufferData = (UINT)std::size(vertexBufferData);
-
-    // for (int i = 0; i < sizeVertexBufferData; ++i)
-    // {
-    //     vertexBufferData->TexCoord.x *= 10.f;
-    //     vertexBufferData->TexCoord.y *= 10.f;
-    // }
-    
-    const USHORT indexBufferData[] = 
-    {
-        0,2,1, 2,3,1,
-        1,3,5, 3,7,5,
-        2,6,3, 3,6,7,
-        4,5,7, 4,7,6,
-        0,4,2, 2,4,6,
-        0,1,4, 1,5,4,
-    };
-    constexpr UINT sizeIndexBufferData = (UINT)std::size(indexBufferData);
-    
+    SMeshInfo meshInfoCube = {};
+    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(L"D:/Projects/JuProject/Game/Data/Cube.obj",&meshInfoCube);
+    assert(successImportingMesh);
+ 
     // Create Vertex Buffer and bind it to the pipeline
     {
         D3D11_BUFFER_DESC bufferDesc = {};
@@ -283,11 +244,11 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(vertexBufferData);
+        bufferDesc.ByteWidth = sizeof(SVertex) * meshInfoCube.nbVertexBuffer;
         bufferDesc.StructureByteStride = sizeof(SVertex);
 
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = vertexBufferData;
+        subResourceData.pSysMem = &meshInfoCube.VertexBuffer;
 
         ID3D11Buffer* vertexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &vertexBuffer));
@@ -304,11 +265,11 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(indexBufferData);
-        bufferDesc.StructureByteStride = sizeof(USHORT);
+        bufferDesc.ByteWidth = sizeof(TVertexIndex) * meshInfoCube.nbIndexBuffer;
+        bufferDesc.StructureByteStride = sizeof(TVertexIndex);
         
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = indexBufferData;
+        subResourceData.pSysMem = meshInfoCube.IndexBuffer.Indexes;
         
         ID3D11Buffer* indexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &indexBuffer));
@@ -460,7 +421,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     }
 
     DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    DXImmediateContext->DrawIndexed(sizeIndexBufferData,  0u, 0);
+    DXImmediateContext->DrawIndexed(meshInfoCube.nbIndexBuffer,  0u, 0);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()

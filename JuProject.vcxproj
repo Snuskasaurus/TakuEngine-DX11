@@ -246,6 +246,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source\Engine\HResultHandler.cpp" />
+    <ClCompile Include="Source\Engine\MeshImporter.cpp" />
     <ClCompile Include="Source\Engine\WICTextureLoader.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -401,6 +402,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Engine\Color.h" />
     <ClInclude Include="Source\Engine\HResultHandler.h" />
+    <ClInclude Include="Source\Engine\MeshImporter.h" />
     <ClInclude Include="Source\Engine\WICTextureLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
