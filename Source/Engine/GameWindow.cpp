@@ -17,6 +17,8 @@
 
 namespace dx = DirectX;
 
+#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/"
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -234,7 +236,7 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
 void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
 {
     SMeshInfo meshInfoCube = {};
-    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(L"D:/Projects/JuProject/Game/Data/Suzanne.obj",&meshInfoCube);
+    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(GAME_DATA_PATH L"Suzanne.obj", &meshInfoCube);
     assert(successImportingMesh);
  
     // Create Vertex Buffer and bind it to the pipeline
@@ -390,7 +392,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         
         ID3D11Resource* texture = nullptr;
         ID3D11ShaderResourceView* textureView = nullptr;
-        CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, L"D:/Projects/JuProject/Game/Data/TextureTest.bmp", &texture, &textureView, 0));
+        CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, GAME_DATA_PATH L"TextureTest.bmp", &texture, &textureView, 0));
         texture->Release();
         DXImmediateContext->PSSetShaderResources(0u, 1u, &textureView);
     }
