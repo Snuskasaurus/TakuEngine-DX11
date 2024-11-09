@@ -2,7 +2,7 @@
 
 #include <sal.h>
 
-#define MAX_VERTEX_BUFFER_VERTICES 1024
+#define MAX_VERTEX_BUFFER_VERTICES 4096
 #define MAX_INDEX_BUFFER_INDEXES 4096
 
 using TVertexIndex = unsigned short;
@@ -22,8 +22,9 @@ struct float3
 
 struct SVertex
 {
-    float3 Position;
-    float2 TextureCoordinate;
+    float3 vp;
+    float2 vt;
+    float3 vn;
 };
 
 struct SVertexBuffer

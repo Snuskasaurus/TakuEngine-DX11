@@ -463,31 +463,19 @@ static HRESULT CreateTextureFromWIC( _In_ ID3D11Device* d3dDevice,
             return hr;
     }
 
-    // See if format is supported for auto-gen mipmaps (varies by feature level)
-    bool autogen = false;
-    // if ( d3dContext != 0 && textureView != 0 ) // Must have context and shader-view to auto generate mipmaps
-    // {
-    //     UINT fmtSupport = 0;
-    //     hr = d3dDevice->CheckFormatSupport( format, &fmtSupport );
-    //     if ( SUCCEEDED(hr) && ( fmtSupport & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN ) )
-    //     {
-    //         autogen = true;
-    //     }
-    // }
-
     // Create texture
     D3D11_TEXTURE2D_DESC desc;
     desc.Width = twidth;
     desc.Height = theight;
-    desc.MipLevels = (autogen) ? 0 : 1;
+    desc.MipLevels = 1;
     desc.ArraySize = 1;
     desc.Format = format;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = (autogen) ? (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET) : (D3D11_BIND_SHADER_RESOURCE);
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.CPUAccessFlags = 0;
-    desc.MiscFlags = (autogen) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+    desc.MiscFlags = 0;
 
     D3D11_SUBRESOURCE_DATA initData;
     initData.pSysMem = temp.get();
@@ -495,7 +483,7 @@ static HRESULT CreateTextureFromWIC( _In_ ID3D11Device* d3dDevice,
     initData.SysMemSlicePitch = static_cast<UINT>( imageSize );
 
     ID3D11Texture2D* tex = nullptr;
-    hr = d3dDevice->CreateTexture2D( &desc, (autogen) ? nullptr : &initData, &tex );
+    hr = d3dDevice->CreateTexture2D(&desc, &initData, &tex);
     if ( SUCCEEDED(hr) && tex != 0 )
     {
         if (textureView != 0)
@@ -504,20 +492,14 @@ static HRESULT CreateTextureFromWIC( _In_ ID3D11Device* d3dDevice,
             memset( &SRVDesc, 0, sizeof( SRVDesc ) );
             SRVDesc.Format = format;
             SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            SRVDesc.Texture2D.MipLevels = (autogen) ? -1 : 1;
+            SRVDesc.Texture2D.MostDetailedMip = 0;
+            SRVDesc.Texture2D.MipLevels = 1;
 
             hr = d3dDevice->CreateShaderResourceView( tex, &SRVDesc, textureView );
             if ( FAILED(hr) )
             {
                 tex->Release();
                 return hr;
-            }
-
-            if ( autogen )
-            {
-                assert( d3dContext != 0 );
-                d3dContext->UpdateSubresource( tex, 0, nullptr, temp.get(), static_cast<UINT>(rowPitch), static_cast<UINT>(imageSize) );
-                d3dContext->GenerateMips( *textureView );
             }
         }
 

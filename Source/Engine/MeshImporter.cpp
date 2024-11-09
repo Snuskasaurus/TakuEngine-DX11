@@ -2,34 +2,64 @@
 
 // Highly inspired by http://www.opengl-tutorial.org/beginners-tutorials/tutorial-7-model-loading/
 
+
+#define MAX_NB_V 1024
+#define MAX_NB_VN 2048
+#define MAX_NB_VT 4096
+#define MAX_NB_F 4096
+
 #define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
 
 #include <assert.h>
 #include <cstdio>
 #include <cstring>
 
-bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshInfo* SMeshInfo)
+struct SFaceElement
+{
+    TVertexIndex Geometry = 0;
+    TVertexIndex Texture = 0;
+    TVertexIndex Normal = 0;
+};
+
+
+void AddToVertexBuffer(_Out_ SMeshInfo* MeshInfo, const float3 vp, const float2 vt, const float3 vn)
+{
+    MeshInfo->VertexBuffer.Vertices[MeshInfo->nbVertexBuffer].vp = vp;
+    MeshInfo->VertexBuffer.Vertices[MeshInfo->nbVertexBuffer].vt = vt;
+    MeshInfo->VertexBuffer.Vertices[MeshInfo->nbVertexBuffer].vn = vn;
+    
+    MeshInfo->nbVertexBuffer++;
+}
+
+void AddToIndexBuffer(_Out_ SMeshInfo* MeshInfo, TVertexIndex Index)
+{
+    MeshInfo->IndexBuffer.Indexes[MeshInfo->nbIndexBuffer] = Index;
+    MeshInfo->nbIndexBuffer++;
+}
+
+bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshInfo* MeshInfo)
 {
     FILE* fileStream = nullptr;
 
-    const errno_t resultFOpen = _wfopen_s(&fileStream, _fileName, L"r");
-    if(resultFOpen != 0 || fileStream == nullptr)
+    const errno_t resultFileOpen = _wfopen_s(&fileStream, _fileName, L"r");
+    if(resultFileOpen != 0 || fileStream == nullptr)
     {
         TRIGGER_ERROR(); // Failed to open file
         return false;
     }
     
-    int nbVertexPos = 0;
-    float3 tempVertexPos[MAX_VERTEX_BUFFER_VERTICES] = {};
+    int countV = 0;
+    float3 arrayV[MAX_NB_V] = {};
     
-    int nbTexCoord = 0;
-    float2 tempTexCoord[MAX_VERTEX_BUFFER_VERTICES] = {};
+    int countVN = 0;
+    float3 arrayVN[MAX_NB_VN] = {};
     
-    int nbFace = 0;
-    TVertexIndex tempVertexIndex[MAX_INDEX_BUFFER_INDEXES] = {};
-    TVertexIndex tempUVIndex[MAX_INDEX_BUFFER_INDEXES] = {};
-    TVertexIndex tempNormalIndex[MAX_INDEX_BUFFER_INDEXES] = {};
-
+    int countVT = 0;
+    float2 arrayVT[MAX_NB_VT] = {};
+    
+    int countF = 0;
+    SFaceElement arrayF[MAX_NB_F] = {};
+    
     bool ReadingFile = true;
     while(ReadingFile)
     {
@@ -43,67 +73,94 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
         if (strcmp(lineHeader, "v") == 0) // Read vertex position
         {
             const int matches = fscanf_s(fileStream, "%f %f %f\n",
-                &tempVertexPos[nbVertexPos].x,
-                &tempVertexPos[nbVertexPos].y,
-                &tempVertexPos[nbVertexPos].z);
-            nbVertexPos++;
-            if (nbVertexPos >= MAX_VERTEX_BUFFER_VERTICES)
-            {
-                TRIGGER_ERROR();
-                return false;
-            }
+                &arrayV[countV].x,
+                &arrayV[countV].y,
+                &arrayV[countV].z);
+            arrayV[countV].z = arrayV[countV].z * -1.0f;
+
+            countV++;
+            assert(countV < MAX_NB_V);
         }
-        else if (strcmp(lineHeader, "vt") == 0) // Read texture coordinates
+        else if (strcmp(lineHeader, "vn") == 0) // Read vertex normals
+        {
+            const int matches = fscanf_s(fileStream, "%f %f %f\n",
+                &arrayVN[countVN].x,
+                &arrayVN[countVN].y,
+                &arrayVN[countVN].z);
+            arrayVN[countVN].z = arrayVN[countVN].z * -1.0f;
+
+            countVN++;
+            assert(countVN < MAX_NB_VN);
+        }
+        else if (strcmp(lineHeader, "vt") == 0) // Read vertex texture coordinates
         {
             const int matches = fscanf_s(fileStream, "%f %f\n",
-                &tempTexCoord[nbTexCoord].x,
-                &tempTexCoord[nbTexCoord].y);
-            nbTexCoord++;
+                &arrayVT[countVT].x,
+                &arrayVT[countVT].y);
+            arrayVT[countVT].y = 1.0f - arrayVT[countVT].y;
+
+            countVT++;
+            assert(countVT < MAX_NB_VT);
         }
         else if (strcmp(lineHeader, "f") == 0) // Read faces informations
         {
-            int matches = fscanf_s(fileStream, "%hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu\n",
-                &tempVertexIndex[nbFace * 3],     &tempUVIndex[nbFace * 3],     &tempNormalIndex[nbFace * 3],
-                &tempVertexIndex[nbFace * 3 + 1], &tempUVIndex[nbFace * 3 + 1], &tempNormalIndex[nbFace * 3 + 1],
-                &tempVertexIndex[nbFace * 3 + 2], &tempUVIndex[nbFace * 3 + 2], &tempNormalIndex[nbFace * 3 + 2] );
+            const int matches = fscanf_s(fileStream, "%hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu\n",
+                  &arrayF[countF + 2].Geometry, &arrayF[countF + 2].Texture, &arrayF[countF + 2].Normal,
+                  &arrayF[countF + 1].Geometry, &arrayF[countF + 1].Texture, &arrayF[countF + 1].Normal,
+                  &arrayF[countF + 0].Geometry, &arrayF[countF + 0].Texture, &arrayF[countF + 0].Normal);
+
+            countF += 3;
+            assert(countF < MAX_NB_F);
+            
             if (matches != 9)
             {
                 TRIGGER_ERROR(); // TODO Julien Rogel (06/11/2024): Need to re-write this parser if it happens
                 return false;
             }
-            nbFace++;
-            if (nbFace * 3 >= MAX_INDEX_BUFFER_INDEXES)
-            {
-                TRIGGER_ERROR();
-                return false;
-            }
         }
     }
-
-    int SuccessFClose = fclose(fileStream);
-    if (SuccessFClose)
+    const int successFileClose = fclose(fileStream);
+    if (successFileClose)
     {
         TRIGGER_ERROR();
         return false;
     }
-    
-    // Copy vertex buffer
-    for (int iVertex = 0; iVertex < nbVertexPos; ++iVertex)
+
+    struct SUniqueFaceElement
     {
-        memcpy(&SMeshInfo->VertexBuffer.Vertices[iVertex].Position, &tempVertexPos[iVertex], sizeof(float3));
-        memcpy(&SMeshInfo->VertexBuffer.Vertices[iVertex].TextureCoordinate, &tempTexCoord[iVertex], sizeof(float2));
-    }
-    SMeshInfo->nbVertexBuffer = nbVertexPos;
+        int V = 0;
+        int VT = 0;
+        int VN = 0;
+        bool IsSame(int inV, int inVT, int inVN) const { return (inV == V) && (inVT == VT) && (inVN == VN); } // Check Normal ??
+        //bool IsSame(int inV, int inVT, int inVN) const { return (inV == V) && (inVT == VT); }
+    };
+    SUniqueFaceElement arrayUniqueF[MAX_NB_F] = {};
     
-    // Copy face buffer | Texture Coordinate
-    int nbIndex = nbFace * 3;
-    size_t sizeFaceBuffer = sizeof(TVertexIndex) * nbIndex;
-    memcpy(SMeshInfo->IndexBuffer.Indexes, tempVertexIndex, sizeFaceBuffer);
-    for (int iIndexBuffer = 0; iIndexBuffer < nbIndex; ++iIndexBuffer)
+    int LastVertexIndex = 0;
+    for (int iFace = 0; iFace < countF; ++iFace)
     {
-        SMeshInfo->IndexBuffer.Indexes[iIndexBuffer] -= 1;
+        const int indexV = arrayF[iFace].Geometry - 1;
+		const int indexVT = arrayF[iFace].Texture - 1;
+		const int indexVN = arrayF[iFace].Normal - 1;
+
+        bool vertexIsADuplicate = false;
+        for (int iCheck = 0; iCheck <= LastVertexIndex; ++iCheck)
+        {
+            if (arrayUniqueF[iCheck].IsSame(indexV, indexVT, indexVN) == true)
+            {
+                AddToIndexBuffer(MeshInfo, static_cast<TVertexIndex>(iCheck));
+                vertexIsADuplicate = true;
+                break;
+            }
+        }
+        if (vertexIsADuplicate == false)
+        {
+            AddToVertexBuffer(MeshInfo, arrayV[indexV], arrayVT[indexVT], arrayVN[indexVN]);
+            arrayUniqueF[LastVertexIndex] = { indexV, indexVT, indexVN };
+            AddToIndexBuffer(MeshInfo, static_cast<TVertexIndex>(LastVertexIndex));
+            LastVertexIndex++;
+        }
     }
-    SMeshInfo->nbIndexBuffer = nbIndex;
     
     return true;
 }

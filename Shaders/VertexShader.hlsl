@@ -1,18 +1,29 @@
-struct VSOut
+cbuffer c_buffer : register(b0)
 {
-    float2 texCoord : TexCoord;
-    float4 position : SV_Position;
+    matrix TRANSFORM;
 };
 
-cbuffer CBuffer
+struct VS_Input
 {
-    matrix transform;
-}
+    float3 position : POSITION;
+    float2 uv : UV;
+    float3 normal : NORMAL;
+};
 
-VSOut main(float3 position : Position, float2 texCoord: TexCoord)
+struct VS_Output
 {
-    VSOut vso;
-    vso.texCoord = texCoord;
-    vso.position = mul(float4(position, 1.0f), transform);
-    return vso;
+    float2 uv : UV;
+    float4 position : SV_POSITION;
+    float3 normal : NORMAL;
+};
+
+VS_Output main(VS_Input input)
+{
+    VS_Output output;
+
+    output.position = mul(float4(input.position, 1.0f), TRANSFORM);
+    output.uv = input.uv;
+    output.normal = input.normal;
+
+    return output;
 }

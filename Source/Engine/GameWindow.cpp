@@ -17,7 +17,12 @@
 
 namespace dx = DirectX;
 
-#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/"
+#define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
+//#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
+
+//#define MESH_TO_IMPORT L"Cube"
+#define MESH_TO_IMPORT L"Suzanne"
+//#define MESH_TO_IMPORT L"Square"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
@@ -45,6 +50,9 @@ ID3D11DepthStencilView* DXDepthStencilView = nullptr;
 float rr, gg, bb = 0.0f;
 float XPositionCursor, YPositionCursor = 0.0f;
 float ZPositionCube = 0.0f;
+float AngleXShape = 0.0f;
+float AngleZShape = 0.0f;
+float AngleYShape = 0.0f;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
@@ -170,6 +178,16 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             {
                 PostQuitMessage(1);
             }
+            
+            if (wParam == 'Q') AngleZShape += 0.05f;
+            if (wParam == 'E') AngleZShape -= 0.05f;
+            
+            if (wParam == 'W') AngleXShape += 0.05f;
+            if (wParam == 'S') AngleXShape -= 0.05f;
+            
+            if (wParam == 'D') AngleYShape -= 0.05f;
+            if (wParam == 'A') AngleYShape += 0.05f;
+            
             if (wParam == 'R') rr > 0.0f ? rr = 0.0f : rr = 1.0f;
             if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
             if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
@@ -233,10 +251,10 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float Angle)
+void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float AngleX, const float AngleY, const float AngleZ)
 {
-    SMeshInfo meshInfoCube = {};
-    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(GAME_DATA_PATH L"Suzanne.obj", &meshInfoCube);
+    SMeshInfo meshInfo = {};
+    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(GAME_DATA_PATH MESH_TO_IMPORT L".obj", &meshInfo);
     assert(successImportingMesh);
  
     // Create Vertex Buffer and bind it to the pipeline
@@ -246,11 +264,11 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(SVertex) * meshInfoCube.nbVertexBuffer;
+        bufferDesc.ByteWidth = sizeof(SVertex) * meshInfo.nbVertexBuffer;
         bufferDesc.StructureByteStride = sizeof(SVertex);
 
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = &meshInfoCube.VertexBuffer;
+        subResourceData.pSysMem = &meshInfo.VertexBuffer;
 
         ID3D11Buffer* vertexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &vertexBuffer));
@@ -267,11 +285,11 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(TVertexIndex) * meshInfoCube.nbIndexBuffer;
+        bufferDesc.ByteWidth = sizeof(TVertexIndex) * meshInfo.nbIndexBuffer;
         bufferDesc.StructureByteStride = sizeof(TVertexIndex);
         
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = meshInfoCube.IndexBuffer.Indexes;
+        subResourceData.pSysMem = meshInfo.IndexBuffer.Indexes;
         
         ID3D11Buffer* indexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &indexBuffer));
@@ -291,8 +309,9 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         } constantBufferData =
         {
             dx::XMMatrixTranspose(
-                dx::XMMatrixRotationZ(Angle) 
-                * dx::XMMatrixRotationX(Angle)
+                  dx::XMMatrixRotationX(AngleX)
+                * dx::XMMatrixRotationY(AngleY) 
+                * dx::XMMatrixRotationZ(AngleZ) 
                 * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
                 * dx::XMMatrixTranslation(xOffset, yOffset, zOffset)
                 * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 1000.0f)
@@ -325,15 +344,16 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         DXImmediateContext->VSSetShader(vertexShader, nullptr, 0u);
         vertexShader->Release();
 
-        // Input Layout for 2d vertex
+        // Input Layout for 3d vertex
         {
             ID3D11InputLayout* inputLayout;
             constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
             {
-                { "Position", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA, 0u },
-                { "TexCoord",0,DXGI_FORMAT_R32G32_FLOAT,0,24,D3D11_INPUT_PER_VERTEX_DATA,0 },
-            };
-            UINT sizeInputElementDesc = 2u;
+                { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+                { "UV",  0u,  DXGI_FORMAT_R32G32_FLOAT,     0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+                { "NORMAL",    0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+				};
+            UINT sizeInputElementDesc = 3u;
             CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, sizeInputElementDesc, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
             DXImmediateContext->IASetInputLayout(inputLayout);
             inputLayout->Release();
@@ -392,7 +412,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         
         ID3D11Resource* texture = nullptr;
         ID3D11ShaderResourceView* textureView = nullptr;
-        CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, GAME_DATA_PATH L"TextureTest.bmp", &texture, &textureView, 0));
+        CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, GAME_DATA_PATH MESH_TO_IMPORT L".bmp", &texture, &textureView, 0));
         texture->Release();
         DXImmediateContext->PSSetShaderResources(0u, 1u, &textureView);
     }
@@ -401,9 +421,13 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     {
         D3D11_SAMPLER_DESC samplerDesc = {};
         samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.BorderColor[0] = SColor::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = SColor::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = SColor::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[3] = 1.0f;
         
         ID3D11SamplerState* samplerState = nullptr;
         CHECK_HRESULT(DXDevice->CreateSamplerState(&samplerDesc, &samplerState));
@@ -423,7 +447,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     }
 
     DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    DXImmediateContext->DrawIndexed(meshInfoCube.nbIndexBuffer,  0u, 0);
+    DXImmediateContext->DrawIndexed(meshInfo.nbIndexBuffer,  0u, 0);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
@@ -445,11 +469,11 @@ void JuProject::DoFrame(const float dt)
     static float AngleShape = 0.0f;
     AngleShape += 0.25f * dt;
     
-    DrawCube(0.0f, 0.0f, 4.0f, AngleShape + 20.0f);
+    //DrawCube(0.0f, 0.0f, 4.0f, AngleShape, AngleShape, AngleShape);
 
     float XPositionCube = (XPositionCursor / WindowSizeX * 2.0f) - 1.0f;
     float YPositionCube = -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f;
-    DrawCube(XPositionCube, YPositionCube, 4.0f + ZPositionCube, AngleShape);
+    DrawCube(XPositionCube, YPositionCube, 4.0f + ZPositionCube, AngleXShape, AngleYShape, AngleZShape);
     
     EndFrame();
 }
