@@ -22,8 +22,8 @@ VS_Output main(VS_Input input)
     VS_Output output;
 
     output.position = mul(float4(input.position, 1.0f), TRANSFORM);
+    output.normal = mul(float3(input.normal), TRANSFORM);
     output.uv = input.uv;
-    output.normal = input.normal;
 
     return output;
 }

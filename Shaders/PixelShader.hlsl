@@ -8,10 +8,19 @@ struct PS_Input
 Texture2D texColor : register(t0);
 SamplerState samplerState;
 
+cbuffer c_buffer : register(b0)
+{
+    float3 worldLightDir;
+    float worldLightAmbient; 
+};
+
 float4 main(PS_Input input) : SV_Target
 {
-    //return float4(input.normal, 1.0f);
-    //return float4(input.position);
-    //return float4(input.uv, 1.0f, 1.0f);
-    return texColor.Sample(samplerState, input.uv);
+    input.normal = normalize(input.normal);
+
+    float4 Color = texColor.Sample(samplerState, input.uv);
+    float4 AmbiantColor = Color * worldLightAmbient;
+    float3 finalColor = AmbiantColor + saturate(dot(worldLightDir, input.normal) * Color);
+    
+    return float4(finalColor, 1.0f);
 }

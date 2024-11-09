@@ -360,22 +360,23 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         }
         vsBlob->Release();
     }
+
+    __declspec(align(16)) struct SWorldLight
+    {
+        float3 Direction = {0.0f, 0.0f, 0.0};
+        float Ambient = 0.0f;
+    };
     
     // Create a pixel shader constant buffer with the face colors
     {
-        struct SConstantBufferPixelShader
+        __declspec(align(16)) struct SConstantBufferPixelShader
         {
-            SColorFloat FaceColors[6];
+            SWorldLight WorldLight;
         };
 
         SConstantBufferPixelShader ConstantBufferPixelShader =
         {
-            SColor::Red.ToFloat(),
-            SColor::Green.ToFloat(),
-            SColor::Blue.ToFloat(),
-            SColor::Magenta.ToFloat(),
-            SColor::Yellow.ToFloat(),
-            SColor::Cyan.ToFloat(),
+            {{ 0.0f, 1.0f, 0.0f }, 0.1f }
         };
 
         D3D11_BUFFER_DESC bufferDesc = {};
