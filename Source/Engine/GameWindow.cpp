@@ -20,9 +20,10 @@ namespace dx = DirectX;
 #define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
 //#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
 
-//#define MESH_TO_IMPORT L"Cube"
-#define MESH_TO_IMPORT L"Suzanne"
 //#define MESH_TO_IMPORT L"Square"
+//#define MESH_TO_IMPORT L"Cube"
+#define MESH_TO_IMPORT L"Sphere"
+//#define MESH_TO_IMPORT L"Suzanne"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
@@ -363,7 +364,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
 
     __declspec(align(16)) struct SWorldLight
     {
-        float3 Direction = {0.0f, 0.0f, 0.0};
+        float3 Direction = {0.37f, 0.93f, 0.0};
         float Ambient = 0.0f;
     };
     

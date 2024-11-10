@@ -4,7 +4,7 @@
 
 
 #define MAX_NB_V 1024
-#define MAX_NB_VN 2048
+#define MAX_NB_VN 4096
 #define MAX_NB_VT 4096
 #define MAX_NB_F 4096
 
