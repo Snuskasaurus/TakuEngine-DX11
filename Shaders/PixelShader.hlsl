@@ -18,9 +18,13 @@ float4 main(PS_Input input) : SV_Target
 {
     input.normal = normalize(input.normal);
 
-    float4 Color = texColor.Sample(samplerState, input.uv);
-    float4 AmbiantColor = Color * worldLightAmbient;
-    float3 finalColor = AmbiantColor + saturate(dot(worldLightDir, input.normal) * Color);
+    float3 Color = texColor.Sample(samplerState, input.uv);
+    float Ambiant = worldLightAmbient;
+    float Diffuse = max(dot(worldLightDir, input.normal), 0.0);
+
+    float Specular = pow(Diffuse, 32.0) * 4.2;
     
-    return float4(finalColor, 1.0f);
+    float3 finalColor = Color * (Ambiant + Diffuse + Specular);
+    
+    return float4(min(finalColor, 1.0), 1.0);
 }
