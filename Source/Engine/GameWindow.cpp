@@ -23,7 +23,8 @@ namespace dx = DirectX;
 //#define MESH_TO_IMPORT L"Square"
 //#define MESH_TO_IMPORT L"Cube"
 //#define MESH_TO_IMPORT L"Sphere"
-#define MESH_TO_IMPORT L"Suzanne"
+//#define MESH_TO_IMPORT L"Suzanne"
+#define MESH_TO_IMPORT L"Crate"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
@@ -377,7 +378,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
 
         SConstantBufferPixelShader ConstantBufferPixelShader =
         {
-            {{ 0.44f, 0.87f, 0.22f }, 0.05f }
+            {{ 0.44f, 0.87f, 0.22f }, 0.15f }
         };
 
         D3D11_BUFFER_DESC bufferDesc = {};

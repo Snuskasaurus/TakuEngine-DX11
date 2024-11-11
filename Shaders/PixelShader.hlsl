@@ -21,7 +21,6 @@ float4 main(PS_Input input) : SV_Target
     float3 Color = texColor.Sample(samplerState, input.uv);
     float Ambiant = worldLightAmbient;
     float Diffuse = max(dot(worldLightDir, input.normal), 0.0);
-
     float Specular = pow(Diffuse, 32.0) * 4.2;
     
     float3 finalColor = Color * (Ambiant + Diffuse + Specular);
