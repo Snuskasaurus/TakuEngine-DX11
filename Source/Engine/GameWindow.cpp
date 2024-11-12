@@ -427,10 +427,10 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.BorderColor[0] = SColor::Magenta.ToFloat().r;
-        samplerDesc.BorderColor[1] = SColor::Magenta.ToFloat().g;
-        samplerDesc.BorderColor[2] = SColor::Magenta.ToFloat().b;
-        samplerDesc.BorderColor[3] = 1.0f;
+        samplerDesc.BorderColor[0] = TFloatColor::Magenta.r;
+        samplerDesc.BorderColor[1] = TFloatColor::Magenta.g;
+        samplerDesc.BorderColor[2] = TFloatColor::Magenta.b;
+        samplerDesc.BorderColor[3] = TFloatColor::Magenta.a;
         
         ID3D11SamplerState* samplerState = nullptr;
         CHECK_HRESULT(DXDevice->CreateSamplerState(&samplerDesc, &samplerState));
