@@ -17,14 +17,14 @@
 
 namespace dx = DirectX;
 
-#define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
-//#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
+//#define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
+#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
 
 //#define MESH_TO_IMPORT L"Square"
 //#define MESH_TO_IMPORT L"Cube"
 //#define MESH_TO_IMPORT L"Sphere"
-//#define MESH_TO_IMPORT L"Suzanne"
-#define MESH_TO_IMPORT L"Crate"
+#define MESH_TO_IMPORT L"Suzanne"
+//#define MESH_TO_IMPORT L"Crate"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
@@ -308,18 +308,18 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         struct SConstantBuffer
         {
             dx::XMMATRIX transform; 
-        } constantBufferData =
-        {
-            dx::XMMatrixTranspose(
-                  dx::XMMatrixRotationX(AngleX)
-                * dx::XMMatrixRotationY(AngleY) 
-                * dx::XMMatrixRotationZ(AngleZ) 
-                * dx::XMMatrixScaling(0.45f, 0.45f, 0.45f)
-                * dx::XMMatrixTranslation(xOffset, yOffset, zOffset)
-                * dx::XMMatrixPerspectiveLH(1.0f, ScreenRatio, 0.5f, 1000.0f)
-                )
         };
-    
+
+        SConstantBuffer constantBufferData;
+        constantBufferData.transform = dx::XMMatrixRotationX(AngleX);
+        constantBufferData.transform *= dx::XMMatrixRotationY(AngleY);
+        constantBufferData.transform *= dx::XMMatrixRotationZ(AngleZ);
+        constantBufferData.transform *= dx::XMMatrixScaling(0.45f, 0.45f, 0.45f);
+        constantBufferData.transform *= dx::XMMatrixTranslation(xOffset, yOffset, zOffset);
+        constantBufferData.transform *= dx::XMMatrixPerspectiveRH(1.0f, ScreenRatio, 0.5f, 1000.0f);
+
+        constantBufferData.transform = dx::XMMatrixTranspose(constantBufferData.transform);
+        
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
         bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -476,7 +476,7 @@ void JuProject::DoFrame(const float dt)
 
     float XPositionCube = (XPositionCursor / WindowSizeX * 2.0f) - 1.0f;
     float YPositionCube = -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f;
-    DrawCube(XPositionCube, YPositionCube, 4.0f + ZPositionCube, AngleXShape, AngleYShape, AngleZShape);
+    DrawCube(0.0f, 0.0f, -5.0f + ZPositionCube, AngleXShape, AngleYShape, AngleZShape);
     
     EndFrame();
 }

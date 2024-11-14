@@ -76,7 +76,6 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
                 &arrayV[countV].x,
                 &arrayV[countV].y,
                 &arrayV[countV].z);
-            arrayV[countV].z = arrayV[countV].z * -1.0f;
 
             countV++;
             assert(countV < MAX_NB_V);
@@ -87,7 +86,6 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
                 &arrayVN[countVN].x,
                 &arrayVN[countVN].y,
                 &arrayVN[countVN].z);
-            arrayVN[countVN].z = arrayVN[countVN].z * -1.0f;
 
             countVN++;
             assert(countVN < MAX_NB_VN);
@@ -97,7 +95,6 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
             const int matches = fscanf_s(fileStream, "%f %f\n",
                 &arrayVT[countVT].x,
                 &arrayVT[countVT].y);
-            arrayVT[countVT].y = 1.0f - arrayVT[countVT].y;
 
             countVT++;
             assert(countVT < MAX_NB_VT);
@@ -105,9 +102,9 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
         else if (strcmp(lineHeader, "f") == 0) // Read faces informations
         {
             const int matches = fscanf_s(fileStream, "%hu/%hu/%hu %hu/%hu/%hu %hu/%hu/%hu\n",
-                  &arrayF[countF + 2].Geometry, &arrayF[countF + 2].Texture, &arrayF[countF + 2].Normal,
+                  &arrayF[countF + 0].Geometry, &arrayF[countF + 0].Texture, &arrayF[countF + 0].Normal,
                   &arrayF[countF + 1].Geometry, &arrayF[countF + 1].Texture, &arrayF[countF + 1].Normal,
-                  &arrayF[countF + 0].Geometry, &arrayF[countF + 0].Texture, &arrayF[countF + 0].Normal);
+                  &arrayF[countF + 2].Geometry, &arrayF[countF + 2].Texture, &arrayF[countF + 2].Normal);
 
             countF += 3;
             assert(countF < MAX_NB_F);
