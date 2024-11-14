@@ -1,6 +1,6 @@
 cbuffer c_buffer : register(b0)
 {
-    matrix TRANSFORM;
+    matrix WORLD_VIEW_PROJECTION;
 };
 
 struct VS_Input
@@ -21,7 +21,7 @@ VS_Output main(VS_Input input)
 {
     VS_Output output;
 
-    output.position = mul(float4(input.position, 1.0f), TRANSFORM);
+    output.position = mul(float4(input.position, 1.0f), WORLD_VIEW_PROJECTION);
     //output.normal = mul(float3(input.normal), TRANSFORM);
     output.normal = input.normal;
     

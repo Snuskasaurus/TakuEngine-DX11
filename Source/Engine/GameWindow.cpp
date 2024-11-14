@@ -17,8 +17,8 @@
 
 namespace dx = DirectX;
 
-//#define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
-#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
+#define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
+//#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
 
 //#define MESH_TO_IMPORT L"Square"
 //#define MESH_TO_IMPORT L"Cube"
@@ -37,7 +37,7 @@ constexpr int DefaultWindowPositionX = 320;
 constexpr int DefaultWindowPositionY = 150;
 constexpr int WindowSizeX = 1680;
 constexpr int WindowSizeY = 600;
-float ScreenRatio = (float)WindowSizeY / (float)WindowSizeX;
+float ScreenRatio = (float)WindowSizeX / (float)WindowSizeY;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // DirectX
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -301,24 +301,25 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     
     // Create a vertex shader constant buffer with the transformation matrix and bind it to the pipeline
     {
-        struct SMatrix
-        {
-            float values[4][4];
-        };
         struct SConstantBuffer
         {
-            dx::XMMATRIX transform; 
+            dx::XMMATRIX WorldViewProjection; 
         };
 
-        SConstantBuffer constantBufferData;
-        constantBufferData.transform = dx::XMMatrixRotationX(AngleX);
-        constantBufferData.transform *= dx::XMMatrixRotationY(AngleY);
-        constantBufferData.transform *= dx::XMMatrixRotationZ(AngleZ);
-        constantBufferData.transform *= dx::XMMatrixScaling(0.45f, 0.45f, 0.45f);
-        constantBufferData.transform *= dx::XMMatrixTranslation(xOffset, yOffset, zOffset);
-        constantBufferData.transform *= dx::XMMatrixPerspectiveRH(1.0f, ScreenRatio, 0.5f, 1000.0f);
+        dx::FXMVECTOR CameraEyePosition = dx::XMVectorSet( 0.0f, 0.0f, -0.05f, 0.0f );
+        dx::FXMVECTOR CameraTargetPosition = dx::XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
+        dx::FXMVECTOR CameraUpDirection = dx::XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+        
+        DirectX::XMMATRIX World = dx::XMMatrixIdentity();
+        DirectX::XMMATRIX Rotation = dx::XMMatrixRotationX(AngleX) * dx::XMMatrixRotationY(AngleY) * dx::XMMatrixRotationZ(AngleZ);
+        DirectX::XMMATRIX Translation = dx::XMMatrixTranslation(xOffset, yOffset, zOffset);
+        World = Rotation * Translation;
+            
+        DirectX::XMMATRIX CameraView = dx::XMMatrixLookAtRH(CameraEyePosition, CameraTargetPosition, CameraUpDirection);
+        DirectX::XMMATRIX CameraProjection = dx::XMMatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
 
-        constantBufferData.transform = dx::XMMatrixTranspose(constantBufferData.transform);
+        SConstantBuffer constantBufferData;
+        constantBufferData.WorldViewProjection = dx::XMMatrixTranspose(World * CameraView * CameraProjection);
         
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -348,14 +349,14 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
 
         // Input Layout for 3d vertex
         {
-            ID3D11InputLayout* inputLayout;
             constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
             {
                 { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
                 { "UV",  0u,  DXGI_FORMAT_R32G32_FLOAT,     0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
                 { "NORMAL",    0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-				};
+                };
             UINT sizeInputElementDesc = 3u;
+            ID3D11InputLayout* inputLayout;
             CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, sizeInputElementDesc, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
             DXImmediateContext->IASetInputLayout(inputLayout);
             inputLayout->Release();
@@ -436,6 +437,25 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         CHECK_HRESULT(DXDevice->CreateSamplerState(&samplerDesc, &samplerState));
         DXImmediateContext->PSSetSamplers(0, 1, &samplerState);
     }
+
+    {
+        D3D11_RASTERIZER_DESC rasterizerDesc = {};
+        rasterizerDesc.AntialiasedLineEnable = true;
+        rasterizerDesc.CullMode = D3D11_CULL_BACK;
+        rasterizerDesc.DepthBias = 0;
+        rasterizerDesc.DepthBiasClamp = 0.0f;
+        rasterizerDesc.DepthClipEnable = true;
+        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+        rasterizerDesc.FrontCounterClockwise = true;
+        rasterizerDesc.MultisampleEnable = false;
+        rasterizerDesc.ScissorEnable = false;
+        rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+    
+        ID3D11RasterizerState* rasterizerState = nullptr;
+        CHECK_HRESULT(DXDevice->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
+        DXImmediateContext->RSSetState(rasterizerState);
+    }
+
     
     // Configure Viewport
     {
@@ -448,7 +468,6 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         viewport.MaxDepth = 1.0f;
         DXImmediateContext->RSSetViewports(1u, &viewport);
     }
-
     DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     DXImmediateContext->DrawIndexed(meshInfo.nbIndexBuffer,  0u, 0);
 }
@@ -476,7 +495,7 @@ void JuProject::DoFrame(const float dt)
 
     float XPositionCube = (XPositionCursor / WindowSizeX * 2.0f) - 1.0f;
     float YPositionCube = -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f;
-    DrawCube(0.0f, 0.0f, -5.0f + ZPositionCube, AngleXShape, AngleYShape, AngleZShape);
+    DrawCube(0.0f, 0.0f, 4.0f + ZPositionCube, AngleXShape, AngleYShape, AngleZShape);
     
     EndFrame();
 }

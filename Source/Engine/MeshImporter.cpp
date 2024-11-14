@@ -95,6 +95,7 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
             const int matches = fscanf_s(fileStream, "%f %f\n",
                 &arrayVT[countVT].x,
                 &arrayVT[countVT].y);
+            arrayVT[countVT].y = 1.0f - arrayVT[countVT].y;
 
             countVT++;
             assert(countVT < MAX_NB_VT);
