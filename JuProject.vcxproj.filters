@@ -16,17 +16,17 @@
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Engine\Color.cpp" />
     <ClCompile Include="Source\Engine\HResultHandler.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\VertexShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PixelShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <ClCompile Include="Source\Engine\Math.cpp" />
+    <ClCompile Include="Source\Engine\MeshImporter.cpp" />
+    <ClCompile Include="Source\Engine\Shaders.cpp" />
+    <ClCompile Include="Source\Engine\WICTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\Color.h" />
     <ClInclude Include="Source\Engine\HResultHandler.h" />
+    <ClInclude Include="Source\Engine\Math.h" />
+    <ClInclude Include="Source\Engine\MeshImporter.h" />
+    <ClInclude Include="Source\Engine\Shaders.h" />
+    <ClInclude Include="Source\Engine\WICTextureLoader.h" />
   </ItemGroup>
 </Project>
