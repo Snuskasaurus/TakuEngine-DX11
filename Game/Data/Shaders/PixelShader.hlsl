@@ -14,7 +14,7 @@ cbuffer c_buffer : register(b0)
     float worldLightAmbient; 
 };
 
-float4 main(PS_Input input) : SV_Target
+float4 Main(PS_Input input) : SV_Target
 {
     input.normal = normalize(input.normal);
 

@@ -1,38 +1,26 @@
 ﻿#pragma once
 
 #include <sal.h>
+#include "Math.h"
 
 #define MAX_VERTEX_BUFFER_VERTICES 4096
 #define MAX_INDEX_BUFFER_INDEXES 4096
 
 using TVertexIndex = unsigned short;
 
-struct float2
+struct alignas(16) SVertex
 {
-    float x = 0.0f;
-    float y = 0.0f;
+    TVector3f vp;
+    TVector2f vt;
+    TVector3f vn;
 };
 
-struct float3
-{
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-};
-
-struct SVertex
-{
-    float3 vp;
-    float2 vt;
-    float3 vn;
-};
-
-struct SVertexBuffer
+struct alignas(16) SVertexBuffer
 {
     SVertex Vertices[MAX_VERTEX_BUFFER_VERTICES];
 };
 
-struct IndexBuffer
+struct alignas(16) IndexBuffer
 {
     TVertexIndex Indexes[MAX_INDEX_BUFFER_INDEXES];
 };

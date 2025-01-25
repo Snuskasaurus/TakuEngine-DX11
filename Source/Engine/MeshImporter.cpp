@@ -22,7 +22,7 @@ struct SFaceElement
 };
 
 
-void AddToVertexBuffer(_Out_ SMeshInfo* MeshInfo, const float3 vp, const float2 vt, const float3 vn)
+void AddToVertexBuffer(_Out_ SMeshInfo* MeshInfo, const TVector3f vp, const TVector2f vt, const TVector3f vn)
 {
     MeshInfo->VertexBuffer.Vertices[MeshInfo->nbVertexBuffer].vp = vp;
     MeshInfo->VertexBuffer.Vertices[MeshInfo->nbVertexBuffer].vt = vt;
@@ -49,13 +49,13 @@ bool TryToImportMeshInfoFromOBJFile(_In_ const wchar_t* _fileName, _Out_ SMeshIn
     }
     
     int countV = 0;
-    float3 arrayV[MAX_NB_V] = {};
+    TVector3f arrayV[MAX_NB_V] = {};
     
     int countVN = 0;
-    float3 arrayVN[MAX_NB_VN] = {};
+    TVector3f arrayVN[MAX_NB_VN] = {};
     
     int countVT = 0;
-    float2 arrayVT[MAX_NB_VT] = {};
+    TVector2f arrayVT[MAX_NB_VT] = {};
     
     int countF = 0;
     SFaceElement arrayF[MAX_NB_F] = {};

@@ -8,17 +8,20 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <dxgiformat.h>
-#include <iterator>
 
+#include "Math.h"
 #include "Color.h"
+
 #include "HResultHandler.h"
+
 #include "MeshImporter.h"
+#include "Shaders.h"
 #include "WICTextureLoader.h"
 
 namespace dx = DirectX;
 
-#define GAME_DATA_PATH L"D:/Projects/JuProject/Game/Data/" // 1st PC
-//#define GAME_DATA_PATH L"E:/Perso/JuProject/Game/Data/" // 2nd PC
+#define GAME_DATA_PATH L"Game/Data/"
+#define GAME_DATA_SHADER_PATH L"Game/Data/Shaders/"
 
 //#define MESH_TO_IMPORT L"Square"
 //#define MESH_TO_IMPORT L"Cube"
@@ -51,7 +54,7 @@ ID3D11DepthStencilView* DXDepthStencilView = nullptr;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 float rr, gg, bb = 0.0f;
 float XPositionCursor, YPositionCursor = 0.0f;
-float ZPositionCube = 0.0f;
+float ZOffsetPositionCamera = -5.0f;
 float AngleXShape = 0.0f;
 float AngleZShape = 0.0f;
 float AngleYShape = 0.0f;
@@ -197,7 +200,7 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     case WM_MOUSEWHEEL:
         {
             short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-            ZPositionCube += (float)zDelta * 0.0025f;
+            ZOffsetPositionCamera += (float)zDelta * 0.0025f;
         } break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -298,29 +301,29 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         DXImmediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0u);
         indexBuffer->Release();
     }
-    
+
     // Create a vertex shader constant buffer with the transformation matrix and bind it to the pipeline
     {
         struct SConstantBuffer
         {
-            dx::XMMATRIX WorldViewProjection; 
+            TMatrix4f WorldViewProjection; 
         };
 
-        dx::FXMVECTOR CameraEyePosition = dx::XMVectorSet( 0.0f, 0.0f, -0.05f, 0.0f );
-        dx::FXMVECTOR CameraTargetPosition = dx::XMVectorSet( 0.0f, 0.0f, 0.0f, 0.0f );
-        dx::FXMVECTOR CameraUpDirection = dx::XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
-        
-        DirectX::XMMATRIX World = dx::XMMatrixIdentity();
-        DirectX::XMMATRIX Rotation = dx::XMMatrixRotationX(AngleX) * dx::XMMatrixRotationY(AngleY) * dx::XMMatrixRotationZ(AngleZ);
-        DirectX::XMMATRIX Translation = dx::XMMatrixTranslation(xOffset, yOffset, zOffset);
-        World = Rotation * Translation;
-            
-        DirectX::XMMATRIX CameraView = dx::XMMatrixLookAtRH(CameraEyePosition, CameraTargetPosition, CameraUpDirection);
-        DirectX::XMMATRIX CameraProjection = dx::XMMatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
+        auto cameraEyePosition = TVector3f( 0.0f, 0.0f, ZOffsetPositionCamera);
+        auto cameraTargetPosition = TVector3f( 0.0f, 0.0f, 0.0f);
+        auto cameraUpDirection = TVector3f( 0.0f, 1.0f, 0.0f);
+
+        TMatrix4f worldMatrix = TMatrix4f::Identity;
+        TMatrix4f rotation = TMatrix4f::MatrixRotationX(AngleX) * TMatrix4f::MatrixRotationY(AngleY) * TMatrix4f::MatrixRotationZ(AngleZ);
+        TMatrix4f translation = TMatrix4f::MatrixTranslation({xOffset, yOffset, zOffset });
+        worldMatrix = rotation * translation;
+
+        TMatrix4f cameraView = TMatrix4f::MatrixLookAtRH(cameraEyePosition, cameraTargetPosition, cameraUpDirection);
+        TMatrix4f cameraProjection = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
 
         SConstantBuffer constantBufferData;
-        constantBufferData.WorldViewProjection = dx::XMMatrixTranspose(World * CameraView * CameraProjection);
-        
+        constantBufferData.WorldViewProjection = TMatrix4f::Transpose(worldMatrix * cameraView * cameraProjection);
+
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
         bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -328,7 +331,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         bufferDesc.MiscFlags = 0u;
         bufferDesc.ByteWidth = sizeof(constantBufferData);
         bufferDesc.StructureByteStride = 0u;
-        
+
         D3D11_SUBRESOURCE_DATA subResourceData = {};
         subResourceData.pSysMem = &constantBufferData;
         
@@ -341,7 +344,8 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     // Create VertexShader and bind it to the pipeline
     {
         ID3DBlob* vsBlob = nullptr;
-        CHECK_HRESULT(D3DReadFileToBlob(L"VertexShader.cso", &vsBlob));
+        CompileShader(GAME_DATA_SHADER_PATH L"VertexShader.hlsl", "vs_5_0", &vsBlob);
+        //CHECK_HRESULT(D3DReadFileToBlob(, &vsBlob));
         ID3D11VertexShader* vertexShader = nullptr;
         CHECK_HRESULT(DXDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShader));
         DXImmediateContext->VSSetShader(vertexShader, nullptr, 0u);
@@ -366,7 +370,7 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
 
     __declspec(align(16)) struct SWorldLight
     {
-        float3 Direction = {0.37f, 0.93f, 0.0};
+        TVector3f Direction = {0.37f, 0.93f, 0.0};
         float Ambient = 0.0f;
     };
     
@@ -402,7 +406,8 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
     // Create PixelShader and bind it to the pipeline
     {
         ID3DBlob* psBlob = nullptr;
-        CHECK_HRESULT(D3DReadFileToBlob(L"PixelShader.cso", &psBlob));
+        CompileShader(GAME_DATA_SHADER_PATH L"PixelShader.hlsl", "ps_5_0", &psBlob);
+        //CHECK_HRESULT(D3DReadFileToBlob(L".cso", &psBlob));
         ID3D11PixelShader* pixelShader = nullptr;
         CHECK_HRESULT(DXDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pixelShader));
         psBlob->Release();
@@ -490,12 +495,11 @@ void JuProject::DoFrame(const float dt)
 
     static float AngleShape = 0.0f;
     AngleShape += 0.25f * dt;
-    
     //DrawCube(0.0f, 0.0f, 4.0f, AngleShape, AngleShape, AngleShape);
 
     float XPositionCube = (XPositionCursor / WindowSizeX * 2.0f) - 1.0f;
     float YPositionCube = -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f;
-    DrawCube(0.0f, 0.0f, 4.0f + ZPositionCube, AngleXShape, AngleYShape, AngleZShape);
+    DrawCube(0.0f, 0.0f, 0.0f, AngleXShape, AngleYShape, AngleZShape);
     
     EndFrame();
 }
