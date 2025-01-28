@@ -1,8 +1,53 @@
 ﻿#include "Math.h"
 
-#include <cmath>
-#include <cassert>
+#include <corecrt_math.h>
+#include <DirectXMath.h>
 
+//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------- DirectX Conversions
+//----------------------------------------------------------------------------------------------------------------------
+static DirectX::FXMVECTOR ToDirectXVector(const TVector3f& _v)
+{
+    return  { _v.x, _v.y, _v.z, 0.0f };
+}
+//----------------------------------------------------------------------------------------------------------------------
+static auto FromDirectXVector(const DirectX::FXMVECTOR& _v) -> TVector3f
+{
+    TVector3f result;
+    result.x = DirectX::XMVectorGetX(_v);
+    result.y = DirectX::XMVectorGetY(_v);
+    result.z = DirectX::XMVectorGetZ(_v);
+    return result;
+}
+//----------------------------------------------------------------------------------------------------------------------
+TMatrix4f FromDirectXMatrix(const DirectX::XMMATRIX& _matrix)
+{
+#define DX_GET_X(v) DirectX::XMVectorGetX(_matrix.r[v])
+#define DX_GET_Y(v) DirectX::XMVectorGetY(_matrix.r[v])
+#define DX_GET_Z(v) DirectX::XMVectorGetZ(_matrix.r[v])
+#define DX_GET_W(v) DirectX::XMVectorGetW(_matrix.r[v])
+    return
+    {
+		    { DX_GET_X(0),   DX_GET_Y(0),   DX_GET_Z(0),   DX_GET_W(0) },
+            { DX_GET_X(1),   DX_GET_Y(1),   DX_GET_Z(1),   DX_GET_W(1) },
+            { DX_GET_X(2),   DX_GET_Y(2),   DX_GET_Z(2),   DX_GET_W(2) },
+            { DX_GET_X(3),   DX_GET_Y(3),   DX_GET_Z(3),   DX_GET_W(3) }
+    };
+#undef DX_GET_W
+#undef DX_GET_Z
+#undef DX_GET_Y
+#undef DX_GET_X
+}
+//----------------------------------------------------------------------------------------------------------------------
+DirectX::XMMATRIX ToDirectXMatrix(const TMatrix4f& _matrix)
+{
+    return DirectX::XMMatrixSet(_matrix.x.x, _matrix.x.y, _matrix.x.z, _matrix.x.w,
+                                _matrix.y.x, _matrix.y.y, _matrix.y.z, _matrix.y.w,
+                                _matrix.z.x, _matrix.z.y, _matrix.z.z, _matrix.z.w,
+                                _matrix.w.x, _matrix.w.y, _matrix.w.z, _matrix.w.w);
+}
+//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------- Math Common
 //----------------------------------------------------------------------------------------------------------------------
 float Math::Square(const float _f)
 {
@@ -29,6 +74,15 @@ float Math::Abs(const float _f)
     return fabsf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------- TVector3f
+//----------------------------------------------------------------------------------------------------------------------
+TVector3f TVector3f::TransformCoord(const TVector3f& _v, const TMatrix4f& _m)
+{
+    return FromDirectXVector(DirectX::XMVector3TransformCoord(ToDirectXVector(_v), ToDirectXMatrix(_m)));
+}
+//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------- TMatrix4f
+//----------------------------------------------------------------------------------------------------------------------
 const TMatrix4f TMatrix4f::Identity =
 {
     { 1.0f, 0.0f, 0.0f, 0.0f },
@@ -36,40 +90,18 @@ const TMatrix4f TMatrix4f::Identity =
     { 0.0f, 0.0f, 1.0f, 0.0f },
     { 0.0f, 0.0f, 0.0f, 1.0f },
 };
-//----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::FromDirectXMatrix(const DirectX::XMMATRIX& _matrix)
-{
-#define DX_GET_X(v) DirectX::XMVectorGetX(_matrix.r[v])
-#define DX_GET_Y(v) DirectX::XMVectorGetY(_matrix.r[v])
-#define DX_GET_Z(v) DirectX::XMVectorGetZ(_matrix.r[v])
-#define DX_GET_W(v) DirectX::XMVectorGetW(_matrix.r[v])
-    return
-	{
-		{ DX_GET_X(0),   DX_GET_Y(0),   DX_GET_Z(0),   DX_GET_W(0) },
-		{ DX_GET_X(1),   DX_GET_Y(1),   DX_GET_Z(1),   DX_GET_W(1) },
-		{ DX_GET_X(2),   DX_GET_Y(2),   DX_GET_Z(2),   DX_GET_W(2) },
-		{ DX_GET_X(3),   DX_GET_Y(3),   DX_GET_Z(3),   DX_GET_W(3) }
-	};
-#undef DX_GET_W
-#undef DX_GET_Z
-#undef DX_GET_Y
-#undef DX_GET_X
-}
-//----------------------------------------------------------------------------------------------------------------------
-DirectX::XMMATRIX TMatrix4f::ToDirectXMatrix(const TMatrix4f& _matrix)
-{
-    return DirectX::XMMatrixSet(_matrix.x.x, _matrix.x.y, _matrix.x.z, _matrix.x.w,
-                                _matrix.y.x, _matrix.y.y, _matrix.y.z, _matrix.y.w,
-                                _matrix.z.x, _matrix.z.y, _matrix.z.z, _matrix.z.w,
-                                _matrix.w.x, _matrix.w.y, _matrix.w.z, _matrix.w.w);
-}
-//----------------------------------------------------------------------------------------------------------------------
-bool TMatrix4f::CompareMatrixToDirectXMatrix(const TMatrix4f& _m1, const DirectX::XMMATRIX& _m2)
-{
-    const TMatrix4f matrixDirectX = FromDirectXMatrix(_m2);
-    const TMatrix4f matrixDirectXTransposed = Transpose(matrixDirectX);
-    return _m1 == matrixDirectXTransposed;
-}
+// //----------------------------------------------------------------------------------------------------------------------
+// TMatrix4f& TMatrix4f::operator*=(const TMatrix4f& _m)
+// {
+//     // const DirectX::XMMATRIX matrix1 = ToDirectXMatrix(*this);
+//     // const DirectX::XMMATRIX matrix2 = ToDirectXMatrix(_m);
+//     // const TMatrix4f Result = FromDirectXMatrix(matrix1 * matrix2);
+//     // this->x = Result.x;
+//     // this->y = Result.y;
+//     // this->z = Result.z;
+//     // this->w = Result.w;
+//     // return *this;
+// }
 //----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::MatrixTranslation(const TVector3f& _translation)
 {
@@ -90,6 +122,12 @@ TMatrix4f TMatrix4f::MatrixRotationZ(const float _angle)
 {
     return FromDirectXMatrix(DirectX::XMMatrixRotationZ(_angle));
 }
+
+TMatrix4f TMatrix4f::MatrixRotationRollPitchYaw(float _roll, float _pitch, float _yaw)
+{
+    return FromDirectXMatrix(DirectX::XMMatrixRotationRollPitchYaw(_pitch, _yaw, _roll));
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::MatrixScale(const float _scale)
 {
@@ -108,4 +146,11 @@ TMatrix4f TMatrix4f::MatrixPerspectiveFovRH(const float _fovAngleY, const float 
 {
     return FromDirectXMatrix(DirectX::XMMatrixPerspectiveFovRH(_fovAngleY, _aspectRatio, _nearZ, _farZ));
 }
+
+TMatrix4f TMatrix4f::Transpose(const TMatrix4f& _m)
+{
+    const DirectX::XMMATRIX matrix = ToDirectXMatrix(_m);
+    return FromDirectXMatrix(DirectX::XMMatrixTranspose(matrix));
+}
+
 //----------------------------------------------------------------------------------------------------------------------
