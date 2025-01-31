@@ -10,6 +10,8 @@ namespace JuProject
         int Reason = -1;
     };
 
+    HWND GetGameWindow();
+    
     void CreateGameWindow(const HINSTANCE hInstance);
     void DestroyGameWindow();
     SExitResult HandleGameWindowMessage();

@@ -74,8 +74,20 @@ float Math::Abs(const float _f)
     return fabsf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
+float Math::Clamp(const float _f, const float _min, const float _max)
+{
+    return (_f < _min) ? _min : ((_f > _max) ? _max : _f);
+}
+//----------------------------------------------------------------------------------------------------------------------
 //------------------------------------------- TVector3f
 //----------------------------------------------------------------------------------------------------------------------
+const TVector3f TVector3f::Forward = { 0.0f, 1.0f, 0.0f };
+const TVector3f TVector3f::Backward = { 0.0f, -1.0f, 0.0f };
+const TVector3f TVector3f::Right = { 1.0f, 0.0f, 0.0f };
+const TVector3f TVector3f::Left = { -1.0f, 0.0f, 0.0f };
+const TVector3f TVector3f::Up = { 0.0f, 0.0f, 1.0f };
+const TVector3f TVector3f::Down = { 0.0f, 0.0f, -1.0f };
+
 TVector3f TVector3f::TransformCoord(const TVector3f& _v, const TMatrix4f& _m)
 {
     return FromDirectXVector(DirectX::XMVector3TransformCoord(ToDirectXVector(_v), ToDirectXMatrix(_m)));
@@ -90,56 +102,42 @@ const TMatrix4f TMatrix4f::Identity =
     { 0.0f, 0.0f, 1.0f, 0.0f },
     { 0.0f, 0.0f, 0.0f, 1.0f },
 };
-// //----------------------------------------------------------------------------------------------------------------------
-// TMatrix4f& TMatrix4f::operator*=(const TMatrix4f& _m)
-// {
-//     // const DirectX::XMMATRIX matrix1 = ToDirectXMatrix(*this);
-//     // const DirectX::XMMATRIX matrix2 = ToDirectXMatrix(_m);
-//     // const TMatrix4f Result = FromDirectXMatrix(matrix1 * matrix2);
-//     // this->x = Result.x;
-//     // this->y = Result.y;
-//     // this->z = Result.z;
-//     // this->w = Result.w;
-//     // return *this;
-// }
+const TMatrix4f TMatrix4f::View =
+{
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, -1.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
 //----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::MatrixTranslation(const TVector3f& _translation)
 {
     return FromDirectXMatrix(DirectX::XMMatrixTranslation(_translation.x, _translation.y, _translation.z));
 }
 //----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::MatrixRotationX(const float _angle)
+TMatrix4f TMatrix4f::MatrixRotationPitch(const float _pitch)
 {
-    return FromDirectXMatrix(DirectX::XMMatrixRotationX(_angle));
+    return FromDirectXMatrix(DirectX::XMMatrixRotationX(_pitch));
 }
 //----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::MatrixRotationY(const float _angle)
+TMatrix4f TMatrix4f::MatrixRotationRoll(const float _roll)
 {
-    return FromDirectXMatrix(DirectX::XMMatrixRotationY(_angle));
+    return FromDirectXMatrix(DirectX::XMMatrixRotationY(_roll));
 }
 //----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::MatrixRotationZ(const float _angle)
+TMatrix4f TMatrix4f::MatrixRotationYaw(const float _yaw)
 {
-    return FromDirectXMatrix(DirectX::XMMatrixRotationZ(_angle));
+    return FromDirectXMatrix(DirectX::XMMatrixRotationZ(_yaw));
 }
-
-TMatrix4f TMatrix4f::MatrixRotationRollPitchYaw(float _roll, float _pitch, float _yaw)
+//----------------------------------------------------------------------------------------------------------------------
+TMatrix4f TMatrix4f::MatrixRotationPitchRollYaw(float _pitch, float _roll, float _yaw)
 {
-    return FromDirectXMatrix(DirectX::XMMatrixRotationRollPitchYaw(_pitch, _yaw, _roll));
+    return FromDirectXMatrix(DirectX::XMMatrixRotationRollPitchYaw(_pitch, _roll, _yaw)); // NOLINT(Inverted to match my View matrix, readability-suspicious-call-argument)
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::MatrixScale(const float _scale)
 {
     return FromDirectXMatrix(DirectX::XMMatrixScaling(_scale, _scale, _scale));
-}
-//----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::MatrixLookAtRH(const TVector3f& _cameraPosition, const TVector3f& _lookAtPosition, const TVector3f& _up)
-{
-    const DirectX::FXMVECTOR eyePosition = { _cameraPosition.x, _cameraPosition.y, _cameraPosition.z, 0.0f};
-    const DirectX::FXMVECTOR focusPosition = { _lookAtPosition.x, _lookAtPosition.y, _lookAtPosition.z, 0.0f};
-    const DirectX::FXMVECTOR upDirection = { _up.x, _up.y, _up.z, 0.0f};
-    return FromDirectXMatrix(DirectX::XMMatrixLookAtRH(eyePosition, focusPosition, upDirection));
 }
 //----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::MatrixPerspectiveFovRH(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ)
@@ -151,6 +149,12 @@ TMatrix4f TMatrix4f::Transpose(const TMatrix4f& _m)
 {
     const DirectX::XMMATRIX matrix = ToDirectXMatrix(_m);
     return FromDirectXMatrix(DirectX::XMMatrixTranspose(matrix));
+}
+
+TMatrix4f TMatrix4f::Inverse(const TMatrix4f& _m)
+{
+    const DirectX::XMMATRIX matrix = ToDirectXMatrix(_m);
+    return FromDirectXMatrix(DirectX::XMMatrixInverse(nullptr, matrix));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -18,6 +18,7 @@ namespace Math // To avoid having CMath included everywhere
     float Tan(const float _f);
     float Cos(const float _f);
     float Abs(const float _f);
+    float Clamp(const float _f, const float _min, const float _max);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f
@@ -37,6 +38,13 @@ struct TVector3f
     float y = 0.0f;
     float z = 0.0f;
 
+    static const TVector3f Forward;
+    static const TVector3f Backward;
+    static const TVector3f Right;
+    static const TVector3f Left;
+    static const TVector3f Up;
+    static const TVector3f Down;
+    
     TVector3f() : x(0.0f), y(0.0f), z(0.0f) {}
     TVector3f(float _x, float _y) : x(_x), y(_y), z(0.0f) {}
     TVector3f(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
@@ -229,15 +237,16 @@ struct alignas(16) TMatrix4f
 #pragma endregion // operator_region
     
     static const TMatrix4f Identity;
+    static const TMatrix4f View;
     
     static TMatrix4f MatrixTranslation(const TVector3f& _translation);
-    static TMatrix4f MatrixRotationX(const float _angle); 
-    static TMatrix4f MatrixRotationY(const float _angle); 
-    static TMatrix4f MatrixRotationZ(const float _angle);
-    static TMatrix4f MatrixRotationRollPitchYaw(const float _roll, const float _pitch, const float _yaw);
+    static TMatrix4f MatrixRotationPitch(const float _pitch);
+    static TMatrix4f MatrixRotationRoll(const float _roll);
+    static TMatrix4f MatrixRotationYaw(const float _yaw);
+    static TMatrix4f MatrixRotationPitchRollYaw(const float _pitch, const float _roll, const float _yaw);
     static TMatrix4f MatrixScale(const float _scale);
-    static TMatrix4f MatrixLookAtRH(const TVector3f& _cameraPosition, const TVector3f& _lookAtPosition, const TVector3f& _up);
     static TMatrix4f MatrixPerspectiveFovRH(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ);
     static TMatrix4f Transpose(const TMatrix4f& _m);
+    static TMatrix4f Inverse(const TMatrix4f& _m);
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------

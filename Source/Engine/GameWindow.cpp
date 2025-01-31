@@ -5,7 +5,6 @@
 #include <wincodec.h>
 
 #include <d3d11.h>
-#include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <dxgiformat.h>
 
@@ -18,7 +17,7 @@
 #include "Shaders.h"
 #include "WICTextureLoader.h"
 
-namespace dx = DirectX;
+#include "FreeLookCamera.h"
 
 #define GAME_DATA_PATH L"Game/Data/"
 #define GAME_DATA_SHADER_PATH L"Game/Data/Shaders/"
@@ -26,21 +25,24 @@ namespace dx = DirectX;
 //#define MESH_TO_IMPORT L"Square"
 //#define MESH_TO_IMPORT L"Cube"
 //#define MESH_TO_IMPORT L"Sphere"
-#define MESH_TO_IMPORT L"Suzanne"
-//#define MESH_TO_IMPORT L"Crate"
+//#define MESH_TO_IMPORT L"Suzanne"
+#define MESH_TO_IMPORT L"Crate"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 HWND GameWindow;
+HWND JuProject::GetGameWindow() { return GameWindow; }
+
 const wchar_t* GameClassName = L"JuProject";
 const wchar_t* WindowName = L"JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 constexpr int DefaultWindowPositionX = 320;
 constexpr int DefaultWindowPositionY = 150;
-constexpr int WindowSizeX = 1680;
-constexpr int WindowSizeY = 600;
-float ScreenRatio = (float)WindowSizeX / (float)WindowSizeY;
+constexpr int DefaultWindowSizeX = 1680;
+constexpr int DefaultWindowSizeY = 600;
+float WindowSizeX = (float)DefaultWindowSizeX;
+float WindowSizeY = (float)DefaultWindowSizeY;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // DirectX
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,12 +60,17 @@ float ZOffsetPositionCamera = -5.0f;
 float AngleXShape = 0.0f;
 float AngleZShape = 0.0f;
 float AngleYShape = 0.0f;
+SMeshInfo meshInfo = {};
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+// Game Camera
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+TFreeLookCamera GameCamera;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
     DXGI_SWAP_CHAIN_DESC SwapChainDesc;
-    SwapChainDesc.BufferDesc.Width = WindowSizeX;
-    SwapChainDesc.BufferDesc.Height = WindowSizeY;
+    SwapChainDesc.BufferDesc.Width = DefaultWindowSizeX;
+    SwapChainDesc.BufferDesc.Height = DefaultWindowSizeY;
     SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
     SwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
@@ -111,8 +118,8 @@ void InitializeDirectX11()
         ID3D11Texture2D* depthStencilTexture = nullptr;
         {
             D3D11_TEXTURE2D_DESC depthStencilTextureDesc;
-            depthStencilTextureDesc.Width = WindowSizeX;
-            depthStencilTextureDesc.Height = WindowSizeY;
+            depthStencilTextureDesc.Width = DefaultWindowSizeX;
+            depthStencilTextureDesc.Height = DefaultWindowSizeY;
             depthStencilTextureDesc.MipLevels = 1u;
             depthStencilTextureDesc.ArraySize = 1u;
             depthStencilTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -157,11 +164,26 @@ void UninitializeDirectX11()
     DXImmediateContext = nullptr;
 }
 
+struct Input
+{
+    float CameraForwardMovement = 0.0f;
+    float CameraRightMovement = 0.0f;
+    float CameraRotationPitch = 0.0f;
+    float CameraRotationYaw = 0.0f;
+};
+Input Input;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
+    case WM_SIZE:
+        {
+            UINT width = LOWORD(lParam);
+            UINT height = HIWORD(lParam);
+            WindowSizeX = (float)height;
+            WindowSizeY = (float)width;
+        } break;
     case WM_DESTROY:
         {
             PostQuitMessage(1);
@@ -174,8 +196,13 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         {
             short xPos = GET_X_LPARAM(lParam); 
             short yPos = GET_Y_LPARAM(lParam);
-            XPositionCursor = (float) xPos;
-            YPositionCursor = (float) yPos;
+            float NewXPositionCursor = (float) xPos;
+            float NewYPositionCursor = (float) yPos;
+            //CameraRotationYaw = (XPositionCursor - NewXPositionCursor) * 0.0001f;
+            //CameraRotationPitch = (YPositionCursor - NewYPositionCursor) * 0.0001f;
+            XPositionCursor = NewXPositionCursor;
+            YPositionCursor = NewYPositionCursor;
+            
         } break;
     case WM_KEYDOWN:
         {
@@ -184,18 +211,19 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 PostQuitMessage(1);
             }
             
-            if (wParam == 'Q') AngleZShape += 0.05f;
-            if (wParam == 'E') AngleZShape -= 0.05f;
+            if (wParam == 'Q') Input.CameraRotationYaw += 0.08f;
+            if (wParam == 'E') Input.CameraRotationYaw -= 0.08f;
+            if (wParam == 'R') Input.CameraRotationPitch += 0.08f;
+            if (wParam == 'F') Input.CameraRotationPitch -= 0.08f;
             
-            if (wParam == 'W') AngleXShape += 0.05f;
-            if (wParam == 'S') AngleXShape -= 0.05f;
+            if (wParam == 'W') Input.CameraForwardMovement += 0.2f;
+            if (wParam == 'S') Input.CameraForwardMovement -= 0.2f;
+            if (wParam == 'D') Input.CameraRightMovement += 0.2f;
+            if (wParam == 'A') Input.CameraRightMovement -= 0.2f;
             
-            if (wParam == 'D') AngleYShape -= 0.05f;
-            if (wParam == 'A') AngleYShape += 0.05f;
-            
-            if (wParam == 'R') rr > 0.0f ? rr = 0.0f : rr = 1.0f;
-            if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
-            if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
+            //if (wParam == 'R') rr > 0.0f ? rr = 0.0f : rr = 1.0f;
+            //if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
+            //if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
         } break;
     case WM_MOUSEWHEEL:
         {
@@ -224,12 +252,19 @@ void JuProject::CreateGameWindow(const HINSTANCE hInstance)
     RegisterClassEx(&wc);
 	
     GameWindow = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
-        DefaultWindowPositionX, DefaultWindowPositionY, WindowSizeX, WindowSizeY,
+        DefaultWindowPositionX, DefaultWindowPositionY, DefaultWindowSizeX, DefaultWindowSizeY,
         nullptr, nullptr, hInstance, nullptr);
     
     ShowWindow(GameWindow, SW_SHOW);
     
     InitializeDirectX11();
+
+    // Import Mesh
+    {
+        // TODO Julien Rogel (28/01/2025): Move it elsewhere
+        bool successImportingMesh = TryToImportMeshInfoFromOBJFile(GAME_DATA_PATH MESH_TO_IMPORT L".obj", &meshInfo);
+        assert(successImportingMesh);
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void JuProject::DestroyGameWindow()
@@ -256,12 +291,8 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawCube(const float xOffset, const float yOffset,  const float zOffset, const float AngleX, const float AngleY, const float AngleZ)
+void DrawMesh(const float xOffset, const float yOffset,  const float zOffset, const float AngleX, const float AngleY, const float AngleZ)
 {
-    SMeshInfo meshInfo = {};
-    bool successImportingMesh = TryToImportMeshInfoFromOBJFile(GAME_DATA_PATH MESH_TO_IMPORT L".obj", &meshInfo);
-    assert(successImportingMesh);
- 
     // Create Vertex Buffer and bind it to the pipeline
     {
         D3D11_BUFFER_DESC bufferDesc = {};
@@ -308,21 +339,21 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         {
             TMatrix4f WorldViewProjection; 
         };
-
-        auto cameraEyePosition = TVector3f( 0.0f, 0.0f, ZOffsetPositionCamera);
-        auto cameraTargetPosition = TVector3f( 0.0f, 0.0f, 0.0f);
-        auto cameraUpDirection = TVector3f( 0.0f, 1.0f, 0.0f);
-
-        TMatrix4f worldMatrix = TMatrix4f::Identity;
-        TMatrix4f rotation = TMatrix4f::MatrixRotationX(AngleX) * TMatrix4f::MatrixRotationY(AngleY) * TMatrix4f::MatrixRotationZ(AngleZ);
+        
+        TMatrix4f ObjectWorldMatrix = TMatrix4f::Identity;
+        TMatrix4f rotation = TMatrix4f::MatrixRotationPitchRollYaw(AngleX, AngleY, AngleZ);
         TMatrix4f translation = TMatrix4f::MatrixTranslation({xOffset, yOffset, zOffset });
-        worldMatrix = rotation * translation;
+        ObjectWorldMatrix = rotation * translation;
 
-        TMatrix4f cameraView = TMatrix4f::MatrixLookAtRH(cameraEyePosition, cameraTargetPosition, cameraUpDirection);
-        TMatrix4f cameraProjection = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
+        TMatrix4f InvertedCameraMatrix = GameCamera.GetCameraWorldInverseMatrix();
+        
+        const float ScreenRatio = WindowSizeY / WindowSizeX;
+        const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
 
+        TMatrix4f FinalMatrix = ObjectWorldMatrix * InvertedCameraMatrix * TMatrix4f::View * PerspectiveMatrix;
+        
         SConstantBuffer constantBufferData;
-        constantBufferData.WorldViewProjection = TMatrix4f::Transpose(worldMatrix * cameraView * cameraProjection);
+        constantBufferData.WorldViewProjection = TMatrix4f::Transpose(FinalMatrix);
 
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -460,13 +491,12 @@ void DrawCube(const float xOffset, const float yOffset,  const float zOffset, co
         CHECK_HRESULT(DXDevice->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
         DXImmediateContext->RSSetState(rasterizerState);
     }
-
     
     // Configure Viewport
     {
         D3D11_VIEWPORT viewport;
-        viewport.Width = WindowSizeX;
-        viewport.Height = WindowSizeY;
+        viewport.Width = DefaultWindowSizeX;
+        viewport.Height = DefaultWindowSizeY;
         viewport.TopLeftX = 0.0f;
         viewport.TopLeftY = 0.0f;
         viewport.MinDepth = 0.0f;
@@ -494,13 +524,21 @@ void JuProject::DoFrame(const float dt)
     ClearBuffer(rr, gg, bb);
 
     static float AngleShape = 0.0f;
-    AngleShape += 0.25f * dt;
-    //DrawCube(0.0f, 0.0f, 4.0f, AngleShape, AngleShape, AngleShape);
-
-    float XPositionCube = (XPositionCursor / WindowSizeX * 2.0f) - 1.0f;
-    float YPositionCube = -(YPositionCursor / WindowSizeY * 2.0f) + 1.0f;
-    DrawCube(0.0f, 0.0f, 0.0f, AngleXShape, AngleYShape, AngleZShape);
+    //AngleShape += 3.0f * dt;
+    
+    //GameCamera.SetMovementInput(Input.CameraForwardMovement, Input.CameraRightMovement);
+    //GameCamera.SetRotation(Input.CameraRotationYaw, Input.CameraRotationPitch);
+    
+    GameCamera.UpdateCamera();
+    
+    DrawMesh(0.0f, 0.0f, -10.0f, AngleShape + 10.0f, AngleShape * 1.0f, AngleShape);
+    DrawMesh(0.0f, 0.0f, -5.0f, AngleShape + 5.0f, AngleShape, AngleShape);
+    DrawMesh(0.0f, 0.0f, 0.0f, AngleShape * 1.0f, AngleShape, AngleShape * 0.5f);
+    DrawMesh(0.0f, 0.0f, 5.0f, AngleShape + 1.0f, AngleShape, AngleShape);
+    DrawMesh(0.0f, 0.0f, 10.0f, AngleShape + 5.0f, AngleShape, AngleShape);
     
     EndFrame();
+
+    Input = {};
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
