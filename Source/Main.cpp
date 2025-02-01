@@ -2,18 +2,20 @@
 #include "Engine/Inputmanager.h"
 
 #include "Test.h"
+#include "Engine/TimeManager.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
 	TestValidation::RunTest_Matrix();
-	
+
+	JuProject::InitializeTime();
 	JuProject::CreateGameWindow(hInstance);
 	InitializeInput(hInstance);
 	
 	while (true)
 	{
-		Sleep(16);
-		const float dt = 0.01f;
+		//Sleep(12);
+		const float dt = JuProject::GetDeltaTime();
 		
 		DetectInputs(dt);
 		JuProject::DoFrame(dt);

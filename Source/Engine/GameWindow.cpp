@@ -524,12 +524,8 @@ void JuProject::DoFrame(const float dt)
     ClearBuffer(rr, gg, bb);
 
     static float AngleShape = 0.0f;
-    //AngleShape += 3.0f * dt;
     
-    //GameCamera.SetMovementInput(Input.CameraForwardMovement, Input.CameraRightMovement);
-    //GameCamera.SetRotation(Input.CameraRotationYaw, Input.CameraRotationPitch);
-    
-    GameCamera.UpdateCamera();
+    GameCamera.UpdateCamera(dt);
     
     DrawMesh(0.0f, 0.0f, -10.0f, AngleShape + 10.0f, AngleShape * 1.0f, AngleShape);
     DrawMesh(0.0f, 0.0f, -5.0f, AngleShape + 5.0f, AngleShape, AngleShape);

@@ -523,6 +523,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Source\Engine\TimeManager.cpp" />
     <ClCompile Include="Source\Engine\WICTextureLoader.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -835,6 +836,7 @@
     <ClInclude Include="Source\Engine\Math.h" />
     <ClInclude Include="Source\Engine\MeshImporter.h" />
     <ClInclude Include="Source\Engine\Shaders.h" />
+    <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\WICTextureLoader.h" />
     <ClInclude Include="Source\Test.h" />
   </ItemGroup>

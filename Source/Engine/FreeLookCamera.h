@@ -6,7 +6,7 @@ class TFreeLookCamera
 {
 
 public:
-    void UpdateCamera();
+    void UpdateCamera(const float dt);
     TMatrix4f GetCameraWorldMatrix() const { return CamMatrix; }
     TMatrix4f GetCameraWorldInverseMatrix() const { return TMatrix4f::Inverse(CamMatrix); }
 
@@ -21,6 +21,6 @@ private: // Transform
     float CamYaw = 0.0f;
     float CamPitch = 0.0f;
 private:
-    float SpeedRotation = 0.001f;
+    float SpeedRotation = 0.05f;
     float SpeedMovement = 2.0f;
 };

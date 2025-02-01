@@ -5,15 +5,15 @@
 
 #include "Inputmanager.h"
 
-void TFreeLookCamera::UpdateCamera()
+void TFreeLookCamera::UpdateCamera(const float dt)
 {
     // Inputs ----------------------------------------------------------------------------------------------------------
     
-    const float InputForward = GET_INPUT(CameraForward) * SpeedMovement;
-    const float InputRight = GET_INPUT(CameraRight) * SpeedMovement;
-    const float InputUp = GET_INPUT(CameraUp) * SpeedMovement;
-    const float InputYaw = GET_INPUT(CameraYaw) * SpeedRotation;
-    const float InputPitch = GET_INPUT(CameraPitch) * SpeedRotation;
+    const float InputForward = GET_INPUT(CameraForward) * SpeedMovement * dt;
+    const float InputRight = GET_INPUT(CameraRight) * SpeedMovement * dt;
+    const float InputUp = GET_INPUT(CameraUp) * SpeedMovement * dt;
+    const float InputYaw = GET_INPUT(CameraYaw) * SpeedRotation * dt;
+    const float InputPitch = GET_INPUT(CameraPitch) * SpeedRotation * dt;
 
     // Update Yaw and Pitch --------------------------------------------------------------------------------------------
     
@@ -42,13 +42,15 @@ void TFreeLookCamera::UpdateCamera()
 
     // Logs ------------------------------------------------------------------------------------------------------------
     
+    OutputDebugStringA(("dt=" + std::to_string(dt) + "\n").c_str());
+    
 #define PRINT_VEC(VecName, Vec) OutputDebugStringA((VecName " = [" + std::to_string(Vec.x) + "|" + std::to_string(Vec.y) + "|" + std::to_string(Vec.z) + "]\n").c_str());
 
-    OutputDebugStringA("---------------------------\n");
-    PRINT_VEC("Camera Position", Position)
-    PRINT_VEC("Camera FORWARD", CamForward)
-    PRINT_VEC("Camera RIGHT", CamRight)
-    PRINT_VEC("Camera UP", CamUp)
+    // OutputDebugStringA("---------------------------\n");
+    // PRINT_VEC("Camera Position", Position)
+    // PRINT_VEC("Camera FORWARD", CamForward)
+    // PRINT_VEC("Camera RIGHT", CamRight)
+    // PRINT_VEC("Camera UP", CamUp)
     
 #undef PRINT_VEC
 }
