@@ -16,7 +16,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 	{
 		//Sleep(12);
 		const float dt = JuProject::GetDeltaTime();
-		
 		DetectInputs(dt);
 		JuProject::DoFrame(dt);
 		ClearInputs();

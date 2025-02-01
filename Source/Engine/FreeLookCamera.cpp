@@ -35,14 +35,14 @@ void TFreeLookCamera::UpdateCamera(const float dt)
 
     Position += CamRight * InputRight;
     Position += CamForward * InputForward;
-    Position += CamUp * InputUp;
+    Position += TVector3f::Up * InputUp;
     
     const TMatrix4f CamPositionMatrix = TMatrix4f::MatrixTranslation(Position);
     CamMatrix = CamRotationMatrix * CamPositionMatrix;
 
     // Logs ------------------------------------------------------------------------------------------------------------
     
-    OutputDebugStringA(("dt=" + std::to_string(dt) + "\n").c_str());
+    //OutputDebugStringA(("dt=" + std::to_string(dt) + "\n").c_str());
     
 #define PRINT_VEC(VecName, Vec) OutputDebugStringA((VecName " = [" + std::to_string(Vec.x) + "|" + std::to_string(Vec.y) + "|" + std::to_string(Vec.z) + "]\n").c_str());
 
