@@ -10,23 +10,21 @@
 
 #include "Math.h"
 #include "Color.h"
-
 #include "HResultHandler.h"
-
-#include "MeshImporter.h"
 #include "Shaders.h"
 #include "WICTextureLoader.h"
-
 #include "FreeLookCamera.h"
+#include "MeshManager.h"
 
-#define GAME_DATA_PATH L"Game/Data/"
-#define GAME_DATA_SHADER_PATH L"Game/Data/Shaders/"
+#define GAME_DATA_PATH "Game/Data/"
+#define GAME_DATA_SHADER_PATH "Game/Data/Shaders/"
 
-//#define MESH_TO_IMPORT L"Square"
-//#define MESH_TO_IMPORT L"Cube"
-//#define MESH_TO_IMPORT L"Sphere"
-//#define MESH_TO_IMPORT L"Suzanne"
-#define MESH_TO_IMPORT L"Crate"
+//#define MESH_TO_IMPORT "Square"
+//#define MESH_TO_IMPORT "Cube"
+//#define MESH_TO_IMPORT "Sphere"
+//#define MESH_TO_IMPORT "Suzanne"
+//#define MESH_TO_IMPORT "Crate"
+#define MESH_TO_IMPORT "Monster"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
@@ -37,10 +35,10 @@ HWND JuProject::GetGameWindow() { return GameWindow; }
 const wchar_t* GameClassName = L"JuProject";
 const wchar_t* WindowName = L"JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
-constexpr int DefaultWindowPositionX = 320;
-constexpr int DefaultWindowPositionY = 150;
-constexpr int DefaultWindowSizeX = 1680;
-constexpr int DefaultWindowSizeY = 600;
+constexpr int DefaultWindowSizeX = (int)(1920 * 0.85);
+constexpr int DefaultWindowSizeY = (int)(1080 * 0.85);
+constexpr int DefaultWindowPositionX = (int)(DefaultWindowSizeX * 0.1);
+constexpr int DefaultWindowPositionY = (int)(DefaultWindowSizeY * 0.1);
 float WindowSizeX = (float)DefaultWindowSizeX;
 float WindowSizeY = (float)DefaultWindowSizeY;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +58,7 @@ float ZOffsetPositionCamera = -5.0f;
 float AngleXShape = 0.0f;
 float AngleZShape = 0.0f;
 float AngleYShape = 0.0f;
-SMeshInfo meshInfo = {};
+JuProject::SMeshData MeshData = {};
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Game Camera
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -262,7 +260,7 @@ void JuProject::CreateGameWindow(const HINSTANCE hInstance)
     // Import Mesh
     {
         // TODO Julien Rogel (28/01/2025): Move it elsewhere
-        bool successImportingMesh = TryToImportMeshInfoFromOBJFile(GAME_DATA_PATH MESH_TO_IMPORT L".obj", &meshInfo);
+        const bool successImportingMesh = MeshManager::TryToImportOBJ(GAME_DATA_PATH MESH_TO_IMPORT ".obj", &MeshData);
         assert(successImportingMesh);
     }
 }
@@ -295,22 +293,23 @@ void DrawMesh(const float xOffset, const float yOffset,  const float zOffset, co
 {
     // Create Vertex Buffer and bind it to the pipeline
     {
+        constexpr UINT strideVertex = JuProject::SMeshData::VertexBuffer_StructureByteStride;
+        
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(SVertex) * meshInfo.nbVertexBuffer;
-        bufferDesc.StructureByteStride = sizeof(SVertex);
+        bufferDesc.ByteWidth = MeshData.VertexBuffer_ByteWidth;
+        bufferDesc.StructureByteStride = strideVertex;
 
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = &meshInfo.VertexBuffer;
+        subResourceData.pSysMem = MeshData.VertexBuffer.data();
 
         ID3D11Buffer* vertexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &vertexBuffer));
-        constexpr UINT stride = sizeof(SVertex);
         constexpr UINT offset = 0u;
-        DXImmediateContext->IASetVertexBuffers(0u, 1u, &vertexBuffer, &stride, &offset);
+        DXImmediateContext->IASetVertexBuffers(0u, 1u, &vertexBuffer, &strideVertex, &offset);
         vertexBuffer->Release();
     }
     
@@ -321,11 +320,11 @@ void DrawMesh(const float xOffset, const float yOffset,  const float zOffset, co
         bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(TVertexIndex) * meshInfo.nbIndexBuffer;
-        bufferDesc.StructureByteStride = sizeof(TVertexIndex);
+        bufferDesc.ByteWidth = MeshData.IndexBuffer_ByteWidth;
+        bufferDesc.StructureByteStride = MeshData.IndexBuffer_StructureByteStride;
         
         D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = meshInfo.IndexBuffer.Indexes;
+        subResourceData.pSysMem = MeshData.IndexBuffer.data();
         
         ID3D11Buffer* indexBuffer = nullptr;
         CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &indexBuffer));
@@ -504,7 +503,7 @@ void DrawMesh(const float xOffset, const float yOffset,  const float zOffset, co
         DXImmediateContext->RSSetViewports(1u, &viewport);
     }
     DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    DXImmediateContext->DrawIndexed(meshInfo.nbIndexBuffer,  0u, 0);
+    DXImmediateContext->DrawIndexed(MeshData.IndexCount,  0u, 0);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
@@ -524,14 +523,15 @@ void JuProject::DoFrame(const float dt)
     ClearBuffer(rr, gg, bb);
 
     static float AngleShape = 0.0f;
+    AngleShape += dt;
     
     GameCamera.UpdateCamera(dt);
     
-    DrawMesh(0.0f, 0.0f, -10.0f, AngleShape + 10.0f, AngleShape * 1.0f, AngleShape);
-    DrawMesh(0.0f, 0.0f, -5.0f, AngleShape + 5.0f, AngleShape, AngleShape);
-    DrawMesh(0.0f, 0.0f, 0.0f, AngleShape * 1.0f, AngleShape, AngleShape * 0.5f);
-    DrawMesh(0.0f, 0.0f, 5.0f, AngleShape + 1.0f, AngleShape, AngleShape);
-    DrawMesh(0.0f, 0.0f, 10.0f, AngleShape + 5.0f, AngleShape, AngleShape);
+    DrawMesh(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AngleShape);
+    //DrawMesh(0.0f, 0.0f, -5.0f, AngleShape + 5.0f, AngleShape, AngleShape);
+    //DrawMesh(0.0f, 0.0f, 0.0f, AngleShape * 1.0f, AngleShape, AngleShape * 0.5f);
+    //DrawMesh(0.0f, 0.0f, 5.0f, AngleShape + 1.0f, AngleShape, AngleShape);
+    //DrawMesh(0.0f, 0.0f, 10.0f, AngleShape + 5.0f, AngleShape, AngleShape);
     
     EndFrame();
 

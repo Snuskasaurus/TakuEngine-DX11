@@ -8,6 +8,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 {
 	TestValidation::RunTest_Matrix();
 
+	//JuProject::MeshManager::InitializeMeshManager();
 	JuProject::InitializeTime();
 	JuProject::CreateGameWindow(hInstance);
 	InitializeInput(hInstance);
