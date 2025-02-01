@@ -35,6 +35,7 @@ struct TVector3f
 {
     float x, y, z;
 
+    static const TVector3f Zero;
     static const TVector3f Forward;
     static const TVector3f Backward;
     static const TVector3f Right;

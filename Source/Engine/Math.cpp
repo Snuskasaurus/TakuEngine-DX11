@@ -81,6 +81,7 @@ float Math::Clamp(const float _f, const float _min, const float _max)
 //----------------------------------------------------------------------------------------------------------------------
 //------------------------------------------- TVector3f
 //----------------------------------------------------------------------------------------------------------------------
+const TVector3f TVector3f::Zero = { 0.0f, 0.0f, 0.0f };
 const TVector3f TVector3f::Forward = { 0.0f, 1.0f, 0.0f };
 const TVector3f TVector3f::Backward = { 0.0f, -1.0f, 0.0f };
 const TVector3f TVector3f::Right = { 1.0f, 0.0f, 0.0f };
