@@ -23,8 +23,7 @@ namespace Math // To avoid having CMath included everywhere
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f
 {
-    float x = 0.0f;
-    float y = 0.0f;
+    float x, y;
 
     FORCE_INLINE static float Dot(const TVector2f& _v1, const TVector2f& _v2)
     {
@@ -34,9 +33,7 @@ struct TVector2f
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector3f
 {
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
+    float x, y, z;
 
     static const TVector3f Forward;
     static const TVector3f Backward;
@@ -45,7 +42,7 @@ struct TVector3f
     static const TVector3f Up;
     static const TVector3f Down;
     
-    TVector3f() : x(0.0f), y(0.0f), z(0.0f) {}
+    TVector3f() {}
     TVector3f(float _x, float _y) : x(_x), y(_y), z(0.0f) {}
     TVector3f(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
@@ -136,12 +133,9 @@ struct TVector3f
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector4f
 {
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float w = 0.0f;
+    float x, y, z, w;
 
-    TVector4f() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
+    TVector4f() {}
     TVector4f(const float _x, const float _y, const float _z, const float _w) : x(_x), y(_y), z(_z), w(_w) {}
 
 #pragma region operator_region
@@ -203,10 +197,7 @@ struct TVector4f
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct alignas(16) TMatrix4f
 {
-    TVector4f x = { 0.0f, 0.0f, 0.0f, 0.0f };
-    TVector4f y = { 0.0f, 0.0f, 0.0f, 0.0f };
-    TVector4f z = { 0.0f, 0.0f, 0.0f, 0.0f };
-    TVector4f w = { 0.0f, 0.0f, 0.0f, 0.0f };
+    TVector4f x, y, z, w;
 
 #pragma region operator_region
 
