@@ -3,6 +3,8 @@
 #include <sal.h>
 #include "Math.h"
 
+// To replace later by Asset-Importer-Lib (if needed) https://assimp-docs.readthedocs.io/en/latest/index.html
+
 #define MAX_VERTEX_BUFFER_VERTICES 4096
 #define MAX_INDEX_BUFFER_INDEXES 4096
 

@@ -12,7 +12,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 	
 	while (true)
 	{
-		Sleep(16);
+		//Sleep(16);
 		const float dt = 0.01f;
 		
 		DetectInputs(dt);
