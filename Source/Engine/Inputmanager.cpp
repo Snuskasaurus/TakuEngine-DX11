@@ -63,6 +63,10 @@ void DetectMouseInputs(float _dt)
     {
         Inputs.CameraPitch = -(float)mouseCurrState.lY;
     }
+    if (mouseCurrState.lZ != mouseLastState.lZ)
+    {
+        Inputs.CameraSpeed = (float)mouseCurrState.lZ;
+    }
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void DetectInputs(float _dt)

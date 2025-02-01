@@ -8,10 +8,15 @@
 void TFreeLookCamera::UpdateCamera(const float dt)
 {
     // Inputs ----------------------------------------------------------------------------------------------------------
+
+    SpeedMovement += GET_INPUT(CameraSpeed) * 0.25f * dt;
+    if (SpeedMovement <= 0.0f)
+        SpeedMovement = 0.0f;
     
     const float InputForward = GET_INPUT(CameraForward) * SpeedMovement * dt;
     const float InputRight = GET_INPUT(CameraRight) * SpeedMovement * dt;
     const float InputUp = GET_INPUT(CameraUp) * SpeedMovement * dt;
+    
     const float InputYaw = GET_INPUT(CameraYaw) * SpeedRotation * dt;
     const float InputPitch = GET_INPUT(CameraPitch) * SpeedRotation * dt;
 

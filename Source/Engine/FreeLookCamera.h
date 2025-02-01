@@ -21,6 +21,7 @@ private: // Transform
     float CamYaw = 0.0f;
     float CamPitch = 0.0f;
 private:
-    float SpeedRotation = 0.05f;
+    float SpeedRotation = 0.04f;
     float SpeedMovement = 2.0f;
+    float SensitivityMultiplier = 1.0f;
 };

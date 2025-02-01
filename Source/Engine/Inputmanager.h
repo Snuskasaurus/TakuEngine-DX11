@@ -13,6 +13,7 @@ struct TInputHolder
     float CameraUp = 0.0f;
     float CameraPitch = 0.0f;
     float CameraYaw = 0.0f;
+    float CameraSpeed = 0.0f;
 };
 
 #define GET_INPUT(InputName) GetInputHolder()->InputName
