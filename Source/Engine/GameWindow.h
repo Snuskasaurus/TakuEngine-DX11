@@ -1,21 +1,30 @@
 ﻿#pragma once
 
 #include <Windows.h>
+#include "Math.h"
 
-namespace JuProject
+struct ID3D11Device;
+struct ID3D11DeviceContext;
+
+struct SExitResult
 {
-    struct SExitResult
-    {
-        bool Exiting = false;
-        int Reason = -1;
-    };
+    bool Exiting = false;
+    int Reason = -1;
+};
 
-    HWND GetGameWindow();
-    
-    void CreateGameWindow(const HINSTANCE hInstance);
-    void DestroyGameWindow();
-    SExitResult HandleGameWindowMessage();
+void CreateGameWindow(const HINSTANCE hInstance);
+void DestroyGameWindow();
+SExitResult HandleGameWindowMessage();
 
-    void DoFrame(const float dt);
-}
+void DoFrame(const float dt);
+
+class GameWindow
+{
+public:
+    static HWND GetWindowHandle();
+    static bool HasFocus();
+    static ID3D11Device* GetDevice();
+    static ID3D11DeviceContext* GetImmediateContext();
+    static TMatrix4f GetPerspectiveMatrix();
+};
 

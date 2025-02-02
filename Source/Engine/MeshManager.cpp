@@ -8,8 +8,6 @@
 
 #include "Shaders.h"
 
-using namespace JuProject;
-
 struct SFaceInfo
 {
     TVertexIndex GeometryIndex, TextureIndex, NormalIndex;

@@ -1,10 +1,13 @@
 ﻿#pragma once
+#include "Debug/CommonEngine.h"
 
 // Inspired by https://www.braynzarsoft.net/viewtutorial/q16390-15-high-resolution-timer
 
-namespace JuProject
+class MTime
 {
-    void InitializeTime();
-    float GetDeltaTime();
-    float GetTime();
-}
+    SINGLETON_DECLARE(MTime)
+public:
+    static void InitializeTime();
+    static float GetDeltaTime();
+    static float GetTime();
+};

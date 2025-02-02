@@ -1,20 +1,13 @@
 ﻿#include "TimeManager.h"
 
 #include <Windows.h>
-#include <assert.h>
-
-LONGLONG CounterStart;
-LONGLONG CounterLastFrame;
-
-float CountsPerSecond;
-
-int frameCount = 0;
-int fps = 0;
-
-float frameTime;
 
 ///---------------------------------------------------------------------------------------------------------------------
-void JuProject::InitializeTime()
+LONGLONG CounterStart;
+LONGLONG CounterLastFrame;
+float CountsPerSecond;
+///---------------------------------------------------------------------------------------------------------------------
+void MTime::InitializeTime()
 {
     LARGE_INTEGER QueryHolder;
     QueryPerformanceFrequency(&QueryHolder);
@@ -26,23 +19,21 @@ void JuProject::InitializeTime()
     CounterLastFrame = CounterStart;
 }
 ///---------------------------------------------------------------------------------------------------------------------
-float JuProject::GetDeltaTime()
+float MTime::GetDeltaTime()
 {
     LARGE_INTEGER QueryHolder;
     QueryPerformanceCounter(&QueryHolder);
 
     LONGLONG CounterSinceLastFrame = QueryHolder.QuadPart - CounterLastFrame;
     CounterLastFrame = QueryHolder.QuadPart;
-
-    assert(CounterSinceLastFrame >= 0);
-
+    
     return (float)(CounterSinceLastFrame) / CountsPerSecond;
 }
 ///---------------------------------------------------------------------------------------------------------------------
-float JuProject::GetTime()
+float MTime::GetTime()
 {
     LARGE_INTEGER currentTime;
     QueryPerformanceCounter(&currentTime);
-    return (float)(currentTime.QuadPart-CounterStart)/CountsPerSecond;
+    return (float)(currentTime.QuadPart - CounterStart) / CountsPerSecond;
 }
 ///---------------------------------------------------------------------------------------------------------------------

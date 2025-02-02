@@ -145,6 +145,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Engine\Debug\CommonEngine.cpp" />
+    <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
     <ClCompile Include="Source\Engine\FreeLookCamera.cpp" />
     <ClCompile Include="Source\Engine\Color.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -373,6 +375,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source\Engine\Inputmanager.cpp" />
+    <ClCompile Include="Source\Engine\GraphicPipeline.cpp" />
     <ClCompile Include="Source\Engine\MeshManager.cpp" />
     <ClCompile Include="Source\Engine\Shaders.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -525,6 +528,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Source\Engine\World.cpp" />
     <ClCompile Include="Source\Test.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -755,15 +759,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Engine\Debug\CommonEngine.h" />
+    <ClInclude Include="Source\Engine\Debug\Profiling.h" />
     <ClInclude Include="Source\Engine\FreeLookCamera.h" />
     <ClInclude Include="Source\Engine\Color.h" />
+    <ClInclude Include="Source\Engine\GameWindow.h" />
     <ClInclude Include="Source\Engine\HResultHandler.h" />
     <ClInclude Include="Source\Engine\Inputmanager.h" />
     <ClInclude Include="Source\Engine\Math.h" />
+    <ClInclude Include="Source\Engine\GraphicPipeline.h" />
     <ClInclude Include="Source\Engine\MeshManager.h" />
     <ClInclude Include="Source\Engine\Shaders.h" />
     <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\WICTextureLoader.h" />
+    <ClInclude Include="Source\Engine\World.h" />
     <ClInclude Include="Source\Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -242,3 +242,25 @@ struct alignas(16) TMatrix4f
     static TMatrix4f Inverse(const TMatrix4f& _m);
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+struct TRotator
+{
+    float Yaw = 0.0f;
+    float Pitch = 0.0f;
+    float Roll = 0.0f;
+};
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+struct TTransform
+{
+    static TMatrix4f ToMatrix(const TTransform& _t)
+    {
+        // TODO Julien Rogel (01/02/2025): Optimize by removing unnecessary matrix multiplication when rotation values are 0
+        return TMatrix4f::Identity
+             * TMatrix4f::MatrixRotationPitch(_t.Rotator.Pitch)
+             * TMatrix4f::MatrixRotationYaw(_t.Rotator.Yaw)
+             * TMatrix4f::MatrixRotationRoll(_t.Rotator.Roll)
+             * TMatrix4f::MatrixTranslation(_t.Position);
+    }
+    TVector3f Position = TVector3f::Zero;
+    TRotator Rotator = { 0.0f, 0.0f, 0.0f };
+};
+//---------------------------------------------------------------------------------------------------------------------------------------------------------

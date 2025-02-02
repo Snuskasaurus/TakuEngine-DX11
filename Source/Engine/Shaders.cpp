@@ -6,7 +6,7 @@
 #include "HResultHandler.h"
 
 
-void CompileShader(LPCWSTR FileName, const char* Target, ID3DBlob** ShaderOut)
+void ShaderManager::CompileShader(LPCWSTR _fileName, const char* _target, ID3DBlob** _shaderOut)
 {
     UINT flags1 = 0;
     UINT flags2 = 0;
@@ -25,9 +25,9 @@ void CompileShader(LPCWSTR FileName, const char* Target, ID3DBlob** ShaderOut)
     
     ID3DBlob* ErrorBlob = nullptr;
     
-    HRESULT HResult = D3DCompileFromFile(FileName, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-                                     "Main", Target,
-                                     flags1, flags2, ShaderOut, &ErrorBlob);
+    HRESULT HResult = D3DCompileFromFile(_fileName, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+                                     "Main", _target,
+                                     flags1, flags2, _shaderOut, &ErrorBlob);
     if (HResult != 0)
     {
         const char* errorMsg = (const char*)ErrorBlob->GetBufferPointer();

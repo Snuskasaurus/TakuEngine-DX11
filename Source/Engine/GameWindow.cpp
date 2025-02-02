@@ -9,29 +9,24 @@
 #include <dxgiformat.h>
 
 #include "Math.h"
-#include "Color.h"
 #include "HResultHandler.h"
-#include "Shaders.h"
-#include "WICTextureLoader.h"
-#include "FreeLookCamera.h"
+#include "GraphicPipeline.h"
 #include "MeshManager.h"
 
 #define GAME_DATA_PATH "Game/Data/"
 #define GAME_DATA_SHADER_PATH "Game/Data/Shaders/"
 
-//#define MESH_TO_IMPORT "Square"
-//#define MESH_TO_IMPORT "Cube"
-//#define MESH_TO_IMPORT "Sphere"
-//#define MESH_TO_IMPORT "Suzanne"
-//#define MESH_TO_IMPORT "Crate"
-#define MESH_TO_IMPORT "Monster"
+#define MESH_TO_IMPORT_SQUARE "Square"
+#define MESH_TO_IMPORT_CUBE "Cube"
+#define MESH_TO_IMPORT_SPHERE "Sphere"
+#define MESH_TO_IMPORT_SUZANNE "Suzanne"
+#define MESH_TO_IMPORT_CRATE "Crate"
+#define MESH_TO_IMPORT_MONSTER "Monster"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // Window
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-HWND GameWindow;
-HWND JuProject::GetGameWindow() { return GameWindow; }
-
+HWND GameWindowHandle;
 const wchar_t* GameClassName = L"JuProject";
 const wchar_t* WindowName = L"JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
@@ -41,6 +36,7 @@ constexpr int DefaultWindowPositionX = (int)(DefaultWindowSizeX * 0.1);
 constexpr int DefaultWindowPositionY = (int)(DefaultWindowSizeY * 0.1);
 float WindowSizeX = (float)DefaultWindowSizeX;
 float WindowSizeY = (float)DefaultWindowSizeY;
+bool HasWindowFocus = false;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 // DirectX
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,19 +46,30 @@ IDXGISwapChain* DXSwapChain = nullptr;
 ID3D11RenderTargetView* DXRenderTargetView = nullptr;
 ID3D11DepthStencilView* DXDepthStencilView = nullptr;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-// Others
+// Actors
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-float rr, gg, bb = 0.0f;
-float XPositionCursor, YPositionCursor = 0.0f;
-float ZOffsetPositionCamera = -5.0f;
-float AngleXShape = 0.0f;
-float AngleZShape = 0.0f;
-float AngleYShape = 0.0f;
-JuProject::SMeshData MeshData = {};
+CStaticMesh MeshTest1;
+CStaticMesh MeshTest2;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-// Game Camera
+// GameWindow Class
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-TFreeLookCamera GameCamera;
+HWND GameWindow::GetWindowHandle() { return GameWindowHandle; }
+
+bool GameWindow::HasFocus() { return HasWindowFocus; }
+
+ID3D11Device* GameWindow::GetDevice() { return DXDevice; }
+
+ID3D11DeviceContext* GameWindow::GetImmediateContext()
+{
+    return DXImmediateContext;
+}
+TMatrix4f GameWindow::GetPerspectiveMatrix()
+{
+    // TODO Julien Rogel (02/02/2025): no need to compute it each time we call it but only when ScreenRatio change
+    const float ScreenRatio = WindowSizeY / WindowSizeX;
+    const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
+    return PerspectiveMatrix;
+}
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void InitializeDirectX11()
 {
@@ -78,7 +85,7 @@ void InitializeDirectX11()
     SwapChainDesc.SampleDesc.Quality = 0;
     SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     SwapChainDesc.BufferCount = 1;
-    SwapChainDesc.OutputWindow = GameWindow;
+    SwapChainDesc.OutputWindow = GameWindowHandle;
     SwapChainDesc.Windowed = TRUE;
     SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     SwapChainDesc.Flags = 0;
@@ -89,7 +96,7 @@ void InitializeDirectX11()
 #endif
     
     CHECK_HRESULT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, CreateDeviceAndSwapChainFlags, nullptr, 0,D3D11_SDK_VERSION, &SwapChainDesc, &DXSwapChain, &DXDevice,nullptr, &DXImmediateContext));
-
+    
     // Create Render target view from back buffer
     {
         ID3D11Resource* DXBackBuffer = nullptr;
@@ -161,15 +168,6 @@ void UninitializeDirectX11()
     DXImmediateContext->Release();
     DXImmediateContext = nullptr;
 }
-
-struct Input
-{
-    float CameraForwardMovement = 0.0f;
-    float CameraRightMovement = 0.0f;
-    float CameraRotationPitch = 0.0f;
-    float CameraRotationYaw = 0.0f;
-};
-Input Input;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -186,53 +184,19 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         {
             PostQuitMessage(1);
         } break;
-    case WM_CHAR:
+    case WM_SETFOCUS:
         {
-            
-        } break;
-    case WM_MOUSEMOVE:
+            HasWindowFocus = true;
+        } break ;
+    case WM_KILLFOCUS:
         {
-            short xPos = GET_X_LPARAM(lParam); 
-            short yPos = GET_Y_LPARAM(lParam);
-            float NewXPositionCursor = (float) xPos;
-            float NewYPositionCursor = (float) yPos;
-            //CameraRotationYaw = (XPositionCursor - NewXPositionCursor) * 0.0001f;
-            //CameraRotationPitch = (YPositionCursor - NewYPositionCursor) * 0.0001f;
-            XPositionCursor = NewXPositionCursor;
-            YPositionCursor = NewYPositionCursor;
-            
-        } break;
-    case WM_KEYDOWN:
-        {
-            if (wParam == VK_ESCAPE)
-            {
-                PostQuitMessage(1);
-            }
-            
-            if (wParam == 'Q') Input.CameraRotationYaw += 0.08f;
-            if (wParam == 'E') Input.CameraRotationYaw -= 0.08f;
-            if (wParam == 'R') Input.CameraRotationPitch += 0.08f;
-            if (wParam == 'F') Input.CameraRotationPitch -= 0.08f;
-            
-            if (wParam == 'W') Input.CameraForwardMovement += 0.2f;
-            if (wParam == 'S') Input.CameraForwardMovement -= 0.2f;
-            if (wParam == 'D') Input.CameraRightMovement += 0.2f;
-            if (wParam == 'A') Input.CameraRightMovement -= 0.2f;
-            
-            //if (wParam == 'R') rr > 0.0f ? rr = 0.0f : rr = 1.0f;
-            //if (wParam == 'G') gg > 0.0f ? gg = 0.0f : gg = 1.0f;
-            //if (wParam == 'B') bb > 0.0f ? bb = 0.0f : bb = 1.0f;
-        } break;
-    case WM_MOUSEWHEEL:
-        {
-            short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-            ZOffsetPositionCamera += (float)zDelta * 0.0025f;
-        } break;
+            HasWindowFocus = false;
+        } break ;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void JuProject::CreateGameWindow(const HINSTANCE hInstance)
+void CreateGameWindow(const HINSTANCE hInstance)
 {
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(wc);
@@ -249,32 +213,29 @@ void JuProject::CreateGameWindow(const HINSTANCE hInstance)
     wc.lpszClassName = GameClassName;
     RegisterClassEx(&wc);
 	
-    GameWindow = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
+    GameWindowHandle = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
         DefaultWindowPositionX, DefaultWindowPositionY, DefaultWindowSizeX, DefaultWindowSizeY,
         nullptr, nullptr, hInstance, nullptr);
     
-    ShowWindow(GameWindow, SW_SHOW);
+    ShowWindow(GameWindowHandle, SW_SHOW);
     
     InitializeDirectX11();
 
-    // Import Mesh
-    {
-        // TODO Julien Rogel (28/01/2025): Move it elsewhere
-        const bool successImportingMesh = MeshManager::TryToImportOBJ(GAME_DATA_PATH MESH_TO_IMPORT ".obj", &MeshData);
-        assert(successImportingMesh);
-    }
+    CStaticMesh::InitializeCommonPipeline();
+    MeshTest1.InitializeStaticMeshPipeline({TVector3f{0.0f, 0.0f, -1.0f}}, MESH_TO_IMPORT_CRATE);
+    MeshTest2.InitializeStaticMeshPipeline({}, MESH_TO_IMPORT_MONSTER);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void JuProject::DestroyGameWindow()
+void DestroyGameWindow()
 {
-    assert(GameWindow != nullptr);
+    assert(GameWindowHandle != nullptr);
     
     UninitializeDirectX11();
     
-    DestroyWindow(GameWindow);
+    DestroyWindow(GameWindowHandle);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-JuProject::SExitResult JuProject::HandleGameWindowMessage()
+SExitResult HandleGameWindowMessage()
 {
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -289,190 +250,8 @@ JuProject::SExitResult JuProject::HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawMesh(const float xOffset, const float yOffset,  const float zOffset, const float AngleX, const float AngleY, const float AngleZ)
+void DrawScreen()
 {
-    // Create Vertex Buffer and bind it to the pipeline
-    {
-        constexpr UINT strideVertex = JuProject::SMeshData::VertexBuffer_StructureByteStride;
-        
-        D3D11_BUFFER_DESC bufferDesc = {};
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        bufferDesc.CPUAccessFlags = 0u;
-        bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = MeshData.VertexBuffer_ByteWidth;
-        bufferDesc.StructureByteStride = strideVertex;
-
-        D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = MeshData.VertexBuffer.data();
-
-        ID3D11Buffer* vertexBuffer = nullptr;
-        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &vertexBuffer));
-        constexpr UINT offset = 0u;
-        DXImmediateContext->IASetVertexBuffers(0u, 1u, &vertexBuffer, &strideVertex, &offset);
-        vertexBuffer->Release();
-    }
-    
-    // Create Index Buffer and bind it to the pipeline
-    {
-        D3D11_BUFFER_DESC bufferDesc = {};
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        bufferDesc.CPUAccessFlags = 0u;
-        bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = MeshData.IndexBuffer_ByteWidth;
-        bufferDesc.StructureByteStride = MeshData.IndexBuffer_StructureByteStride;
-        
-        D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = MeshData.IndexBuffer.data();
-        
-        ID3D11Buffer* indexBuffer = nullptr;
-        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &indexBuffer));
-        DXImmediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0u);
-        indexBuffer->Release();
-    }
-
-    // Create a vertex shader constant buffer with the transformation matrix and bind it to the pipeline
-    {
-        struct SConstantBuffer
-        {
-            TMatrix4f WorldViewProjection; 
-        };
-        
-        TMatrix4f ObjectWorldMatrix = TMatrix4f::Identity;
-        TMatrix4f rotation = TMatrix4f::MatrixRotationPitchRollYaw(AngleX, AngleY, AngleZ);
-        TMatrix4f translation = TMatrix4f::MatrixTranslation({xOffset, yOffset, zOffset });
-        ObjectWorldMatrix = rotation * translation;
-
-        TMatrix4f InvertedCameraMatrix = GameCamera.GetCameraWorldInverseMatrix();
-        
-        const float ScreenRatio = WindowSizeY / WindowSizeX;
-        const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
-
-        TMatrix4f FinalMatrix = ObjectWorldMatrix * InvertedCameraMatrix * TMatrix4f::View * PerspectiveMatrix;
-        
-        SConstantBuffer constantBufferData;
-        constantBufferData.WorldViewProjection = TMatrix4f::Transpose(FinalMatrix);
-
-        D3D11_BUFFER_DESC bufferDesc = {};
-        bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(constantBufferData);
-        bufferDesc.StructureByteStride = 0u;
-
-        D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = &constantBufferData;
-        
-        ID3D11Buffer* constantBuffer = nullptr;
-        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &constantBuffer));
-        DXImmediateContext->VSSetConstantBuffers(0u, 1u, &constantBuffer);
-        constantBuffer->Release();
-    }
-    
-    // Create VertexShader and bind it to the pipeline
-    {
-        ID3DBlob* vsBlob = nullptr;
-        CompileShader(GAME_DATA_SHADER_PATH L"VertexShader.hlsl", "vs_5_0", &vsBlob);
-        //CHECK_HRESULT(D3DReadFileToBlob(, &vsBlob));
-        ID3D11VertexShader* vertexShader = nullptr;
-        CHECK_HRESULT(DXDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShader));
-        DXImmediateContext->VSSetShader(vertexShader, nullptr, 0u);
-        vertexShader->Release();
-
-        // Input Layout for 3d vertex
-        {
-            constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
-            {
-                { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-                { "UV",  0u,  DXGI_FORMAT_R32G32_FLOAT,     0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-                { "NORMAL",    0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-                };
-            UINT sizeInputElementDesc = 3u;
-            ID3D11InputLayout* inputLayout;
-            CHECK_HRESULT(DXDevice->CreateInputLayout(inputElementDesc, sizeInputElementDesc, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout));
-            DXImmediateContext->IASetInputLayout(inputLayout);
-            inputLayout->Release();
-        }
-        vsBlob->Release();
-    }
-
-    __declspec(align(16)) struct SWorldLight
-    {
-        TVector3f Direction = {0.37f, 0.93f, 0.0};
-        float Ambient = 0.0f;
-    };
-    
-    // Create a pixel shader constant buffer with the face colors
-    {
-        __declspec(align(16)) struct SConstantBufferPixelShader
-        {
-            SWorldLight WorldLight;
-        };
-
-        SConstantBufferPixelShader ConstantBufferPixelShader =
-        {
-            {{ 0.44f, 0.87f, 0.22f }, 0.15f }
-        };
-
-        D3D11_BUFFER_DESC bufferDesc = {};
-        bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(ConstantBufferPixelShader);
-        bufferDesc.StructureByteStride = 0u;
-       
-        D3D11_SUBRESOURCE_DATA subResourceData = {};
-        subResourceData.pSysMem = &ConstantBufferPixelShader;
-       
-        ID3D11Buffer* constantBuffer = nullptr;
-        CHECK_HRESULT(DXDevice->CreateBuffer(&bufferDesc, &subResourceData, &constantBuffer));
-        DXImmediateContext->PSSetConstantBuffers(0u, 1u, &constantBuffer);
-        constantBuffer->Release();
-    }
-    
-    // Create PixelShader and bind it to the pipeline
-    {
-        ID3DBlob* psBlob = nullptr;
-        CompileShader(GAME_DATA_SHADER_PATH L"PixelShader.hlsl", "ps_5_0", &psBlob);
-        //CHECK_HRESULT(D3DReadFileToBlob(L".cso", &psBlob));
-        ID3D11PixelShader* pixelShader = nullptr;
-        CHECK_HRESULT(DXDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pixelShader));
-        psBlob->Release();
-        DXImmediateContext->PSSetShader(pixelShader, nullptr, 0u);
-        pixelShader->Release();
-    }
-    
-    // Import, Create and Bind texture to the pixel shader
-    {
-        // TODO Julien Rogel (03/11/2024): Extract init of texture & textureView out of CreateWICTextureFromFile
-        
-        ID3D11Resource* texture = nullptr;
-        ID3D11ShaderResourceView* textureView = nullptr;
-        CHECK_HRESULT(CreateWICTextureFromFile(DXDevice, DXImmediateContext, GAME_DATA_PATH MESH_TO_IMPORT L".bmp", &texture, &textureView, 0));
-        texture->Release();
-        DXImmediateContext->PSSetShaderResources(0u, 1u, &textureView);
-    }
-
-    // Create and bind sampler state to the pixel shader
-    {
-        D3D11_SAMPLER_DESC samplerDesc = {};
-        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.BorderColor[0] = SColor::Magenta.ToFloat().r;
-        samplerDesc.BorderColor[1] = SColor::Magenta.ToFloat().g;
-        samplerDesc.BorderColor[2] = SColor::Magenta.ToFloat().b;
-        samplerDesc.BorderColor[3] = 1.0f;
-        
-        ID3D11SamplerState* samplerState = nullptr;
-        CHECK_HRESULT(DXDevice->CreateSamplerState(&samplerDesc, &samplerState));
-        DXImmediateContext->PSSetSamplers(0, 1, &samplerState);
-    }
-
     {
         D3D11_RASTERIZER_DESC rasterizerDesc = {};
         rasterizerDesc.AntialiasedLineEnable = true;
@@ -502,8 +281,6 @@ void DrawMesh(const float xOffset, const float yOffset,  const float zOffset, co
         viewport.MaxDepth = 1.0f;
         DXImmediateContext->RSSetViewports(1u, &viewport);
     }
-    DXImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    DXImmediateContext->DrawIndexed(MeshData.IndexCount,  0u, 0);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void EndFrame()
@@ -518,23 +295,22 @@ void ClearBuffer(float r, float g, float b)
     DXImmediateContext->ClearDepthStencilView(DXDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void JuProject::DoFrame(const float dt)
+void DoFrame(const float dt)
 {
-    ClearBuffer(rr, gg, bb);
+    if (HasWindowFocus == false)
+        return;
+    
+    ClearBuffer(0.0f, 0.0f, 0.0f);
 
     static float AngleShape = 0.0f;
     AngleShape += dt;
-    
-    GameCamera.UpdateCamera(dt);
-    
-    DrawMesh(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, AngleShape);
-    //DrawMesh(0.0f, 0.0f, -5.0f, AngleShape + 5.0f, AngleShape, AngleShape);
-    //DrawMesh(0.0f, 0.0f, 0.0f, AngleShape * 1.0f, AngleShape, AngleShape * 0.5f);
-    //DrawMesh(0.0f, 0.0f, 5.0f, AngleShape + 1.0f, AngleShape, AngleShape);
-    //DrawMesh(0.0f, 0.0f, 10.0f, AngleShape + 5.0f, AngleShape, AngleShape);
-    
-    EndFrame();
 
-    Input = {};
+    CStaticMesh::UpdateCommonPipeline();
+    
+    MeshTest1.DrawStaticMesh();
+    MeshTest2.DrawStaticMesh();
+
+    DrawScreen();
+    EndFrame();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------

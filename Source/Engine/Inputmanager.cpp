@@ -20,7 +20,7 @@ void InitializeInput(HINSTANCE _hInstance)
     CHECK_HRESULT(DirectInput->CreateDevice(GUID_SysKeyboard, &DIKeyboard, nullptr));
     CHECK_HRESULT(DirectInput->CreateDevice(GUID_SysMouse, &DIMouse, nullptr));
 
-    HWND hwnd = JuProject::GetGameWindow();
+    const HWND hwnd = GameWindow::GetWindowHandle();
     
     CHECK_HRESULT(DIKeyboard->SetDataFormat(&c_dfDIKeyboard));
     CHECK_HRESULT(DIKeyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
@@ -34,7 +34,12 @@ void DetectKeyboardInputs(float _dt)
     BYTE keyboardState[256];
     DIKeyboard->Acquire();
     DIKeyboard->GetDeviceState(sizeof(keyboardState),(LPVOID)&keyboardState);
-
+    
+    if(keyboardState[DIK_ESCAPE] & 0x80)
+    {
+        PostQuitMessage(1);
+    }
+    
 #define INPUT_KEYBOARD_KEY(Key, Input, Value) if(keyboardState[Key] & 0x80) { Inputs.Input = Value; }
 
     INPUT_KEYBOARD_KEY(DIK_D, CameraRight, 1.0f)
@@ -71,6 +76,9 @@ void DetectMouseInputs(float _dt)
 ///---------------------------------------------------------------------------------------------------------------------
 void DetectInputs(float _dt)
 {
+    if (GameWindow::HasFocus() == false)
+        return;
+    
     DetectKeyboardInputs(_dt);
     DetectMouseInputs(_dt);
 }

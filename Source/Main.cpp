@@ -3,25 +3,28 @@
 
 #include "Test.h"
 #include "Engine/TimeManager.h"
+#include "Engine/World.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
 	TestValidation::RunTest_Matrix();
 
-	//JuProject::MeshManager::InitializeMeshManager();
-	JuProject::InitializeTime();
-	JuProject::CreateGameWindow(hInstance);
+	//MeshManager::InitializeMeshManager();
+	MTime::InitializeTime();
+	CreateGameWindow(hInstance);
 	InitializeInput(hInstance);
+	MWorld::InitializeWorld();
 	
 	while (true)
 	{
-		//Sleep(12);
-		const float dt = JuProject::GetDeltaTime();
-		DetectInputs(dt);
-		JuProject::DoFrame(dt);
-		ClearInputs();
-		
-		const JuProject::SExitResult ExitResult = JuProject::HandleGameWindowMessage();
+		const float dt = MTime::GetDeltaTime();
+		{
+			DetectInputs(dt);
+			MWorld::DoWorldUpdate(dt);
+			DoFrame(dt);
+			ClearInputs();
+		}
+		const SExitResult ExitResult = HandleGameWindowMessage();
 		if (ExitResult.Exiting == true) return ExitResult.Reason; // Exit application
 	}
 }
