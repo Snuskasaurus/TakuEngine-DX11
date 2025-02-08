@@ -29,7 +29,7 @@ void InitializeInput(HINSTANCE _hInstance)
     CHECK_HRESULT(DIMouse->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void DetectKeyboardInputs(float _dt)
+void DetectKeyboardInputs()
 {
     BYTE keyboardState[256];
     DIKeyboard->Acquire();
@@ -54,7 +54,7 @@ void DetectKeyboardInputs(float _dt)
 #undef INPUT_KEYBOARD_KEY
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void DetectMouseInputs(float _dt)
+void DetectMouseInputs()
 {
     DIMOUSESTATE mouseCurrState;
     DIMouse->Acquire();
@@ -74,13 +74,13 @@ void DetectMouseInputs(float _dt)
     }
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void DetectInputs(float _dt)
+void DetectInputs()
 {
     if (GameWindow::HasFocus() == false)
         return;
     
-    DetectKeyboardInputs(_dt);
-    DetectMouseInputs(_dt);
+    DetectKeyboardInputs();
+    DetectMouseInputs();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void ClearInputs()

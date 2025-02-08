@@ -19,7 +19,7 @@ struct TInputHolder
 #define GET_INPUT(InputName) GetInputHolder()->InputName
 
 void InitializeInput(HINSTANCE _hInstance);
-void DetectInputs(float _dt);
+void DetectInputs();
 void ClearInputs();
 
 TInputHolder* GetInputHolder();
