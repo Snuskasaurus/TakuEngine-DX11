@@ -227,9 +227,9 @@ bool CStaticMesh::InitializeStaticMeshPipeline(const TTransform& _transform, con
         CHECK_HRESULT(CreateWICTextureFromFile(device, deviceContext, TextureFilenameStream.str().c_str(), &Pipeline.Texture, &Pipeline.TextureView, 0));
     }
     
-    CreateVertexBuffer(device, deviceContext, Pipeline, MeshData);
-    CreateIndexBuffer(device, deviceContext, Pipeline, MeshData);
-    CreateVertexShaderBuffer(device, deviceContext, Pipeline);
+    MGraphicPipeline::CreateVertexBuffer(device, deviceContext, Pipeline, MeshData);
+    MGraphicPipeline::CreateIndexBuffer(device, deviceContext, Pipeline, MeshData);
+    MGraphicPipeline::CreateVertexShaderBuffer(device, deviceContext, Pipeline);
 
     return true;
 }
