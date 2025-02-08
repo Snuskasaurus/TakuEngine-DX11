@@ -16,7 +16,7 @@ void CreateGameWindow(const HINSTANCE hInstance);
 void DestroyGameWindow();
 SExitResult HandleGameWindowMessage();
 
-void DoFrame(const float dt);
+void DoFrame();
 
 class GameWindow
 {

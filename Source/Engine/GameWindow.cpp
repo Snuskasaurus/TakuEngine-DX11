@@ -298,13 +298,10 @@ void EndFrame()
     ClearBuffer(0.0f, 0.0f, 0.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DoFrame(const float dt)
+void DoFrame()
 {
     if (HasWindowFocus == false)
         return;
-
-    static float AngleShape = 0.0f;
-    AngleShape += dt;
 
     CStaticMesh::UpdateCommonPipeline();
     

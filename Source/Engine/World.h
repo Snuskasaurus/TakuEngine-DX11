@@ -17,7 +17,7 @@ private:
 public:
     static void InitializeWorld();
     static MWorld* GetWorld() { return Instance; }
-    static void DoWorldUpdate(const float& _dt) { Instance->OnUpdate(_dt); }
+    static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
     
 public:
     TVector3f GetSunDirection() const { return SunDirection; }
