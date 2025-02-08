@@ -250,20 +250,22 @@ SExitResult HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawScreen()
+void DrawFrame()
 {
     {
         D3D11_RASTERIZER_DESC rasterizerDesc = {};
-        rasterizerDesc.AntialiasedLineEnable = true;
-        rasterizerDesc.CullMode = D3D11_CULL_BACK;
-        rasterizerDesc.DepthBias = 0;
-        rasterizerDesc.DepthBiasClamp = 0.0f;
-        rasterizerDesc.DepthClipEnable = true;
-        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-        rasterizerDesc.FrontCounterClockwise = true;
-        rasterizerDesc.MultisampleEnable = false;
-        rasterizerDesc.ScissorEnable = false;
-        rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+        {
+            rasterizerDesc.AntialiasedLineEnable = true;
+            rasterizerDesc.CullMode = D3D11_CULL_BACK;
+            rasterizerDesc.DepthBias = 0;
+            rasterizerDesc.DepthBiasClamp = 0.0f;
+            rasterizerDesc.DepthClipEnable = true;
+            rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+            rasterizerDesc.FrontCounterClockwise = true;
+            rasterizerDesc.MultisampleEnable = false;
+            rasterizerDesc.ScissorEnable = false;
+            rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+        }
     
         ID3D11RasterizerState* rasterizerState = nullptr;
         CHECK_HRESULT(DXDevice->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
@@ -283,11 +285,6 @@ void DrawScreen()
     }
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void EndFrame()
-{
-    CHECK_HRESULT(DXSwapChain->Present(1u, 0u));
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
 void ClearBuffer(float r, float g, float b)
 {
     const float color[] = { r, g, b, 1.0f };
@@ -295,12 +292,16 @@ void ClearBuffer(float r, float g, float b)
     DXImmediateContext->ClearDepthStencilView(DXDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+void EndFrame()
+{
+    CHECK_HRESULT(DXSwapChain->Present(1u, 0u));
+    ClearBuffer(0.0f, 0.0f, 0.0f);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
 void DoFrame(const float dt)
 {
     if (HasWindowFocus == false)
         return;
-    
-    ClearBuffer(0.0f, 0.0f, 0.0f);
 
     static float AngleShape = 0.0f;
     AngleShape += dt;
@@ -310,7 +311,7 @@ void DoFrame(const float dt)
     MeshTest1.DrawStaticMesh();
     MeshTest2.DrawStaticMesh();
 
-    DrawScreen();
+    DrawFrame();
     EndFrame();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
