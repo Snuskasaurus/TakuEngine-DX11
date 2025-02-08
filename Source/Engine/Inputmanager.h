@@ -16,10 +16,23 @@ struct TInputHolder
     float CameraSpeed = 0.0f;
 };
 
-#define GET_INPUT(InputName) GetInputHolder()->InputName
+class MInput
+{
+private:
+    static MInput* Instance;
 
-void InitializeInput(HINSTANCE _hInstance);
-void DetectInputs();
-void ClearInputs();
+public:
+    static void InitializeInput(HINSTANCE);
+    static void DetectInputs();
+    static void ClearInputs();
+    static TInputHolder* GetInputHolder();
 
-TInputHolder* GetInputHolder();
+private:
+    static void DetectInputs_Keyboard(const BYTE*);
+    static void DetectInputs_Mouse(DIMOUSESTATE);
+    
+private:
+    TInputHolder InputHolder;
+};
+
+#define GET_INPUT(InputName) MInput::GetInputHolder()->InputName

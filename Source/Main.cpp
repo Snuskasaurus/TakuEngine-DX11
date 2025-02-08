@@ -5,20 +5,24 @@
 #include "Engine/TimeManager.h"
 #include "Engine/World.h"
 
-namespace TakuEngine
+namespace MainLoopEngine
 {
 	void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 	{
 		MTime::InitializeTime();
 		CreateGameWindow(hInstance);
-		InitializeInput(hInstance);
+		MInput::InitializeInput(hInstance);
 		MWorld::InitializeWorld();
 	}
 
 	void Update()
 	{
+		MInput::DetectInputs();
+		
 		const float dt = MTime::GetDeltaTime();
 		MWorld::UpdateWorld(dt);
+		
+		MInput::ClearInputs();
 	}
 
 	void Draw()
@@ -29,14 +33,11 @@ namespace TakuEngine
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
-	TakuEngine::Initialization(hInstance, hPrevInstance);
+	MainLoopEngine::Initialization(hInstance, hPrevInstance);
 	while (true)
 	{
-		DetectInputs();
-		TakuEngine::Update();
-		ClearInputs();
-		TakuEngine::Draw();
-		
+		MainLoopEngine::Update();
+		MainLoopEngine::Draw();
 		const SExitResult ExitResult = HandleGameWindowMessage();
 		if (ExitResult.Exiting == true) return ExitResult.Reason; // Exit application
 	}

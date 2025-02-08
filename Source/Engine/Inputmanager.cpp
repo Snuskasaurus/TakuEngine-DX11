@@ -1,95 +1,94 @@
 ﻿#include "Inputmanager.h"
 
+#include <cassert>
 #include <Windows.h>
 
 #include "HResultHandler.h"
 #include "GameWindow.h"
 
-DIMOUSESTATE mouseLastState;
-LPDIRECTINPUT8 DirectInput;
-
-TInputHolder Inputs;
-
-IDirectInputDevice8* DIKeyboard;
-IDirectInputDevice8* DIMouse;
-
 ///---------------------------------------------------------------------------------------------------------------------
-void InitializeInput(HINSTANCE _hInstance)
+LPDIRECTINPUT8 G_DIRECT_INPUT;
+IDirectInputDevice8* G_INPUT_DEVICE_KEYBOARD;
+IDirectInputDevice8* G_INPUT_DEVICE_MOUSE;
+///---------------------------------------------------------------------------------------------------------------------
+MInput* MInput::Instance = nullptr;
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::InitializeInput(HINSTANCE _hInstance)
 {
-    CHECK_HRESULT(DirectInput8Create(_hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&DirectInput, nullptr));
-    CHECK_HRESULT(DirectInput->CreateDevice(GUID_SysKeyboard, &DIKeyboard, nullptr));
-    CHECK_HRESULT(DirectInput->CreateDevice(GUID_SysMouse, &DIMouse, nullptr));
+    assert(Instance == nullptr);
+    Instance = new MInput;
+
+    CHECK_HRESULT(DirectInput8Create(_hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&G_DIRECT_INPUT, nullptr));
+    CHECK_HRESULT(G_DIRECT_INPUT->CreateDevice(GUID_SysKeyboard, &G_INPUT_DEVICE_KEYBOARD, nullptr));
+    CHECK_HRESULT(G_DIRECT_INPUT->CreateDevice(GUID_SysMouse, &G_INPUT_DEVICE_MOUSE, nullptr));
 
     const HWND hwnd = GameWindow::GetWindowHandle();
     
-    CHECK_HRESULT(DIKeyboard->SetDataFormat(&c_dfDIKeyboard));
-    CHECK_HRESULT(DIKeyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
+    CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetDataFormat(&c_dfDIKeyboard));
+    CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 
-    CHECK_HRESULT(DIMouse->SetDataFormat(&c_dfDIMouse));
-    CHECK_HRESULT(DIMouse->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND));
+    CHECK_HRESULT(G_INPUT_DEVICE_MOUSE->SetDataFormat(&c_dfDIMouse));
+    CHECK_HRESULT(G_INPUT_DEVICE_MOUSE->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void DetectKeyboardInputs()
-{
-    BYTE keyboardState[256];
-    DIKeyboard->Acquire();
-    DIKeyboard->GetDeviceState(sizeof(keyboardState),(LPVOID)&keyboardState);
-    
-    if(keyboardState[DIK_ESCAPE] & 0x80)
-    {
-        PostQuitMessage(1);
-    }
-    
-#define INPUT_KEYBOARD_KEY(Key, Input, Value) if(keyboardState[Key] & 0x80) { Inputs.Input = Value; }
-
-    INPUT_KEYBOARD_KEY(DIK_D, CameraRight, 1.0f)
-    INPUT_KEYBOARD_KEY(DIK_A, CameraRight, -1.0f)
-    
-    INPUT_KEYBOARD_KEY(DIK_W, CameraForward, 1.0f)
-    INPUT_KEYBOARD_KEY(DIK_S, CameraForward, -1.0f)
-    
-    INPUT_KEYBOARD_KEY(DIK_LSHIFT, CameraUp, 1.0f)
-    INPUT_KEYBOARD_KEY(DIK_LCONTROL, CameraUp, -1.0f)
-
-#undef INPUT_KEYBOARD_KEY
-}
-///---------------------------------------------------------------------------------------------------------------------
-void DetectMouseInputs()
-{
-    DIMOUSESTATE mouseCurrState;
-    DIMouse->Acquire();
-    DIMouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
-    
-    if(mouseCurrState.lX != mouseLastState.lX)
-    {
-        Inputs.CameraYaw = -(float)mouseCurrState.lX;
-    }
-    if (mouseCurrState.lY != mouseLastState.lY)
-    {
-        Inputs.CameraPitch = -(float)mouseCurrState.lY;
-    }
-    if (mouseCurrState.lZ != mouseLastState.lZ)
-    {
-        Inputs.CameraSpeed = (float)mouseCurrState.lZ;
-    }
-}
-///---------------------------------------------------------------------------------------------------------------------
-void DetectInputs()
+void MInput::DetectInputs()
 {
     if (GameWindow::HasFocus() == false)
         return;
     
-    DetectKeyboardInputs();
-    DetectMouseInputs();
+    BYTE keyboardState[256];
+    G_INPUT_DEVICE_KEYBOARD->Acquire();
+    G_INPUT_DEVICE_KEYBOARD->GetDeviceState(sizeof(keyboardState),(LPVOID)&keyboardState);
+    DetectInputs_Keyboard(keyboardState);
+
+    DIMOUSESTATE mouseCurrState;
+    G_INPUT_DEVICE_MOUSE->Acquire();
+    G_INPUT_DEVICE_MOUSE->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
+    DetectInputs_Mouse(mouseCurrState);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void ClearInputs()
+void MInput::ClearInputs()
 {
-    Inputs = {};
+    Instance->InputHolder = {};
 }
 ///---------------------------------------------------------------------------------------------------------------------
-TInputHolder* GetInputHolder()
+TInputHolder* MInput::GetInputHolder()
 {
-    return &Inputs;
+    return &Instance->InputHolder;
 }
+///---------------------------------------------------------------------------------------------------------------------
+#define KEYBOARD_CALL_FUNCTION(Key, CallFunc) if(_keyboardState[Key] & 0x80) { CallFunc; }
+#define KEYBOARD_CHANGE_INPUT_HOLDER(Key, Input, Value) if(_keyboardState[Key] & 0x80) { Instance->InputHolder.Input = Value; }
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::DetectInputs_Keyboard(const BYTE* _keyboardState)
+{
+    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_D, CameraRight, 1.0f)
+    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_A, CameraRight, -1.0f)
+    
+    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_W, CameraForward, 1.0f)
+    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_S, CameraForward, -1.0f)
+    
+    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_LSHIFT, CameraUp, 1.0f)
+    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_LCONTROL, CameraUp, -1.0f)
+
+#if _DEBUG
+    KEYBOARD_CALL_FUNCTION(DIK_ESCAPE, PostQuitMessage(1))
+#endif
+}
+///---------------------------------------------------------------------------------------------------------------------
+#undef KEYBOARD_CALL_FUNCTION
+#undef KEYBOARD_CHANGE_INPUT_HOLDER
+///---------------------------------------------------------------------------------------------------------------------
+#define MOUSE_AXE_CHANGE_INPUT_HOLDER_POSITIVE(Axis, Input) if(_mouseState.Axis != 0) { Instance->InputHolder.Input = (float)_mouseState.Axis; }
+#define MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE(Axis, Input) if(_mouseState.Axis != 0) { Instance->InputHolder.Input = (float)-_mouseState.Axis; }
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::DetectInputs_Mouse(DIMOUSESTATE _mouseState)
+{
+    MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE(lX, CameraYaw)
+    MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE(lY, CameraPitch)
+    MOUSE_AXE_CHANGE_INPUT_HOLDER_POSITIVE(lZ, CameraSpeed)
+}
+///---------------------------------------------------------------------------------------------------------------------
+#undef MOUSE_AXE_CHANGE_INPUT_HOLDER_POSITIVE
+#undef MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE
 ///---------------------------------------------------------------------------------------------------------------------
