@@ -64,3 +64,16 @@ private:
     SMeshData MeshData;  // TEMPORARY CODE | Will stay as local in CreateStaticMesh
     TTransform Transform; // TEMPORARY CODE | Will stay as local in CreateStaticMesh
 };
+
+class MGraphicPipeline
+{
+public:
+    static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShader&);
+    static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
+    static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
+    static void UpdatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
+    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&, const SMeshData&);
+    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&, const SMeshData&);
+    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&);
+    static void UpdateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&, const TTransform&);
+};

@@ -18,7 +18,7 @@
 static SVertexShader G_VERTEX_SHADER_DATA;
 static SPixelShader G_PIXEL_SHADER_DATA;
 ///---------------------------------------------------------------------------------------------------------------------
-void CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShader& _vertexShader)
+void MGraphicPipeline::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShader& _vertexShader)
 {
     ShaderManager::CompileShader(GAME_DATA_SHADER_PATH L"VertexShader.hlsl", "vs_5_0", &_vertexShader.Blob);
     CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
@@ -37,7 +37,7 @@ void CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _devic
     _deviceContext->IASetInputLayout(_vertexShader.Input);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
+void MGraphicPipeline::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
 {
     ShaderManager::CompileShader(GAME_DATA_SHADER_PATH L"PixelShader.hlsl", "ps_5_0", &_pixelShader.Blob);
     CHECK_HRESULT(_device->CreatePixelShader(_pixelShader.Blob->GetBufferPointer(), _pixelShader.Blob->GetBufferSize(), nullptr, &_pixelShader.Shader));
@@ -59,7 +59,7 @@ void CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _device
     _deviceContext->PSSetSamplers(0, 1, &_pixelShader.TextureSamplerState);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
+void MGraphicPipeline::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
 {
     SPixelShaderConstantBuffer ConstantBufferPixelShader;
     {
@@ -84,7 +84,7 @@ void CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext*
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, &_pixelShader.ConstantBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void UpdatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShader& _pixelShader)
+void MGraphicPipeline::UpdatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShader& _pixelShader)
 {
     SPixelShaderConstantBuffer ConstantBufferPixelShader;
     {
@@ -99,7 +99,7 @@ void UpdatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext*
     _deviceContext->PSSetConstantBuffers(0u, 1u, &_pixelShader.ConstantBuffer);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _meshPipeline, const SMeshData& _meshData)
+void MGraphicPipeline::CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _meshPipeline, const SMeshData& _meshData)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -119,7 +119,7 @@ void CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceConte
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, &_meshPipeline.vertexBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _meshPipeline, const SMeshData& _meshData)
+void MGraphicPipeline::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _meshPipeline, const SMeshData& _meshData)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -139,7 +139,7 @@ void CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContex
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, &_meshPipeline.IndexBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _pipeline)
+void MGraphicPipeline::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _pipeline)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -159,7 +159,7 @@ void CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _devic
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, &_pipeline.VertexConstantBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void UpdateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _pipeline, const TTransform& _transform)
+void MGraphicPipeline::UpdateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SMeshPipeline& _pipeline, const TTransform& _transform)
 {
     SVertexShaderConstantBuffer constantBufferData;
     {
@@ -183,9 +183,9 @@ void CStaticMesh::InitializeCommonPipeline()
     ID3D11Device* device = GameWindow::GetDevice();
     ID3D11DeviceContext* deviceContext = GameWindow::GetImmediateContext();
     
-    CreateAndSetVertexShader(device, deviceContext, G_VERTEX_SHADER_DATA);
-    CreateAndSetPixelShader(device, deviceContext, G_PIXEL_SHADER_DATA);
-    CreatePixelShaderConstantBuffer(device, deviceContext, G_PIXEL_SHADER_DATA);
+    MGraphicPipeline::CreateAndSetVertexShader(device, deviceContext, G_VERTEX_SHADER_DATA);
+    MGraphicPipeline::CreateAndSetPixelShader(device, deviceContext, G_PIXEL_SHADER_DATA);
+    MGraphicPipeline::CreatePixelShaderConstantBuffer(device, deviceContext, G_PIXEL_SHADER_DATA);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void CStaticMesh::UpdateCommonPipeline()
@@ -193,7 +193,7 @@ void CStaticMesh::UpdateCommonPipeline()
     ID3D11Device* device = GameWindow::GetDevice();
     ID3D11DeviceContext* deviceContext = GameWindow::GetImmediateContext();
     
-    UpdatePixelShaderConstantBuffer(device, deviceContext, G_PIXEL_SHADER_DATA);
+    MGraphicPipeline::UpdatePixelShaderConstantBuffer(device, deviceContext, G_PIXEL_SHADER_DATA);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void CStaticMesh::UninitializeCommonPipeline()
@@ -247,7 +247,7 @@ void CStaticMesh::DrawStaticMesh()
     deviceContext->IASetVertexBuffers(0u, 1u, &Pipeline.vertexBuffer, &SMeshData::VertexBuffer_StructureByteStride, &offset);
     deviceContext->IASetIndexBuffer(Pipeline.IndexBuffer, DXGI_FORMAT_R16_UINT, offset);
     
-    UpdateVertexShaderBuffer(device, deviceContext, Pipeline, Transform);
+    MGraphicPipeline::UpdateVertexShaderBuffer(device, deviceContext, Pipeline, Transform);
     
     deviceContext->PSSetShaderResources(0u, 1u, &Pipeline.TextureView);
 
