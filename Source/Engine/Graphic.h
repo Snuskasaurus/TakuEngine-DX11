@@ -78,7 +78,7 @@ class MGraphic
     
 public:
     static void InitializeGraphic();
-    static void DrawGraphic();
+    static void DrawPipeline();
     static void UninitializeGraphic();
 public:
     static void AddMeshToDraw(const TTransform&, const char*);

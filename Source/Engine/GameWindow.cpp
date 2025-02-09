@@ -6,7 +6,7 @@
 #include <DirectXMath.h>
 
 #include "Math.h"
-#include "GraphicPipeline.h"
+#include "Graphic.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 HWND GameWindowHandle;
@@ -86,7 +86,7 @@ void MGameWindow::DrawGameWindow()
     if (MGameWindow::HasFocus() == false)
         return;
 
-    MGraphic::DrawGraphic();
+    MGraphic::DrawPipeline();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 SExitResult MGameWindow::HandleGameWindowMessage()

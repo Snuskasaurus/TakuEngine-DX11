@@ -375,7 +375,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Source\Engine\Inputmanager.cpp" />
-    <ClCompile Include="Source\Engine\GraphicPipeline.cpp" />
+    <ClCompile Include="Source\Engine\Graphic.cpp" />
     <ClCompile Include="Source\Engine\MeshManager.cpp" />
     <ClCompile Include="Source\Engine\Shaders.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -767,7 +767,7 @@
     <ClInclude Include="Source\Engine\HResultHandler.h" />
     <ClInclude Include="Source\Engine\Inputmanager.h" />
     <ClInclude Include="Source\Engine\Math.h" />
-    <ClInclude Include="Source\Engine\GraphicPipeline.h" />
+    <ClInclude Include="Source\Engine\Graphic.h" />
     <ClInclude Include="Source\Engine\MeshManager.h" />
     <ClInclude Include="Source\Engine\Shaders.h" />
     <ClInclude Include="Source\Engine\TimeManager.h" />

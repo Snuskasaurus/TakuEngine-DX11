@@ -2,7 +2,7 @@
 
 #include <assert.h>
 
-#include "GraphicPipeline.h"
+#include "Graphic.h"
 
 #define MESH_TO_IMPORT_SQUARE   "Square"
 #define MESH_TO_IMPORT_CUBE     "Cube"

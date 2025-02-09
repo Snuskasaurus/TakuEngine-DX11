@@ -1,4 +1,4 @@
-﻿#include "GraphicPipeline.h"
+﻿#include "Graphic.h"
 
 #include <d3d11.h>
 #include <sstream>
@@ -19,7 +19,7 @@ static SGraphicResources_Pipeline G_PIPELINE;
 ///---------------------------------------------------------------------------------------------------------------------
 static std::vector<CStaticMesh*> G_MESH_TO_DRAW;
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::DrawGraphic()
+void MGraphic::DrawPipeline()
 {
     MGraphic::SetPixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 
