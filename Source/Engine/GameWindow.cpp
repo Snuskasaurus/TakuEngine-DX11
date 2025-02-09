@@ -7,17 +7,6 @@
 
 #include "Math.h"
 #include "GraphicPipeline.h"
-#include "MeshManager.h"
-
-#define GAME_DATA_PATH "Game/Data/"
-#define GAME_DATA_SHADER_PATH "Game/Data/Shaders/"
-
-#define MESH_TO_IMPORT_SQUARE "Square"
-#define MESH_TO_IMPORT_CUBE "Cube"
-#define MESH_TO_IMPORT_SPHERE "Sphere"
-#define MESH_TO_IMPORT_SUZANNE "Suzanne"
-#define MESH_TO_IMPORT_CRATE "Crate"
-#define MESH_TO_IMPORT_MONSTER "Monster"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 HWND GameWindowHandle;
@@ -83,8 +72,6 @@ void MGameWindow::InitializeGameWindow(const HINSTANCE hInstance)
     ShowWindow(GameWindowHandle, SW_SHOW);
     
     MGraphic::InitializeGraphic();
-    MGraphic::AddMeshToDraw({TVector3f{0.0f, 0.0f, -1.0f}}, MESH_TO_IMPORT_CRATE);
-    MGraphic::AddMeshToDraw({}, MESH_TO_IMPORT_MONSTER);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void MGameWindow::UninitializeGameWindow()
