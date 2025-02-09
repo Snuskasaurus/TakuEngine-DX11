@@ -3,13 +3,9 @@
 #include <Windows.h>
 #include <Windowsx.h>
 #include <wincodec.h>
-
-#include <d3d11.h>
 #include <DirectXMath.h>
-#include <dxgiformat.h>
 
 #include "Math.h"
-#include "HResultHandler.h"
 #include "GraphicPipeline.h"
 #include "MeshManager.h"
 
@@ -24,8 +20,6 @@
 #define MESH_TO_IMPORT_MONSTER "Monster"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-// Window
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
 HWND GameWindowHandle;
 const wchar_t* GameClassName = L"JuProject";
 const wchar_t* WindowName = L"JuProject";
@@ -37,35 +31,6 @@ constexpr UINT DefaultWindowPositionY = (UINT)(DefaultWindowSizeY * 0.1);
 UINT WindowSizeX = DefaultWindowSizeX;
 UINT WindowSizeY = DefaultWindowSizeY;
 bool HasWindowFocus = false;
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-// Actors
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-CStaticMesh MeshTest1;
-CStaticMesh MeshTest2;
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-// GameWindow Class
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-HWND GameWindow::GetWindowHandle() { return GameWindowHandle; }
-bool GameWindow::HasFocus() { return HasWindowFocus; }
-TMatrix4f GameWindow::GetPerspectiveMatrix()
-{
-    // TODO Julien Rogel (02/02/2025): no need to compute it each time we call it but only when ScreenRatio change
-    const float ScreenRatio = (float)WindowSizeY / (float)WindowSizeX;
-    const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
-    return PerspectiveMatrix;
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-void InitializeGraphic()
-{
-    MGraphic::InitializeGraphic();
-    MGraphic::AddMeshToDraw({TVector3f{0.0f, 0.0f, -1.0f}}, MESH_TO_IMPORT_CRATE);
-    MGraphic::AddMeshToDraw({}, MESH_TO_IMPORT_MONSTER);
-}
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-void UninitializeDirectX11()
-{
-    MGraphic::UninitializeGraphic();
-}
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -92,22 +57,24 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void CreateGameWindow(const HINSTANCE hInstance)
+void MGameWindow::InitializeGameWindow(const HINSTANCE hInstance)
 {
-    WNDCLASSEX wc = { 0 };
-    wc.cbSize = sizeof(wc);
-    wc.style = CS_OWNDC;
-    wc.lpfnWndProc = GameWindowProcedure;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = hInstance;
-    wc.hCursor = nullptr;
-    wc.hIcon = nullptr;
-    wc.hbrBackground = nullptr;
-    wc.lpszMenuName = nullptr;
-    wc.hIconSm = nullptr;
-    wc.lpszClassName = GameClassName;
-    RegisterClassEx(&wc);
+    WNDCLASSEX windowInfos = { 0 };
+    {
+        windowInfos.cbSize = sizeof(windowInfos);
+        windowInfos.style = CS_OWNDC;
+        windowInfos.lpfnWndProc = GameWindowProcedure;
+        windowInfos.cbClsExtra = 0;
+        windowInfos.cbWndExtra = 0;
+        windowInfos.hInstance = hInstance;
+        windowInfos.hCursor = nullptr;
+        windowInfos.hIcon = nullptr;
+        windowInfos.hbrBackground = nullptr;
+        windowInfos.lpszMenuName = nullptr;
+        windowInfos.hIconSm = nullptr;
+        windowInfos.lpszClassName = GameClassName;
+    }
+    RegisterClassEx(&windowInfos);
 	
     GameWindowHandle = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,
         DefaultWindowPositionX, DefaultWindowPositionY, DefaultWindowSizeX, DefaultWindowSizeY,
@@ -115,19 +82,27 @@ void CreateGameWindow(const HINSTANCE hInstance)
     
     ShowWindow(GameWindowHandle, SW_SHOW);
     
-    InitializeGraphic();
+    MGraphic::InitializeGraphic();
+    MGraphic::AddMeshToDraw({TVector3f{0.0f, 0.0f, -1.0f}}, MESH_TO_IMPORT_CRATE);
+    MGraphic::AddMeshToDraw({}, MESH_TO_IMPORT_MONSTER);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DestroyGameWindow()
+void MGameWindow::UninitializeGameWindow()
 {
     assert(GameWindowHandle != nullptr);
-    
-    UninitializeDirectX11();
-    
+    MGraphic::UninitializeGraphic();
     DestroyWindow(GameWindowHandle);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-SExitResult HandleGameWindowMessage()
+void MGameWindow::DrawGameWindow()
+{
+    if (MGameWindow::HasFocus() == false)
+        return;
+
+    MGraphic::DrawGraphic();
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+SExitResult MGameWindow::HandleGameWindowMessage()
 {
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -142,14 +117,15 @@ SExitResult HandleGameWindowMessage()
     return {false, -1 };
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void DrawGameWindow()
+UINT MGameWindow::GetGameWindowHeight() { return WindowSizeY; }
+UINT MGameWindow::GetGameWindowWidth() {  return WindowSizeX; }
+HWND MGameWindow::GetWindowHandle() { return GameWindowHandle; }
+bool MGameWindow::HasFocus() { return HasWindowFocus; }
+TMatrix4f MGameWindow::GetPerspectiveMatrix()
 {
-    if (HasWindowFocus == false)
-        return;
-
-    MGraphic::DrawGraphic();
+    // TODO Julien Rogel (02/02/2025): no need to compute it each time we call it but only when ScreenRatio change
+    const float ScreenRatio = (float)WindowSizeY / (float)WindowSizeX;
+    const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFovRH(0.4f * 3.14f, ScreenRatio, 0.0001f, 1000.0f);
+    return PerspectiveMatrix;
 }
-//---------------------------------------------------------------------------------------------------------------------------------------------------------
-UINT GameWindow::GetGameWindowHeight() { return WindowSizeY; }
-UINT GameWindow::GetGameWindowWidth() {  return WindowSizeX; }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -12,14 +12,14 @@ struct SExitResult
     int Reason = -1;
 };
 
-void CreateGameWindow(const HINSTANCE hInstance);
-void DestroyGameWindow();
-SExitResult HandleGameWindowMessage();
 
-void DrawGameWindow();
-
-class GameWindow
+class MGameWindow
 {
+public:
+    static void InitializeGameWindow(const HINSTANCE hInstance);
+    static void UninitializeGameWindow();
+    static void DrawGameWindow();
+    static SExitResult HandleGameWindowMessage();
 public:
     static UINT GetGameWindowHeight();
     static UINT GetGameWindowWidth();

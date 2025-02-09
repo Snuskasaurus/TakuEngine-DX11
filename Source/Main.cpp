@@ -7,15 +7,15 @@
 
 namespace MainLoopEngine
 {
-///---------------------------------------------------------------------------------------------------------------------
+///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 {
+	MGameWindow::InitializeGameWindow(hInstance);
 	MTime::InitializeTime();
-	CreateGameWindow(hInstance);
 	MInput::InitializeInput(hInstance);
 	MWorld::InitializeWorld();
 }
-///---------------------------------------------------------------------------------------------------------------------
+///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Update()
 {
 	MInput::DetectInputs();
@@ -25,12 +25,17 @@ void Update()
 	
 	MInput::ClearInputs();
 }
-///---------------------------------------------------------------------------------------------------------------------
+///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw()
 {
-	DrawGameWindow();
+	MGameWindow::DrawGameWindow();
 }
-///---------------------------------------------------------------------------------------------------------------------
+///--------------------------------------------------------------------------------------------------------------------------------------------------------
+void Uninitialization()
+{
+	MGameWindow::UninitializeGameWindow();
+}
+///--------------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
@@ -40,7 +45,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 	{
 		MainLoopEngine::Update();
 		MainLoopEngine::Draw();
-		const SExitResult ExitResult = HandleGameWindowMessage();
-		if (ExitResult.Exiting == true) return ExitResult.Reason; // Exit application
+		const SExitResult exitResult = MGameWindow::HandleGameWindowMessage();
+		if (exitResult.Exiting == true)
+		{
+			MainLoopEngine::Uninitialization();
+			return exitResult.Reason;
+		}
 	}
 }

@@ -22,7 +22,7 @@ void MInput::InitializeInput(HINSTANCE _hInstance)
     CHECK_HRESULT(G_DIRECT_INPUT->CreateDevice(GUID_SysKeyboard, &G_INPUT_DEVICE_KEYBOARD, nullptr));
     CHECK_HRESULT(G_DIRECT_INPUT->CreateDevice(GUID_SysMouse, &G_INPUT_DEVICE_MOUSE, nullptr));
 
-    const HWND hwnd = GameWindow::GetWindowHandle();
+    const HWND hwnd = MGameWindow::GetWindowHandle();
     
     CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetDataFormat(&c_dfDIKeyboard));
     CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
@@ -33,7 +33,7 @@ void MInput::InitializeInput(HINSTANCE _hInstance)
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::DetectInputs()
 {
-    if (GameWindow::HasFocus() == false)
+    if (MGameWindow::HasFocus() == false)
         return;
     
     BYTE keyboardState[256];

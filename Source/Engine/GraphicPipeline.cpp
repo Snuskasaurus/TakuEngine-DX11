@@ -33,11 +33,11 @@ void MGraphic::DrawGraphic()
         MGraphic::SetPrimitiveAndDraw(G_PIPELINE.DeviceContext, StaticMeshToDraw->MeshData);
     }
     
-    ConfigureViewport(G_PIPELINE.DeviceContext);
-    Rasterize(G_PIPELINE.Device, G_PIPELINE.DeviceContext);
-    PresentSwapChain(G_PIPELINE.SwapChain);
-    ClearRenderTarget(G_PIPELINE.DeviceContext, G_PIPELINE.RenderTargetView);
-    ClearDepthStencil(G_PIPELINE.DeviceContext, G_PIPELINE.DepthStencilView);
+    MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
+    MGraphic::Rasterize(G_PIPELINE.Device, G_PIPELINE.DeviceContext);
+    MGraphic::PresentSwapChain(G_PIPELINE.SwapChain);
+    MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_PIPELINE.RenderTargetView);
+    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_PIPELINE.DepthStencilView);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::InitializeGraphic()
@@ -68,8 +68,8 @@ void MGraphic::InitializeGraphic()
         ID3D11Texture2D* depthStencilTexture = nullptr;
         {
             D3D11_TEXTURE2D_DESC depthStencilTextureDesc;
-            depthStencilTextureDesc.Width = GameWindow::GetGameWindowWidth();
-            depthStencilTextureDesc.Height = GameWindow::GetGameWindowHeight();
+            depthStencilTextureDesc.Width = MGameWindow::GetGameWindowWidth();
+            depthStencilTextureDesc.Height = MGameWindow::GetGameWindowHeight();
             depthStencilTextureDesc.MipLevels = 1u;
             depthStencilTextureDesc.ArraySize = 1u;
             depthStencilTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -121,8 +121,8 @@ void MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName
 void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceContext** _deviceContext, IDXGISwapChain** _swapChain)
 {
     DXGI_SWAP_CHAIN_DESC SwapChainDesc;
-    SwapChainDesc.BufferDesc.Width = GameWindow::GetGameWindowWidth();
-    SwapChainDesc.BufferDesc.Height = GameWindow::GetGameWindowHeight();
+    SwapChainDesc.BufferDesc.Width = MGameWindow::GetGameWindowWidth();
+    SwapChainDesc.BufferDesc.Height = MGameWindow::GetGameWindowHeight();
     SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
     SwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
@@ -132,7 +132,7 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
     SwapChainDesc.SampleDesc.Quality = 0;
     SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     SwapChainDesc.BufferCount = 1;
-    SwapChainDesc.OutputWindow = GameWindow::GetWindowHandle();
+    SwapChainDesc.OutputWindow = MGameWindow::GetWindowHandle();
     SwapChainDesc.Windowed = TRUE;
     SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     SwapChainDesc.Flags = 0;
@@ -327,7 +327,7 @@ void MGraphic::SetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _devi
     {
         const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transform);
         const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->GetInverseCameraMatrix();
-        const TMatrix4f perspectiveMatrix = GameWindow::GetPerspectiveMatrix();
+        const TMatrix4f perspectiveMatrix = MGameWindow::GetPerspectiveMatrix();
         TMatrix4f worldViewProjectionMatrix = TMatrix4f::Transpose(objectWorldMatrix * invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
         
         constantBufferData.WorldViewProjection = worldViewProjectionMatrix;
@@ -365,8 +365,8 @@ void MGraphic::ConfigureViewport(ID3D11DeviceContext* _deviceContext)
 {
     D3D11_VIEWPORT viewportInfos;
     {
-        viewportInfos.Height = (float)GameWindow::GetGameWindowHeight();
-        viewportInfos.Width = (float)GameWindow::GetGameWindowWidth();
+        viewportInfos.Height = (float)MGameWindow::GetGameWindowHeight();
+        viewportInfos.Width = (float)MGameWindow::GetGameWindowWidth();
         viewportInfos.TopLeftX = 0.0f;
         viewportInfos.TopLeftY = 0.0f;
         viewportInfos.MinDepth = 0.0f;
