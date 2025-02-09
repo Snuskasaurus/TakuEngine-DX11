@@ -1,24 +1,34 @@
 ﻿#pragma once
 
+#include <array>
 #include <Windows.h>
 
-struct SColorFloat
+struct TColorF
 {
     float r, g, b, a;
+    
+    static TColorF White;
+    static TColorF Black;
+    static TColorF Red;
+    static TColorF Green;
+    static TColorF Blue;
+    static TColorF Magenta;
+    static TColorF Yellow;
+    static TColorF Cyan;
 };
 
-struct SColor
+struct TColorI
 {
     UINT8 r, g, b, a;
     
-    static SColor White;
-    static SColor Black;
-    static SColor Red;
-    static SColor Green;
-    static SColor Blue;
-    static SColor Magenta;
-    static SColor Yellow;
-    static SColor Cyan;
+    static TColorI White;
+    static TColorI Black;
+    static TColorI Red;
+    static TColorI Green;
+    static TColorI Blue;
+    static TColorI Magenta;
+    static TColorI Yellow;
+    static TColorI Cyan;
 
-    SColorFloat ToFloat() const { return {(float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f}; }
+    TColorF ToFloat() const { return {(float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f}; }
 };

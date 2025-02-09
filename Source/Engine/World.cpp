@@ -1,12 +1,13 @@
 ﻿#include "World.h"
 
+#include <assert.h>
+
 MWorld* MWorld::Instance = nullptr;
 
 ///---------------------------------------------------------------------------------------------------------------------
 void MWorld::InitializeWorld()
 {
-    if (Instance != nullptr)
-        return;
+    assert(Instance == nullptr);
     Instance = new MWorld;
     Instance->OnInit();
 }

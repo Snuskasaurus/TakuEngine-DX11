@@ -9,7 +9,20 @@
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;
 
-struct SMeshPipeline
+struct SGraphicResources_Pipeline
+{
+    ID3D11Device* Device = nullptr;
+    ID3D11DeviceContext* DeviceContext = nullptr;
+    IDXGISwapChain* SwapChain = nullptr;
+    ID3D11RenderTargetView* RenderTargetView = nullptr;
+    ID3D11DepthStencilView* DepthStencilView = nullptr;
+    ID3D11Resource* BackBufferResource = nullptr;
+    
+    SVertexShader VertexShaderData;
+    SPixelShader PixelShaderData;
+};
+
+struct SGraphicResources_Mesh
 {
     ID3D11Resource* Texture = nullptr;
     ID3D11ShaderResourceView* TextureView = nullptr;
@@ -51,29 +64,43 @@ class CStaticMesh
 {
 public:
     
-    static void InitializeCommonPipeline();
-    static void UpdateCommonPipeline();
-    static void UninitializeCommonPipeline();
-    
-    bool InitializeStaticMeshPipeline(const TTransform& _transform, const char* _meshName);
+    bool LoadMeshData(const TTransform& _transform, const char* _meshName);
     void UninitializeStaticMeshPipeline();
-    void DrawStaticMesh();
 
-private:
-    SMeshPipeline Pipeline;  // TEMPORARY CODE | Will stay as local in CreateStaticMesh
-    SMeshData MeshData;  // TEMPORARY CODE | Will stay as local in CreateStaticMesh
-    TTransform Transform; // TEMPORARY CODE | Will stay as local in CreateStaticMesh
+public:
+    SGraphicResources_Mesh GraphicResource;
+    SMeshData MeshData;
+    TTransform Transform;
 };
 
-class MGraphicPipeline
+class MGraphic
 {
+    
 public:
+    static void InitializeGraphic();
+    static void DrawGraphic();
+    static void UninitializeGraphic();
+public:
+    static void AddMeshToDraw(const TTransform&, const char*);
+public:
+    static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShader&);
     static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
     static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
-    static void UpdatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
-    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&, const SMeshData&);
-    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&, const SMeshData&);
-    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&);
-    static void UpdateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SMeshPipeline&, const TTransform&);
+    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
+    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
+    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&);
+public:
+    static void SetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const TTransform&);
+    static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
+public:
+    static void SetPixelShader(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
+    static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
+public:
+    static void SetPrimitiveAndDraw(ID3D11DeviceContext*, const SMeshData&);
+    static void Rasterize(ID3D11Device*, ID3D11DeviceContext*);
+    static void ConfigureViewport(ID3D11DeviceContext*);
+    static void PresentSwapChain(IDXGISwapChain*);
+    static void ClearRenderTarget(ID3D11DeviceContext*, ID3D11RenderTargetView*);
+    static void ClearDepthStencil(ID3D11DeviceContext*, ID3D11DepthStencilView*);
 };

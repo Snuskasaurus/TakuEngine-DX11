@@ -7,28 +7,30 @@
 
 namespace MainLoopEngine
 {
-	void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
-	{
-		MTime::InitializeTime();
-		CreateGameWindow(hInstance);
-		MInput::InitializeInput(hInstance);
-		MWorld::InitializeWorld();
-	}
-
-	void Update()
-	{
-		MInput::DetectInputs();
-		
-		const float dt = MTime::GetDeltaTime();
-		MWorld::UpdateWorld(dt);
-		
-		MInput::ClearInputs();
-	}
-
-	void Draw()
-	{
-		DoFrame();
-	}
+///---------------------------------------------------------------------------------------------------------------------
+void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
+{
+	MTime::InitializeTime();
+	CreateGameWindow(hInstance);
+	MInput::InitializeInput(hInstance);
+	MWorld::InitializeWorld();
+}
+///---------------------------------------------------------------------------------------------------------------------
+void Update()
+{
+	MInput::DetectInputs();
+	
+	const float dt = MTime::GetDeltaTime();
+	MWorld::UpdateWorld(dt);
+	
+	MInput::ClearInputs();
+}
+///---------------------------------------------------------------------------------------------------------------------
+void Draw()
+{
+	DrawGameWindow();
+}
+///---------------------------------------------------------------------------------------------------------------------
 }
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)

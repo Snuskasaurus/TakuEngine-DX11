@@ -16,15 +16,15 @@ void CreateGameWindow(const HINSTANCE hInstance);
 void DestroyGameWindow();
 SExitResult HandleGameWindowMessage();
 
-void DoFrame();
+void DrawGameWindow();
 
 class GameWindow
 {
 public:
+    static UINT GetGameWindowHeight();
+    static UINT GetGameWindowWidth();
     static HWND GetWindowHandle();
     static bool HasFocus();
-    static ID3D11Device* GetDevice();
-    static ID3D11DeviceContext* GetImmediateContext();
     static TMatrix4f GetPerspectiveMatrix();
 };
 
