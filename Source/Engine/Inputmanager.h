@@ -2,8 +2,7 @@
 
 // Created with the help of https://www.braynzarsoft.net/viewtutorial/q16390-18-direct-input
 
-#pragma comment (lib, "dinput8.lib")
-#pragma comment (lib, "dxguid.lib")
+#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
 struct TInputHolder

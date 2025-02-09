@@ -10,8 +10,8 @@
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 HWND GameWindowHandle;
-const wchar_t* GameClassName = L"JuProject";
-const wchar_t* WindowName = L"JuProject";
+const CHAR* GameClassName = "JuProject";
+const CHAR* WindowName = "JuProject";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 constexpr UINT DefaultWindowSizeX = (UINT)(1920 * 0.85);
 constexpr UINT DefaultWindowSizeY = (UINT)(1080 * 0.85);

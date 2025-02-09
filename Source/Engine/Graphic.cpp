@@ -5,7 +5,7 @@
 
 #include "GameWindow.h"
 #include "HResultHandler.h"
-#include "MeshManager.h"
+#include "MeshResources.h"
 #include "Shaders.h"
 #include "WICTextureLoader.h"
 #include "World.h"
@@ -16,7 +16,6 @@
 
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
-///---------------------------------------------------------------------------------------------------------------------
 static std::vector<CStaticMesh*> G_MESH_TO_DRAW;
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::DrawPipeline()
@@ -30,7 +29,7 @@ void MGraphic::DrawPipeline()
         MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource);
         MGraphic::SetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource, StaticMeshToDraw->Transform);
         MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource);
-        MGraphic::SetPrimitiveAndDraw(G_PIPELINE.DeviceContext, StaticMeshToDraw->MeshData);
+        MGraphic::SetPrimitiveAndDraw(G_PIPELINE.DeviceContext, *StaticMeshToDraw->MeshData);
     }
     
     MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
@@ -111,8 +110,8 @@ void MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName
     CStaticMesh* StaticMesh = new CStaticMesh;
     StaticMesh->LoadMeshData(_transform, _meshName);
     
-    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, StaticMesh->MeshData);
-    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, StaticMesh->MeshData);
+    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, *StaticMesh->MeshData);
+    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, *StaticMesh->MeshData);
     MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource);
     
     G_MESH_TO_DRAW.push_back(StaticMesh);
@@ -138,7 +137,7 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
     SwapChainDesc.Flags = 0;
 
     UINT CreateDeviceAndSwapChainFlags = 0u;
-#ifdef _DEBUG
+#if _DEBUG
     CreateDeviceAndSwapChainFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
     
@@ -383,10 +382,8 @@ bool CStaticMesh::LoadMeshData(const TTransform& _transform, const char* _meshNa
 
     // Load the mesh data from file
     {
-        std::stringstream OBJFilenameStream;
-        OBJFilenameStream << GAME_DATA_PATH << _meshName << ".obj";
-        const bool Success = MeshManager::TryToImportOBJ(OBJFilenameStream.str().c_str(), &MeshData);
-        if (Success == false)
+        MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
+        if (MeshData == nullptr)
             return false;
     }
     

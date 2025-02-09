@@ -1,12 +1,19 @@
-﻿#include "MeshManager.h"
+﻿#include "MeshResources.h"
 
+#include <map>
 #include <vector>
 #include <fstream>
 #include <istream>
-
+#include <string>
 #include <assert.h>
+#include <sstream>
 
 #include "Shaders.h"
+
+#define GAME_DATA_PATH "Game/Data/"
+#define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
+
+static std::map<std::string, SMeshData*> G_MESH_DATA_MAP;
 
 struct SFaceInfo
 {
@@ -18,15 +25,13 @@ struct SFaceInfo
     }
 };
 
-std::vector<TVector3f> BufferVertexPosition;
-std::vector<TVector3f> BufferVertexNormals;
-std::vector<TVector2f> BufferTextureCoordinates;
-std::vector<SFaceInfo> BufferFaceInfos;
-std::vector<SFaceInfo> BufferUniqueFaceInfos;
+static std::vector<TVector3f> BufferVertexPosition;
+static std::vector<TVector3f> BufferVertexNormals;
+static std::vector<TVector2f> BufferTextureCoordinates;
+static std::vector<SFaceInfo> BufferFaceInfos;
+static std::vector<SFaceInfo> BufferUniqueFaceInfos;
 
-#define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
-
-void MeshManager::InitializeMeshManager()
+void MMeshResources::InitializeMeshResources()
 {
     BufferVertexPosition.reserve(1024);
     BufferVertexNormals.reserve(1024);
@@ -35,13 +40,44 @@ void MeshManager::InitializeMeshManager()
     BufferUniqueFaceInfos.reserve(4024);
 }
 
-void MeshManager::DeinitializeMeshManager()
+void MMeshResources::UninitializeMeshResources()
 {
     BufferUniqueFaceInfos.shrink_to_fit();
     BufferFaceInfos.shrink_to_fit();
     BufferTextureCoordinates.shrink_to_fit();
     BufferVertexNormals.shrink_to_fit();
     BufferVertexPosition.shrink_to_fit();
+}
+
+SMeshData* MMeshResources::CreateMeshDataFromFileName(const char* _filename)
+{
+#if _DEBUG
+    assert(MMeshResources::GetMeshDataFromFileName(_filename) == nullptr);
+#endif
+    
+    const std::string fileNameAsString = _filename;
+    
+    SMeshData* NewMeshData = new SMeshData();
+    std::stringstream OBJFilenameStream;
+    OBJFilenameStream << GAME_DATA_PATH << _filename << ".obj";
+    const bool successImporting = MMeshResources::TryToImportOBJ(OBJFilenameStream.str().c_str(), NewMeshData);
+    if (successImporting == false)
+    {
+        delete NewMeshData;
+        return nullptr;
+    }
+    
+    G_MESH_DATA_MAP.insert({ fileNameAsString, NewMeshData });
+    return NewMeshData;
+}
+
+SMeshData* MMeshResources::GetMeshDataFromFileName(const char* _filename)
+{
+    const std::string fileNameAsString = _filename;
+    const auto result = G_MESH_DATA_MAP.find(fileNameAsString);
+    if (result == G_MESH_DATA_MAP.end())
+        return nullptr;
+    return result->second;
 }
 
 bool CreateOrGetUniqueFaceIndex(const SFaceInfo& FaceInfo, int* UniqueIndex)
@@ -60,7 +96,7 @@ bool CreateOrGetUniqueFaceIndex(const SFaceInfo& FaceInfo, int* UniqueIndex)
     return true;
 }
 
-bool MeshManager::TryToImportOBJ(const char* Filename, SMeshData* MeshData)
+bool MMeshResources::TryToImportOBJ(const char* Filename, SMeshData* MeshData)
 {
     // Open File
     FILE* fileStream = nullptr;

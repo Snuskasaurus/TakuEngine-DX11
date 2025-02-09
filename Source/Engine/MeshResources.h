@@ -29,10 +29,14 @@ struct SMeshData
     UINT IndexCount;
 };
 
-class MeshManager
+class MMeshResources
 {
 public:
-    static void InitializeMeshManager();
-    static void DeinitializeMeshManager();
-    static bool TryToImportOBJ(const char* Filename, SMeshData* MeshData);
+    static void InitializeMeshResources();
+    static void UninitializeMeshResources();
+public:
+    static SMeshData* CreateMeshDataFromFileName(const char*);
+    static SMeshData* GetMeshDataFromFileName(const char*);
+private:
+    static bool TryToImportOBJ(const char*, SMeshData*);
 };

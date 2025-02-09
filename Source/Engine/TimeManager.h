@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "Debug/CommonEngine.h"
+
+#include "CommonEngine.h"
 
 // Inspired by https://www.braynzarsoft.net/viewtutorial/q16390-15-high-resolution-timer
 

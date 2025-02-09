@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 
 #include "Math.h"
-#include "MeshManager.h"
+#include "MeshResources.h"
 #include "Shaders.h"
 
 struct ID3D11Resource;
@@ -69,13 +69,12 @@ public:
 
 public:
     SGraphicResources_Mesh GraphicResource;
-    SMeshData MeshData;
+    SMeshData* MeshData;
     TTransform Transform;
 };
 
 class MGraphic
 {
-    
 public:
     static void InitializeGraphic();
     static void DrawPipeline();
