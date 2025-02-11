@@ -17,6 +17,25 @@
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
 static std::vector<CStaticMesh*> G_MESH_TO_DRAW;
+
+void MGraphic::CreateRenderTargetView(ID3D11Device* _device, IDXGISwapChain* _swapChain,  ID3D11Resource** _backBufferResource, ID3D11RenderTargetView** _renderTargetView)
+{
+    CHECK_HRESULT(_swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(_backBufferResource)));
+    CHECK_HRESULT(_device->CreateRenderTargetView(*_backBufferResource, nullptr, _renderTargetView));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::StartDrawPipeline()
+{
+    MGraphic::CreateDeviceAndSwapChain(&G_PIPELINE.Device, &G_PIPELINE.DeviceContext, &G_PIPELINE.SwapChain);
+    MGraphic::CreateAndSetDepthStencilState(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.DepthStencilState);
+    MGraphic::CreateDepthStencilTexture(G_PIPELINE.Device, &G_PIPELINE.DepthStencilTexture);
+    MGraphic::CreateDepthStencilView(G_PIPELINE.Device, G_PIPELINE.DepthStencilTexture, &G_PIPELINE.DepthStencilView);
+    MGraphic::CreateRenderTargetView(G_PIPELINE.Device, G_PIPELINE.SwapChain, &G_PIPELINE.BackBufferResource, &G_PIPELINE.RenderTargetView);
+    MGraphic::SetDepthStencilViewToRenderTargetView(G_PIPELINE.DeviceContext, &G_PIPELINE.RenderTargetView, G_PIPELINE.DepthStencilView);
+    MGraphic::CreateAndSetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.VertexShaderData);
+    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
+    MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
+}
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::DrawPipeline()
 {
@@ -41,62 +60,7 @@ void MGraphic::DrawPipeline()
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::InitializeGraphic()
 {
-     MGraphic::CreateDeviceAndSwapChain(&G_PIPELINE.Device, &G_PIPELINE.DeviceContext, &G_PIPELINE.SwapChain);
-    
-    // Create Render target view from back buffer
-    {
-        CHECK_HRESULT(G_PIPELINE.SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&G_PIPELINE.BackBufferResource)));
-        CHECK_HRESULT(G_PIPELINE.Device->CreateRenderTargetView(G_PIPELINE.BackBufferResource, nullptr, &G_PIPELINE.RenderTargetView));
-    }
-
-    // Create Stencil buffer and the Z buffer
-    {
-        // Create depth stencil state and bind it to the pipeline
-        {
-            D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
-            depthStencilDesc.DepthEnable = true;
-            depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-            depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        
-            ID3D11DepthStencilState* depthStencilState = nullptr;
-            CHECK_HRESULT(G_PIPELINE.Device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
-            G_PIPELINE.DeviceContext->OMSetDepthStencilState(depthStencilState, 1u);
-            depthStencilState->Release();
-        }
-        // Create depth stencil texture
-        ID3D11Texture2D* depthStencilTexture = nullptr;
-        {
-            D3D11_TEXTURE2D_DESC depthStencilTextureDesc;
-            depthStencilTextureDesc.Width = MGameWindow::GetGameWindowWidth();
-            depthStencilTextureDesc.Height = MGameWindow::GetGameWindowHeight();
-            depthStencilTextureDesc.MipLevels = 1u;
-            depthStencilTextureDesc.ArraySize = 1u;
-            depthStencilTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
-            depthStencilTextureDesc.SampleDesc.Count = 1u;
-            depthStencilTextureDesc.SampleDesc.Quality = 0u;
-            depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-            depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-            depthStencilTextureDesc.CPUAccessFlags = 0u;
-            depthStencilTextureDesc.MiscFlags = 0u;
-            CHECK_HRESULT(G_PIPELINE.Device->CreateTexture2D(&depthStencilTextureDesc, nullptr, &depthStencilTexture));
-        }
-        // Create view of depth stencil texture
-        {
-            D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-            depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-            depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-            depthStencilViewDesc.Texture2D.MipSlice = 0u;
-            CHECK_HRESULT(G_PIPELINE.Device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &G_PIPELINE.DepthStencilView));
-        }
-
-        G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_PIPELINE.RenderTargetView, G_PIPELINE.DepthStencilView);
-
-        depthStencilTexture->Release();
-    }
-    
-    MGraphic::CreateAndSetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.VertexShaderData);
-    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
-    MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
+    MGraphic::StartDrawPipeline();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::UninitializeGraphic()
@@ -144,6 +108,53 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
     CHECK_HRESULT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE,
         nullptr, CreateDeviceAndSwapChainFlags, nullptr, 0,D3D11_SDK_VERSION,
         &SwapChainDesc, _swapChain, _device,nullptr, _deviceContext));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateAndSetDepthStencilState(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11DepthStencilState** _depthStencilState)
+{
+    D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
+    {
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+    }
+    CHECK_HRESULT(_device->CreateDepthStencilState(&depthStencilDesc, _depthStencilState));
+    _deviceContext->OMSetDepthStencilState(*_depthStencilState, 1u);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateDepthStencilTexture(ID3D11Device* _device, ID3D11Texture2D** _depthStencilTexture)
+{
+    D3D11_TEXTURE2D_DESC DepthStencilTextureDesc = {};
+    {
+        DepthStencilTextureDesc.Width = MGameWindow::GetGameWindowWidth();
+        DepthStencilTextureDesc.Height = MGameWindow::GetGameWindowHeight();
+        DepthStencilTextureDesc.MipLevels = 1u;
+        DepthStencilTextureDesc.ArraySize = 1u;
+        DepthStencilTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        DepthStencilTextureDesc.SampleDesc.Count = 1u;
+        DepthStencilTextureDesc.SampleDesc.Quality = 0u;
+        DepthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+        DepthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        DepthStencilTextureDesc.CPUAccessFlags = 0u;
+        DepthStencilTextureDesc.MiscFlags = 0u;
+    }
+    CHECK_HRESULT(_device->CreateTexture2D(&DepthStencilTextureDesc, nullptr, _depthStencilTexture));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateDepthStencilView(ID3D11Device* _device, ID3D11Texture2D* _depthStencilTexture, ID3D11DepthStencilView** _depthStencilView)
+{
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+    {
+        depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+        depthStencilViewDesc.Texture2D.MipSlice = 0u;
+    }
+    CHECK_HRESULT(G_PIPELINE.Device->CreateDepthStencilView(_depthStencilTexture, &depthStencilViewDesc, _depthStencilView));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::SetDepthStencilViewToRenderTargetView(ID3D11DeviceContext* _deviceContext, ID3D11RenderTargetView** _renderTargetView, ID3D11DepthStencilView* _depthStencilView)
+{
+    _deviceContext->OMSetRenderTargets(1u, _renderTargetView, _depthStencilView);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetVertexAndIndexBuffer(ID3D11DeviceContext* _deviceContext, const SGraphicResources_Mesh& _graphicResource)

@@ -15,8 +15,11 @@ struct SGraphicResources_Pipeline
     ID3D11DeviceContext* DeviceContext = nullptr;
     IDXGISwapChain* SwapChain = nullptr;
     ID3D11RenderTargetView* RenderTargetView = nullptr;
-    ID3D11DepthStencilView* DepthStencilView = nullptr;
     ID3D11Resource* BackBufferResource = nullptr;
+    
+    ID3D11DepthStencilState* DepthStencilState = nullptr;
+    ID3D11Texture2D* DepthStencilTexture = nullptr;
+    ID3D11DepthStencilView* DepthStencilView = nullptr;
     
     SVertexShader VertexShaderData;
     SPixelShader PixelShaderData;
@@ -77,12 +80,18 @@ class MGraphic
 {
 public:
     static void InitializeGraphic();
+    static void StartDrawPipeline();
     static void DrawPipeline();
     static void UninitializeGraphic();
 public:
     static void AddMeshToDraw(const TTransform&, const char*);
 public:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
+    static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);
+    static void CreateDepthStencilTexture(ID3D11Device*, ID3D11Texture2D**);
+    static void CreateDepthStencilView(ID3D11Device*, ID3D11Texture2D*, ID3D11DepthStencilView**);
+    static void CreateRenderTargetView(ID3D11Device*, IDXGISwapChain*, ID3D11Resource**, ID3D11RenderTargetView**);
+    static void SetDepthStencilViewToRenderTargetView(ID3D11DeviceContext*, ID3D11RenderTargetView**, ID3D11DepthStencilView*);
     static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShader&);
     static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
     static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
