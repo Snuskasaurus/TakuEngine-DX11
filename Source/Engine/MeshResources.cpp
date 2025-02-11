@@ -10,7 +10,7 @@
 
 #include "Shaders.h"
 
-#define GAME_DATA_PATH "Game/Data/"
+#define GAME_DATA_PATH "Data/"
 #define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
 
 static std::map<std::string, SMeshData*> G_MESH_DATA_MAP;

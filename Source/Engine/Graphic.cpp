@@ -11,8 +11,8 @@
 #include "World.h"
 #include "Debug/Profiling.h"
 
-#define GAME_DATA_PATH "Game/Data/"
-#define GAME_DATA_SHADER_PATH "Game/Data/Shaders/"
+#define GAME_DATA_PATH "Data/"
+#define GAME_DATA_SHADER_PATH "Data/Shaders/"
 
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;

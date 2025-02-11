@@ -149,8 +149,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Content Include="Game\Data\Shaders\PixelShader.hlsl" />
-    <Content Include="Game\Data\Shaders\VertexShader.hlsl" />
+    <Content Include="Data\Shaders\PixelShader.hlsl" />
+    <Content Include="Data\Shaders\VertexShader.hlsl" />
     <ClCompile Include="Source\Engine\AssetList.cpp" />
     <ClCompile Include="Source\Engine\CommonEngine.cpp" />
     <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
