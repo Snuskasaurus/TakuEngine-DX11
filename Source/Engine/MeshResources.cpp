@@ -13,6 +13,7 @@
 #define GAME_DATA_PATH "Data/"
 #define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
 
+// TODO Julien Rogel (11/02/2025): Change this data structure to use an array and avoid allocation for each mesh data
 static std::map<std::string, SMeshData*> G_MESH_DATA_MAP;
 
 struct SFaceInfo
