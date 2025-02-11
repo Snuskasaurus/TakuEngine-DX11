@@ -85,7 +85,7 @@ public:
     static void UninitializeGraphic();
 public:
     static void AddMeshToDraw(const TTransform&, const char*);
-public:
+private:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);
     static void CreateDepthStencilTexture(ID3D11Device*, ID3D11Texture2D**);
@@ -98,13 +98,13 @@ public:
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
     static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&);
-public:
+private:
     static void SetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const TTransform&);
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
-public:
+private:
     static void SetPixelShader(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
-public:
+private:
     static void SetPrimitiveAndDraw(ID3D11DeviceContext*, const SMeshData&);
     static void Rasterize(ID3D11Device*, ID3D11DeviceContext*);
     static void ConfigureViewport(ID3D11DeviceContext*);
