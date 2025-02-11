@@ -13,7 +13,7 @@ void ShaderManager::CompileShader(LPCWSTR _fileName, const char* _target, ID3DBl
 
     flags1 |= D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR;
     
-#if _DEBUG
+#ifdef _DEBUG
     flags1 |= D3DCOMPILE_DEBUG;
 #endif
     

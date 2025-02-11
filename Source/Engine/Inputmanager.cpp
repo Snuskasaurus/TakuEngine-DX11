@@ -71,7 +71,7 @@ void MInput::DetectInputs_Keyboard(const BYTE* _keyboardState)
     KEYBOARD_CHANGE_INPUT_HOLDER(DIK_LSHIFT, CameraUp, 1.0f)
     KEYBOARD_CHANGE_INPUT_HOLDER(DIK_LCONTROL, CameraUp, -1.0f)
 
-#if _DEBUG
+#ifdef _DEBUG
     KEYBOARD_CALL_FUNCTION(DIK_ESCAPE, PostQuitMessage(1))
 #endif
 }

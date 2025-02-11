@@ -52,7 +52,7 @@ void MMeshResources::UninitializeMeshResources()
 
 SMeshData* MMeshResources::CreateMeshDataFromFileName(const char* _filename)
 {
-#if _DEBUG
+#ifdef _DEBUG
     assert(MMeshResources::GetMeshDataFromFileName(_filename) == nullptr);
 #endif
     

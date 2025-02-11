@@ -137,7 +137,7 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
     SwapChainDesc.Flags = 0;
 
     UINT CreateDeviceAndSwapChainFlags = 0u;
-#if _DEBUG
+#ifdef _DEBUG
     CreateDeviceAndSwapChainFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
     
