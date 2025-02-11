@@ -1,6 +1,6 @@
 ﻿#include "AssetList.h"
 
-#include "MeshResources.h"
+#include "Resources/MeshResources.h"
 
 void MAsset::LoadMeshes()
 {

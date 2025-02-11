@@ -3,8 +3,8 @@
 #include <d3dcommon.h>
 
 #include "Math.h"
-#include "Resources/Mesh.h"
-#include "Resources/Shaders.h"
+#include "Resources/MeshResources.h"
+#include "Resources/ShadersResources.h"
 
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;

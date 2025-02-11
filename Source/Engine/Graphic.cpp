@@ -5,8 +5,8 @@
 
 #include "GameWindow.h"
 #include "HResultHandler.h"
-#include "Resources/Mesh.h"
-#include "Resources/Shaders.h"
+#include "Resources/MeshResources.h"
+#include "Resources/ShadersResources.h"
 #include "WICTextureLoader.h"
 #include "World.h"
 #include "Debug/Profiling.h"
@@ -182,7 +182,7 @@ void MGraphic::ClearDepthStencil(ID3D11DeviceContext* _deviceContext, ID3D11Dept
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShader& _vertexShader)
 {
-    ShaderManager::CompileShader(GAME_DATA_SHADER_PATH L"VertexShader.hlsl", "vs_5_0", &_vertexShader.Blob);
+    MShaderResources::CompileShader(GAME_DATA_SHADER_PATH L"VertexShader.hlsl", "vs_5_0", &_vertexShader.Blob);
     CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
     // VertexShader Input Layout
     {
@@ -201,7 +201,7 @@ void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceConte
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
 {
-    ShaderManager::CompileShader(GAME_DATA_SHADER_PATH L"PixelShader.hlsl", "ps_5_0", &_pixelShader.Blob);
+    MShaderResources::CompileShader(GAME_DATA_SHADER_PATH L"PixelShader.hlsl", "ps_5_0", &_pixelShader.Blob);
     CHECK_HRESULT(_device->CreatePixelShader(_pixelShader.Blob->GetBufferPointer(), _pixelShader.Blob->GetBufferSize(), nullptr, &_pixelShader.Shader));
     _deviceContext->PSSetShader(_pixelShader.Shader, nullptr, 0u);
     

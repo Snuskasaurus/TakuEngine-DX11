@@ -5,8 +5,7 @@
 
 #include "../HResultHandler.h"
 
-
-void ShaderManager::CompileShader(LPCWSTR _fileName, const char* _target, ID3DBlob** _shaderOut)
+void MShaderResources::CompileShader(LPCWSTR _fileName, const char* _target, ID3DBlob** _shaderOut)
 {
     UINT flags1 = 0;
     UINT flags2 = 0;
@@ -16,12 +15,6 @@ void ShaderManager::CompileShader(LPCWSTR _fileName, const char* _target, ID3DBl
 #ifdef _DEBUG
     flags1 |= D3DCOMPILE_DEBUG;
 #endif
-    
-    // const D3D_SHADER_MACRO defines[] = 
-    // {
-    //     "EXAMPLE_DEFINE", "1",
-    //     NULL, NULL
-    // };
     
     ID3DBlob* ErrorBlob = nullptr;
     

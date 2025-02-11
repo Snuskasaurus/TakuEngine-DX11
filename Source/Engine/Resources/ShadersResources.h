@@ -2,6 +2,10 @@
 
 #include <Windows.h>
 #include <d3d11.h>
+#include <map>
+#include <string>
+
+#include "MeshResources.h"
 
 struct SVertexShader
 {
@@ -45,7 +49,7 @@ struct SPixelShader
     }
 };
 
-class ShaderManager
+class MShaderResources
 {
 public:
     static void CompileShader(LPCWSTR _fileName, const char* _target, ID3DBlob** _shaderOut);
