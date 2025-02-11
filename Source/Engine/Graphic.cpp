@@ -17,12 +17,6 @@
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
 static std::vector<CStaticMesh*> G_MESH_TO_DRAW;
-
-void MGraphic::CreateRenderTargetView(ID3D11Device* _device, IDXGISwapChain* _swapChain,  ID3D11Resource** _backBufferResource, ID3D11RenderTargetView** _renderTargetView)
-{
-    CHECK_HRESULT(_swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(_backBufferResource)));
-    CHECK_HRESULT(_device->CreateRenderTargetView(*_backBufferResource, nullptr, _renderTargetView));
-}
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::StartDrawPipeline()
 {
@@ -108,6 +102,12 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
     CHECK_HRESULT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE,
         nullptr, CreateDeviceAndSwapChainFlags, nullptr, 0,D3D11_SDK_VERSION,
         &SwapChainDesc, _swapChain, _device,nullptr, _deviceContext));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateRenderTargetView(ID3D11Device* _device, IDXGISwapChain* _swapChain,  ID3D11Resource** _backBufferResource, ID3D11RenderTargetView** _renderTargetView)
+{
+    CHECK_HRESULT(_swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(_backBufferResource)));
+    CHECK_HRESULT(_device->CreateRenderTargetView(*_backBufferResource, nullptr, _renderTargetView));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetDepthStencilState(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11DepthStencilState** _depthStencilState)
