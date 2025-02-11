@@ -1,9 +1,9 @@
-﻿#include "Shaders.h"
+﻿#include "ShadersResources.h"
 
 #include <d3dcompiler.h>
 #include <intsafe.h>
 
-#include "HResultHandler.h"
+#include "../HResultHandler.h"
 
 
 void ShaderManager::CompileShader(LPCWSTR _fileName, const char* _target, ID3DBlob** _shaderOut)

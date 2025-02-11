@@ -160,7 +160,7 @@
     <ClCompile Include="Source\Engine\HResultHandler.cpp" />
     <ClCompile Include="Source\Engine\Inputmanager.cpp" />
     <ClCompile Include="Source\Engine\Graphic.cpp" />
-    <ClCompile Include="Source\Engine\Resources\Mesh.cpp">
+    <ClCompile Include="Source\Engine\Resources\MeshResources.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
@@ -235,7 +235,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Resources\Shaders.cpp">
+    <ClCompile Include="Source\Engine\Resources\ShadersResources.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
@@ -328,8 +328,8 @@
     <ClInclude Include="Source\Engine\Inputmanager.h" />
     <ClInclude Include="Source\Engine\Math.h" />
     <ClInclude Include="Source\Engine\Graphic.h" />
-    <ClInclude Include="Source\Engine\Resources\Mesh.h" />
-    <ClInclude Include="Source\Engine\Resources\Shaders.h" />
+    <ClInclude Include="Source\Engine\Resources\MeshResources.h" />
+    <ClInclude Include="Source\Engine\Resources\ShadersResources.h" />
     <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\WICTextureLoader.h" />
     <ClInclude Include="Source\Engine\World.h" />

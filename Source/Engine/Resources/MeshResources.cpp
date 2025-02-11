@@ -1,4 +1,4 @@
-﻿#include "Mesh.h"
+﻿#include "MeshResources.h"
 
 #include <map>
 #include <vector>
@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <sstream>
 
-#include "Shaders.h"
+#include "ShadersResources.h"
 
 #define GAME_DATA_PATH "Data/"
 #define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
