@@ -5,8 +5,8 @@
 
 #include "GameWindow.h"
 #include "HResultHandler.h"
-#include "MeshResources.h"
-#include "Shaders.h"
+#include "Resources/Mesh.h"
+#include "Resources/Shaders.h"
 #include "WICTextureLoader.h"
 #include "World.h"
 #include "Debug/Profiling.h"

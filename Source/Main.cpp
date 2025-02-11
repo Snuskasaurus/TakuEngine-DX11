@@ -1,4 +1,4 @@
-#include "Engine/MeshResources.h"
+#include "Engine/Resources/Mesh.h"
 #include "Engine/TimeManager.h"
 #include "Engine/World.h"
 #include "Engine/GameWindow.h"

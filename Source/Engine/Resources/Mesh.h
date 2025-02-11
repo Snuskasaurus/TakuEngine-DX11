@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "Color.h"
-#include "Math.h"
+#include "../Color.h"
+#include "../Math.h"
 
 using TVertexIndex = unsigned short;
 

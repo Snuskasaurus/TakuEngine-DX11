@@ -1,10 +1,10 @@
 ﻿#pragma once
+
 #include <d3dcommon.h>
-#include <DirectXMath.h>
 
 #include "Math.h"
-#include "MeshResources.h"
-#include "Shaders.h"
+#include "Resources/Mesh.h"
+#include "Resources/Shaders.h"
 
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;
