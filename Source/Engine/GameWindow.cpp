@@ -10,8 +10,8 @@
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 HWND GameWindowHandle;
-const CHAR* GameClassName = "TakeEngine";
-const CHAR* WindowName = "TakeEngine";
+const CHAR* GameClassName = "TakuEngine";
+const CHAR* WindowName = "TakuEngine";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 constexpr UINT DefaultWindowSizeX = (UINT)(1920 * 0.85);
 constexpr UINT DefaultWindowSizeY = (UINT)(1080 * 0.85);

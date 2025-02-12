@@ -6,6 +6,7 @@
 #define JU_ASSET_SUZANNE   "Suzanne"
 #define JU_ASSET_CRATE     "Crate"
 #define JU_ASSET_MONSTER   "Monster"
+#define JU_ASSET_TAKUMI    "Takumi"
 
 class MAsset
 {

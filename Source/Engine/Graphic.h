@@ -84,7 +84,7 @@ public:
     static void DrawPipeline();
     static void UninitializeGraphic();
 public:
-    static void AddMeshToDraw(const TTransform&, const char*);
+    static CStaticMesh* AddMeshToDraw(const TTransform&, const char*);
 private:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);

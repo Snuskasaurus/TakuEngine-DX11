@@ -14,7 +14,7 @@ bool HandleHResultError(const int line, const char* filename, const HRESULT HRes
     const std::string message = std::system_category().message(HResult);
     const std::string StringError = message + " (" + std::to_string(static_cast<const unsigned long int>(HResult)) + ")\n" + filename + " at line " + std::to_string(line);
     const char* lpText = StringError.c_str();
-    MessageBox(nullptr, lpText,"TakeEngine HResultError Handler" ,MB_OK | MB_ICONEXCLAMATION);
+    MessageBox(nullptr, lpText,"TakuEngine HResultError Handler" ,MB_OK | MB_ICONEXCLAMATION);
     
     return false;
 }

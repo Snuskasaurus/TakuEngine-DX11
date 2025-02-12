@@ -63,7 +63,7 @@ void MGraphic::UninitializeGraphic()
     G_PIPELINE.PixelShaderData.Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
+CStaticMesh* MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
 {
     CStaticMesh* StaticMesh = new CStaticMesh;
     StaticMesh->LoadMeshData(_transform, _meshName);
@@ -73,6 +73,8 @@ void MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName
     MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource);
     
     G_MESH_TO_DRAW.push_back(StaticMesh);
+
+    return StaticMesh;
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceContext** _deviceContext, IDXGISwapChain** _swapChain)
