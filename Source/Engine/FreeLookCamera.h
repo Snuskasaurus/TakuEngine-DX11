@@ -9,7 +9,9 @@ public:
     void UpdateCamera(const float dt);
     TMatrix4f GetCameraWorldMatrix() const { return CamMatrix; }
     TMatrix4f GetCameraWorldInverseMatrix() const { return TMatrix4f::Inverse(CamMatrix); }
-
+    void SetPosition(TVector3f _newPosition) { Position = _newPosition; }
+    void SetRotation(TRotator _newRotation) { CamYaw = _newRotation.Yaw; CamPitch = _newRotation.Pitch; }
+    
 private:
     TMatrix4f CamMatrix = TMatrix4f::Identity;
     
