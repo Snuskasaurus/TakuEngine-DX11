@@ -65,15 +65,14 @@ __declspec(align(16)) struct SPixelShaderConstantBuffer
 
 class CStaticMesh
 {
-public:
+    friend class MGraphic;
     
-    bool LoadMeshData(const TTransform& _transform, const char* _meshName);
-    void UninitializeStaticMeshPipeline();
-
 public:
+    TTransform Transform;
+
+private:
     SGraphicResources_Mesh GraphicResource;
     SMeshData* MeshData;
-    TTransform Transform;
 };
 
 class MGraphic

@@ -1,5 +1,6 @@
 ﻿#include "Graphic.h"
 
+#include <cassert>
 #include <d3d11.h>
 #include <sstream>
 
@@ -66,7 +67,21 @@ void MGraphic::UninitializeGraphic()
 CStaticMesh* MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
 {
     CStaticMesh* StaticMesh = new CStaticMesh;
-    StaticMesh->LoadMeshData(_transform, _meshName);
+    
+    StaticMesh->Transform = _transform;
+
+    // Load the mesh data from file
+    {
+        StaticMesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
+        assert(StaticMesh->MeshData != nullptr);
+    }
+    
+    // Load the texture
+    {
+        std::wstringstream TextureFilenameStream;
+        TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
+        CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, TextureFilenameStream.str().c_str(), &StaticMesh->GraphicResource.Texture, &StaticMesh->GraphicResource.TextureView, 0));
+    }
     
     MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, *StaticMesh->MeshData);
     MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, *StaticMesh->MeshData);
@@ -385,30 +400,4 @@ void MGraphic::ConfigureViewport(ID3D11DeviceContext* _deviceContext)
         viewportInfos.MaxDepth = 1.0f;
     }
     _deviceContext->RSSetViewports(1u, &viewportInfos);
-}
-///---------------------------------------------------------------------------------------------------------------------
-bool CStaticMesh::LoadMeshData(const TTransform& _transform, const char* _meshName)
-{
-    PROFILE_FUNCTION
-    
-    Transform = _transform;
-
-    // Load the mesh data from file
-    {
-        MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
-        if (MeshData == nullptr)
-            return false;
-    }
-    
-    // Load the texture
-    {
-        std::wstringstream TextureFilenameStream;
-        TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
-        CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, TextureFilenameStream.str().c_str(), &GraphicResource.Texture, &GraphicResource.TextureView, 0));
-    }
-    return true;
-}
-///---------------------------------------------------------------------------------------------------------------------
-void CStaticMesh::UninitializeStaticMeshPipeline()
-{
 }
