@@ -75,6 +75,18 @@ private:
     SMeshData* MeshData;
 };
 
+class CInstancedMesh
+{
+    friend class MGraphic;
+    
+public:
+    std::vector<TTransform> Transforms;
+
+private:
+    SGraphicResources_Mesh GraphicResource;
+    SMeshData* MeshData;
+};
+
 class MGraphic
 {
 public:
@@ -84,6 +96,7 @@ public:
     static void UninitializeGraphic();
 public:
     static CMesh* AddMeshToDraw(const TTransform&, const char*);
+    static CInstancedMesh* AddInstancedMeshToDraw(const TTransform&, const char*);
 private:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);

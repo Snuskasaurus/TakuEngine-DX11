@@ -18,6 +18,7 @@
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
 static std::vector<CMesh*> G_MESH_TO_DRAW;
+static std::vector<CInstancedMesh*> G_INSTANCED_MESH_TO_DRAW;
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::StartDrawPipeline()
 {
@@ -66,30 +67,58 @@ void MGraphic::UninitializeGraphic()
 ///---------------------------------------------------------------------------------------------------------------------
 CMesh* MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
 {
-    CMesh* StaticMesh = new CMesh;
+    CMesh* Mesh = new CMesh;
     
-    StaticMesh->Transform = _transform;
+    Mesh->Transform = _transform;
 
     // Load the mesh data from file
     {
-        StaticMesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
-        assert(StaticMesh->MeshData != nullptr);
+        Mesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
+        assert(Mesh->MeshData != nullptr);
     }
     
     // Load the texture
     {
         std::wstringstream TextureFilenameStream;
         TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
-        CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, TextureFilenameStream.str().c_str(), &StaticMesh->GraphicResource.Texture, &StaticMesh->GraphicResource.TextureView, 0));
+        CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, TextureFilenameStream.str().c_str(), &Mesh->GraphicResource.Texture, &Mesh->GraphicResource.TextureView, 0));
     }
     
-    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, *StaticMesh->MeshData);
-    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource, *StaticMesh->MeshData);
-    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMesh->GraphicResource);
+    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, Mesh->GraphicResource, *Mesh->MeshData);
+    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, Mesh->GraphicResource, *Mesh->MeshData);
+    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, Mesh->GraphicResource);
     
-    G_MESH_TO_DRAW.push_back(StaticMesh);
+    G_MESH_TO_DRAW.push_back(Mesh);
 
-    return StaticMesh;
+    return Mesh;
+}
+///---------------------------------------------------------------------------------------------------------------------
+CInstancedMesh* MGraphic::AddInstancedMeshToDraw(const TTransform& _transform, const char* _meshName)
+{
+    CInstancedMesh* InstancedMesh = new CInstancedMesh;
+
+    InstancedMesh->Transforms.push_back(_transform);
+
+    // Load the mesh data from file
+    {
+        InstancedMesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
+        assert(InstancedMesh->MeshData != nullptr);
+    }
+    
+    // Load the texture
+    {
+        std::wstringstream TextureFilenameStream;
+        TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
+        CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, TextureFilenameStream.str().c_str(), &InstancedMesh->GraphicResource.Texture, &InstancedMesh->GraphicResource.TextureView, 0));
+    }
+    
+    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, InstancedMesh->GraphicResource, *InstancedMesh->MeshData);
+    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, InstancedMesh->GraphicResource, *InstancedMesh->MeshData);
+    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, InstancedMesh->GraphicResource);
+    
+    G_INSTANCED_MESH_TO_DRAW.push_back(InstancedMesh);
+
+    return InstancedMesh;
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceContext** _deviceContext, IDXGISwapChain** _swapChain)
