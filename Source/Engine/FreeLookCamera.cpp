@@ -23,7 +23,7 @@ void TFreeLookCamera::UpdateCamera(const float dt)
     // Update Yaw and Pitch --------------------------------------------------------------------------------------------
     
     CamYaw += InputYaw;
-    CamPitch = Math::Clamp(CamPitch + InputPitch, -1.55334f, 1.55334f);
+    CamPitch = MMath::Clamp(CamPitch + InputPitch, -1.55334f, 1.55334f);
     
     // Position / Rotation / Matrix ------------------------------------------------------------------------------------
   

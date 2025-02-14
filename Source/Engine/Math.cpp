@@ -1,6 +1,7 @@
 ﻿#include "Math.h"
 
 #include <corecrt_math.h>
+#include <cstdlib>
 #include <DirectXMath.h>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -49,34 +50,56 @@ DirectX::XMMATRIX ToDirectXMatrix(const TMatrix4f& _matrix)
 //----------------------------------------------------------------------------------------------------------------------
 //------------------------------------------- Math Common
 //----------------------------------------------------------------------------------------------------------------------
-float Math::Square(const float _f)
+float MMath::Square(const float _f)
 {
     return sqrtf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Math::Sin(const float _f)
+float MMath::Sin(const float _f)
 {
     return sinf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Math::Tan(const float _f)
+float MMath::Tan(const float _f)
 {
     return tanf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Math::Cos(const float _f)
+float MMath::Cos(const float _f)
 {
     return cosf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Math::Abs(const float _f)
+float MMath::Abs(const float _f)
 {
     return fabsf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float Math::Clamp(const float _f, const float _min, const float _max)
+float MMath::Clamp(const float _f, const float _min, const float _max)
 {
     return (_f < _min) ? _min : ((_f > _max) ? _max : _f);
+}
+//----------------------------------------------------------------------------------------------------------------------
+int MMath::RandomNumberIntegerInRange(int _min, int _max)
+{
+    if (_min == _max) return 0;
+    return rand() % (_max - _min) + _min;
+}
+//----------------------------------------------------------------------------------------------------------------------
+float MMath::RandomNumberIntegerInRange(float _min, float _max)
+{
+    if (_max - _min <= 1.0f) return 0.0f;
+    return (float)(rand() % (int)((_max - _min) + _min));
+}
+//----------------------------------------------------------------------------------------------------------------------
+TVector3f MMath::RandomVectorIntegerInRange(TVector3f _min, TVector3f _max)
+{
+    return
+    {
+        RandomNumberIntegerInRange(_min.x, _max.x),
+        RandomNumberIntegerInRange(_min.y, _max.y),
+        RandomNumberIntegerInRange(_min.z, _max.z),
+    };
 }
 //----------------------------------------------------------------------------------------------------------------------
 //------------------------------------------- TVector3f

@@ -1,3 +1,5 @@
+#include <ctime>
+
 #include "Engine/Resources/MeshResources.h"
 #include "Engine/TimeManager.h"
 #include "Engine/World.h"
@@ -47,6 +49,8 @@ void Uninitialization()
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
+	srand(static_cast<unsigned int>(time(nullptr)));
+	
 	TakuEngine::LoadAssets();
 	TakuEngine::Initialization(hInstance, hPrevInstance);
 	while (true)

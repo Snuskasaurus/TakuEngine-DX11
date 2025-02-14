@@ -2,8 +2,8 @@
 
 #define FORCE_INLINE __forceinline
 
-#define EPSILON_FLOAT 1.19209290E-07F
-#define VEC_PRECISION 0.005
+#define MATH_EPSILON_FLOAT 1.19209290E-07F
+#define MATH_SMALL_NUMBER 0.005
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f;
@@ -11,15 +11,20 @@ struct TVector3f;
 struct TVector4f;
 struct TMatrix4f;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-namespace Math // To avoid having CMath included everywhere
+class MMath
 {
-    float Square(const float _f);
-    float Sin(const float _f);
-    float Tan(const float _f);
-    float Cos(const float _f);
-    float Abs(const float _f);
-    float Clamp(const float _f, const float _min, const float _max);
-}
+public:
+    static float Square(const float _f);
+    static float Sin(const float _f);
+    static float Tan(const float _f);
+    static float Cos(const float _f);
+    static float Abs(const float _f);
+    static float Clamp(const float _f, const float _min, const float _max);
+    
+    static int RandomNumberIntegerInRange(int _min, int _max);
+    static float RandomNumberIntegerInRange(float _min, float _max);
+    static TVector3f RandomVectorIntegerInRange(TVector3f _min, TVector3f _max);
+};
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f
 {
@@ -118,7 +123,7 @@ struct TVector3f
     }
     FORCE_INLINE static float Length(const TVector3f& _v)
     {
-        return Math::Square(SquareLength(_v));
+        return MMath::Square(SquareLength(_v));
     }
     FORCE_INLINE static TVector3f Normalize(const TVector3f& _v)
     {
@@ -128,7 +133,7 @@ struct TVector3f
     FORCE_INLINE bool IsNormalized() const
     {
         const float squareLength = TVector3f::SquareLength(*this);
-        return Math::Abs(squareLength) - VEC_PRECISION <= 1.0f;
+        return MMath::Abs(squareLength) - MATH_SMALL_NUMBER <= 1.0f;
     }
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -143,11 +148,11 @@ struct TVector4f
 
     FORCE_INLINE friend bool operator==(const TVector4f& _v1, const TVector4f& _v2)
     {
-        const float f = Math::Abs(_v1.x - _v2.x)
-                      + Math::Abs(_v1.y - _v2.y)
-                      + Math::Abs(_v1.z - _v2.z)
-                      + Math::Abs(_v1.w - _v2.w);
-        return f < VEC_PRECISION;
+        const float f = MMath::Abs(_v1.x - _v2.x)
+                      + MMath::Abs(_v1.y - _v2.y)
+                      + MMath::Abs(_v1.z - _v2.z)
+                      + MMath::Abs(_v1.w - _v2.w);
+        return f < MATH_SMALL_NUMBER;
     }
     
     FORCE_INLINE TVector4f operator-() const
