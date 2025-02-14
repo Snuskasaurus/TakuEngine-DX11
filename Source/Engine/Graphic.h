@@ -6,6 +6,8 @@
 #include "Resources/MeshResources.h"
 #include "Resources/ShadersResources.h"
 
+#define MAX_INSTANCE_COUNT 1024
+
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;
 
@@ -52,9 +54,9 @@ struct SGraphicResources_Mesh
     }
 };
 
-struct SVertexShaderConstantBuffer
+__declspec(align(16)) struct SVertexShaderConstantBuffer
 {
-    TMatrix4f WorldViewProjection; 
+    TMatrix4f WorldViewProjection[MAX_INSTANCE_COUNT]; 
 };
 
 __declspec(align(16)) struct SPixelShaderConstantBuffer
@@ -111,13 +113,13 @@ private:
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
     static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&);
 private:
-    static void SetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const TTransform&);
+    static void SetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const std::vector<TTransform>& _transforms);
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
 private:
     static void SetPixelShader(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
 private:
-    static void SetPrimitiveAndDraw(ID3D11DeviceContext*, const SMeshData&);
+    static void SetPrimitiveAndDraw(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
     static void Rasterize(ID3D11Device*, ID3D11DeviceContext*);
     static void ConfigureViewport(ID3D11DeviceContext*);
     static void PresentSwapChain(IDXGISwapChain*);

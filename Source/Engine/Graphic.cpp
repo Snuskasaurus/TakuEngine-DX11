@@ -19,6 +19,9 @@
 static SGraphicResources_Pipeline G_PIPELINE;
 static std::vector<CMesh*> G_MESH_TO_DRAW;
 static std::vector<CInstancedMesh*> G_INSTANCED_MESH_TO_DRAW;
+
+SVertexShaderConstantBuffer G_VS_CONSTANT_BUFFER;
+
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::StartDrawPipeline()
 {
@@ -37,14 +40,14 @@ void MGraphic::DrawPipeline()
 {
     MGraphic::SetPixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 
-    for (int i = 0; i < G_MESH_TO_DRAW.size(); ++i)
+    for (int i = 0; i < G_INSTANCED_MESH_TO_DRAW.size(); ++i)
     {
-        CMesh* StaticMeshToDraw = G_MESH_TO_DRAW[i];
+        CInstancedMesh* MeshToDraw = G_INSTANCED_MESH_TO_DRAW[i];
         
-        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource);
-        MGraphic::SetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource, StaticMeshToDraw->Transform);
-        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource);
-        MGraphic::SetPrimitiveAndDraw(G_PIPELINE.DeviceContext, *StaticMeshToDraw->MeshData);
+        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, MeshToDraw->GraphicResource);
+        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, MeshToDraw->GraphicResource);
+        MGraphic::SetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, MeshToDraw->GraphicResource, MeshToDraw->Transforms);
+        MGraphic::SetPrimitiveAndDraw(G_PIPELINE.DeviceContext, MeshToDraw->MeshData->IndexCount, (UINT)MeshToDraw->Transforms.size());
     }
     
     MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
@@ -215,10 +218,10 @@ void MGraphic::SetPixelShader(ID3D11DeviceContext* _deviceContext, const SGraphi
     _deviceContext->PSSetShaderResources(0u, 1u, &_graphicResource.TextureView);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetPrimitiveAndDraw(ID3D11DeviceContext* _deviceContext, const SMeshData& _meshData)
+void MGraphic::SetPrimitiveAndDraw(ID3D11DeviceContext* _deviceContext, UINT _indexCountPerInstance, UINT _instanceCount)
 {
     _deviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    _deviceContext->DrawIndexed(_meshData.IndexCount,  0u, 0);
+    _deviceContext->DrawIndexedInstanced(_indexCountPerInstance, _instanceCount, 0u, 0, 0u);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::PresentSwapChain(IDXGISwapChain* _swapChain)
@@ -248,8 +251,10 @@ void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceConte
             { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
             { "UV",        0u,  DXGI_FORMAT_R32G32_FLOAT,     0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
             { "NORMAL",    0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+
+            { "SV_InstanceID",    0u,  DXGI_FORMAT_R32_UINT,  1u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_INSTANCE_DATA, 0u },
             };
-        UINT sizeInputElementDesc = 3u;
+        UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
         CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
     }
     _deviceContext->VSSetShader(_vertexShader.Shader, nullptr, 0u);
@@ -377,21 +382,19 @@ void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceConte
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, &_pipeline.VertexConstantBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SGraphicResources_Mesh& _pipeline, const TTransform& _transform)
+void MGraphic::SetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SGraphicResources_Mesh& _pipeline, const std::vector<TTransform>& _transforms)
 {
-    SVertexShaderConstantBuffer constantBufferData;
+    const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->GetInverseCameraMatrix();
+    const TMatrix4f perspectiveMatrix = MGameWindow::GetPerspectiveMatrix();
+    for (int i = 0; i < _transforms.size(); ++i)
     {
-        const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transform);
-        const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->GetInverseCameraMatrix();
-        const TMatrix4f perspectiveMatrix = MGameWindow::GetPerspectiveMatrix();
-        TMatrix4f worldViewProjectionMatrix = TMatrix4f::Transpose(objectWorldMatrix * invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
-        
-        constantBufferData.WorldViewProjection = worldViewProjectionMatrix;
+        const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transforms[i]);
+        G_VS_CONSTANT_BUFFER.WorldViewProjection[i] = TMatrix4f::Transpose(objectWorldMatrix * invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
     }
 
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     CHECK_HRESULT(_deviceContext->Map(_pipeline.VertexConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-    memcpy(mappedResource.pData, &constantBufferData, sizeof(SVertexShaderConstantBuffer));
+    memcpy(mappedResource.pData, &G_VS_CONSTANT_BUFFER, sizeof(SVertexShaderConstantBuffer));
     _deviceContext->Unmap(_pipeline.VertexConstantBuffer, 0);
     _deviceContext->VSSetConstantBuffers(0u, 1u, &_pipeline.VertexConstantBuffer);
 }
