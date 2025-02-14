@@ -236,7 +236,7 @@ void MGraphic::PresentSwapChain(IDXGISwapChain* _swapChain)
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::ClearRenderTarget(ID3D11DeviceContext* _deviceContext, ID3D11RenderTargetView* _renderTarget)
 {
-    constexpr float ClearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    constexpr float ClearColor[4] = { 0.029f, 0.023f, 0.031f, 1.0f };
     _deviceContext->ClearRenderTargetView(_renderTarget, ClearColor);
 }
 ///---------------------------------------------------------------------------------------------------------------------
