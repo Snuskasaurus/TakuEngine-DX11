@@ -1,7 +1,8 @@
 ﻿#include "Inputmanager.h"
 
-#include <cassert>
 #include <Windows.h>
+
+#include "CoreIncludesExternal.h"
 
 #include "HResultHandler.h"
 #include "GameWindow.h"

@@ -2,9 +2,8 @@
 
 #include <Windows.h>
 #include <d3d11.h>
-#include <map>
-#include <string>
 
+#include "../CoreIncludesExternal.h"
 #include "MeshResources.h"
 
 struct SVertexShader

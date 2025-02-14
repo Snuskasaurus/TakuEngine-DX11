@@ -153,6 +153,7 @@
     <Content Include="Data\Shaders\VertexShader.hlsl" />
     <ClCompile Include="Source\Engine\AssetList.cpp" />
     <ClCompile Include="Source\Engine\CommonEngine.cpp" />
+    <ClCompile Include="Source\Engine\CoreIncludesExternal.cpp" />
     <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
     <ClCompile Include="Source\Engine\FreeLookCamera.cpp" />
     <ClCompile Include="Source\Engine\Color.cpp" />
@@ -320,6 +321,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Engine\AssetList.h" />
     <ClInclude Include="Source\Engine\CommonEngine.h" />
+    <ClInclude Include="Source\Engine\CoreIncludesExternal.h" />
     <ClInclude Include="Source\Engine\Debug\Profiling.h" />
     <ClInclude Include="Source\Engine\FreeLookCamera.h" />
     <ClInclude Include="Source\Engine\Color.h" />

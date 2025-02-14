@@ -1,4 +1,5 @@
 ﻿#include "AssetList.h"
+#include "CoreIncludesExternal.h"
 
 #include "Resources/MeshResources.h"
 

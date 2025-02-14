@@ -1,8 +1,8 @@
 ﻿#include "FreeLookCamera.h"
 
 #include <Windows.h>
-#include <string>
 
+#include "CoreIncludesExternal.h"
 #include "Inputmanager.h"
 
 void TFreeLookCamera::UpdateCamera(const float dt)

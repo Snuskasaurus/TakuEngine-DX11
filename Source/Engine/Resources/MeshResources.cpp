@@ -1,12 +1,6 @@
 ﻿#include "MeshResources.h"
 
-#include <map>
-#include <vector>
-#include <fstream>
-#include <istream>
-#include <string>
-#include <assert.h>
-#include <sstream>
+#include "../CoreIncludesExternal.h"
 
 #include "ShadersResources.h"
 

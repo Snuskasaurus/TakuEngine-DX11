@@ -1,8 +1,7 @@
 ﻿#include "Graphic.h"
 
-#include <cassert>
 #include <d3d11.h>
-#include <sstream>
+#include <d3dcommon.h>
 
 #include "GameWindow.h"
 #include "HResultHandler.h"

@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <d3dcommon.h>
-
 #include "Math.h"
 #include "Resources/MeshResources.h"
 #include "Resources/ShadersResources.h"

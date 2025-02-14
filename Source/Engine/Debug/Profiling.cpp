@@ -1,7 +1,8 @@
 ﻿#include "Profiling.h"
 
 #include <Windows.h>
-#include <string>
+
+#include "../CoreIncludesExternal.h"
 
 static char BufferFuncName[1000] = "";
 

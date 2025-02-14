@@ -1,10 +1,10 @@
 ﻿#include "HResultHandler.h"
 
-#include <assert.h>
-#include <string>
 #include <system_error>
 #include <codecvt>
 #include <locale>
+
+#include "CoreIncludesExternal.h"
 
 bool HandleHResultError(const int line, const char* filename, const HRESULT HResult) noexcept
 {
