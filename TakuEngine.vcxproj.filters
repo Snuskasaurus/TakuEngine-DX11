@@ -13,6 +13,9 @@
     <Filter Include="Source\Engine\Debug">
       <UniqueIdentifier>{a376ad2f-e92b-4a3b-a025-676abe114d73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Game">
+      <UniqueIdentifier>{5eb598e0-996c-4676-a862-fa98d766a337}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Engine\CommonEngine.cpp">
@@ -36,9 +39,6 @@
     <ClCompile Include="Source\Engine\Inputmanager.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Shaders.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Test.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
@@ -46,9 +46,6 @@
       <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\WICTextureLoader.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\World.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Main.cpp">
@@ -60,10 +57,16 @@
     <ClCompile Include="Source\Engine\AssetList.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\MeshResources.cpp">
+    <ClCompile Include="Source\Engine\Math.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Math.cpp">
+    <ClCompile Include="Source\Game\World.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Resources\MeshResources.cpp">
+      <Filter>Source\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Engine\Resources\ShadersResources.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,9 +95,6 @@
     <ClInclude Include="Source\Engine\Math.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Shaders.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Test.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
@@ -104,16 +104,19 @@
     <ClInclude Include="Source\Engine\WICTextureLoader.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\World.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Debug\Profiling.h">
       <Filter>Source\Engine\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\AssetList.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\MeshResources.h">
+    <ClInclude Include="Source\Game\World.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Resources\MeshResources.h">
+      <Filter>Source\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Engine\Resources\ShadersResources.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
   </ItemGroup>

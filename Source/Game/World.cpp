@@ -2,8 +2,8 @@
 
 #include <assert.h>
 
-#include "AssetList.h"
-#include "Graphic.h"
+#include "../Engine/AssetList.h"
+#include "../Engine/Graphic.h"
 
 CMesh* Mesh = nullptr;
 CInstancedMesh* InstancedMesh = nullptr;

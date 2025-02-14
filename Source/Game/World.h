@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "Math.h"
-#include "FreeLookCamera.h"
+#include "../Engine/Math.h"
+#include "../Engine/FreeLookCamera.h"
 
 __declspec(align(16)) struct SWorldLight
 {
