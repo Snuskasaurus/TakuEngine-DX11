@@ -1,11 +1,11 @@
 #include <ctime>
 
-#include "Engine/Resources/MeshResources.h"
-#include "Engine/TimeManager.h"
-#include "Engine/World.h"
-#include "Engine/GameWindow.h"
-#include "Engine/Inputmanager.h"
-#include "Engine/AssetList.h"
+#include "Resources/MeshResources.h"
+#include "TimeManager.h"
+#include "World.h"
+#include "GameWindow.h"
+#include "Inputmanager.h"
+#include "AssetList.h"
 
 namespace TakuEngine
 {

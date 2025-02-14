@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#include "../CoreIncludesExternal.h"
+#include "../IncludesExternal.h"
 
 static char BufferFuncName[1000] = "";
 

@@ -1,6 +1,6 @@
 ﻿#include "MeshResources.h"
 
-#include "../CoreIncludesExternal.h"
+#include "../IncludesExternal.h"
 
 #include "ShadersResources.h"
 

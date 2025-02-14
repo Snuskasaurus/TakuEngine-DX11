@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../CoreIncludesExternal.h"
+#include "../IncludesExternal.h"
 
 #include "../Color.h"
 #include "../Math.h"

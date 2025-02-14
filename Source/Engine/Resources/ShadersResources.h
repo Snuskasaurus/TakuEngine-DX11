@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <d3d11.h>
 
-#include "../CoreIncludesExternal.h"
+#include "../IncludesExternal.h"
 #include "MeshResources.h"
 
 struct SVertexShader

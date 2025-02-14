@@ -4,7 +4,7 @@
 #include <codecvt>
 #include <locale>
 
-#include "CoreIncludesExternal.h"
+#include "IncludesExternal.h"
 
 bool HandleHResultError(const int line, const char* filename, const HRESULT HResult) noexcept
 {
