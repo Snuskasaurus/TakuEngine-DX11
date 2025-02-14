@@ -17,7 +17,7 @@
 
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
-static std::vector<CStaticMesh*> G_MESH_TO_DRAW;
+static std::vector<CMesh*> G_MESH_TO_DRAW;
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::StartDrawPipeline()
 {
@@ -38,7 +38,7 @@ void MGraphic::DrawPipeline()
 
     for (int i = 0; i < G_MESH_TO_DRAW.size(); ++i)
     {
-        CStaticMesh* StaticMeshToDraw = G_MESH_TO_DRAW[i];
+        CMesh* StaticMeshToDraw = G_MESH_TO_DRAW[i];
         
         MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource);
         MGraphic::SetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, StaticMeshToDraw->GraphicResource, StaticMeshToDraw->Transform);
@@ -64,9 +64,9 @@ void MGraphic::UninitializeGraphic()
     G_PIPELINE.PixelShaderData.Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
-CStaticMesh* MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
+CMesh* MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
 {
-    CStaticMesh* StaticMesh = new CStaticMesh;
+    CMesh* StaticMesh = new CMesh;
     
     StaticMesh->Transform = _transform;
 

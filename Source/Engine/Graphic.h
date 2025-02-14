@@ -63,7 +63,7 @@ __declspec(align(16)) struct SPixelShaderConstantBuffer
     float SunAmbient;
 };
 
-class CStaticMesh
+class CMesh
 {
     friend class MGraphic;
     
@@ -83,7 +83,7 @@ public:
     static void DrawPipeline();
     static void UninitializeGraphic();
 public:
-    static CStaticMesh* AddMeshToDraw(const TTransform&, const char*);
+    static CMesh* AddMeshToDraw(const TTransform&, const char*);
 private:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);

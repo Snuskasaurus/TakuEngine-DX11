@@ -5,7 +5,7 @@
 #include "AssetList.h"
 #include "Graphic.h"
 
-CStaticMesh* TakumiMesh = nullptr;
+CMesh* TakumiMesh = nullptr;
     
 ///---------------------------------------------------------------------------------------------------------------------
 MWorld* MWorld::Instance = nullptr;
