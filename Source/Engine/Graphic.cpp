@@ -15,6 +15,11 @@
 #define GAME_DATA_PATH "Data/"
 #define GAME_DATA_SHADER_PATH "Data/Shaders/"
 
+#define RESOLUTION_WIDTH    1920
+#define RESOLUTION_HEIGHT   1080
+int GetResolutionWidth() { return RESOLUTION_WIDTH; }
+int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
+
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
 static std::vector<CMesh*> G_MESH_TO_DRAW;
@@ -127,8 +132,8 @@ CInstancedMesh* MGraphic::AddInstancedMeshToDraw(const TTransform& _transform, c
 void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceContext** _deviceContext, IDXGISwapChain** _swapChain)
 {
     DXGI_SWAP_CHAIN_DESC SwapChainDesc;
-    SwapChainDesc.BufferDesc.Width = MGameWindow::GetGameWindowWidth();
-    SwapChainDesc.BufferDesc.Height = MGameWindow::GetGameWindowHeight();
+    SwapChainDesc.BufferDesc.Width = GetResolutionWidth();
+    SwapChainDesc.BufferDesc.Height = GetResolutionHeight();
     SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
     SwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
@@ -175,8 +180,8 @@ void MGraphic::CreateDepthStencilTexture(ID3D11Device* _device, ID3D11Texture2D*
 {
     D3D11_TEXTURE2D_DESC DepthStencilTextureDesc = {};
     {
-        DepthStencilTextureDesc.Width = MGameWindow::GetGameWindowWidth();
-        DepthStencilTextureDesc.Height = MGameWindow::GetGameWindowHeight();
+        DepthStencilTextureDesc.Width = GetResolutionWidth();
+        DepthStencilTextureDesc.Height = GetResolutionHeight();
         DepthStencilTextureDesc.MipLevels = 1u;
         DepthStencilTextureDesc.ArraySize = 1u;
         DepthStencilTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -424,8 +429,8 @@ void MGraphic::ConfigureViewport(ID3D11DeviceContext* _deviceContext)
 {
     D3D11_VIEWPORT viewportInfos;
     {
-        viewportInfos.Height = (float)MGameWindow::GetGameWindowHeight();
-        viewportInfos.Width = (float)MGameWindow::GetGameWindowWidth();
+        viewportInfos.Height = (float)GetResolutionHeight();
+        viewportInfos.Width = (float)GetResolutionWidth();
         viewportInfos.TopLeftX = 0.0f;
         viewportInfos.TopLeftY = 0.0f;
         viewportInfos.MinDepth = 0.0f;
