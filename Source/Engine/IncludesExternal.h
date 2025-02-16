@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-//#ifndef  _DEBUG
+#ifdef NDEBUG
     #define _ITERATOR_DEBUG_LEVEL 0
-//#endif
+#endif
 
 #include <cassert>
 #include <sstream>
