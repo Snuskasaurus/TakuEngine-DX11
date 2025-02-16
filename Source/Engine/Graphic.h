@@ -26,33 +26,6 @@ struct SGraphicResources_Pipeline
     SPixelShader PixelShaderData;
 };
 
-struct SGraphicResources_Mesh
-{
-    ID3D11Resource* Texture = nullptr;
-    ID3D11ShaderResourceView* TextureView = nullptr;
-    ID3D11Buffer* vertexBuffer = nullptr;
-    ID3D11Buffer* IndexBuffer = nullptr;
-    ID3D11Buffer* VertexConstantBuffer = nullptr;
-
-    void Release()
-    {
-        Texture->Release();
-        Texture = nullptr;
-        
-        TextureView->Release();
-        TextureView = nullptr;
-        
-        vertexBuffer->Release();
-        vertexBuffer = nullptr;
-
-        IndexBuffer->Release();
-        IndexBuffer = nullptr;
-
-        VertexConstantBuffer->Release();
-        VertexConstantBuffer = nullptr;
-    }
-};
-
 __declspec(align(16)) struct SVertexShaderConstantBuffer
 {
     TMatrix4f WorldViewProjection[MAX_INSTANCE_COUNT]; 
@@ -62,30 +35,6 @@ __declspec(align(16)) struct SPixelShaderConstantBuffer
 {
     TVector3f SunDirection;
     float SunAmbient;
-};
-
-class CMesh
-{
-    friend class MGraphic;
-    
-public:
-    TTransform Transform;
-
-private:
-    SGraphicResources_Mesh GraphicResource;
-    SMeshData* MeshData;
-};
-
-class CInstancedMesh
-{
-    friend class MGraphic;
-    
-public:
-    std::vector<TTransform> Transforms;
-
-private:
-    SGraphicResources_Mesh GraphicResource;
-    SMeshData* MeshData;
 };
 
 class MGraphic
