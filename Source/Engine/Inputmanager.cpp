@@ -6,6 +6,7 @@
 
 #include "HResultHandler.h"
 #include "GameWindow.h"
+#include "World.h"
 
 ///---------------------------------------------------------------------------------------------------------------------
 LPDIRECTINPUT8 G_DIRECT_INPUT;
@@ -46,6 +47,8 @@ void MInput::DetectInputs()
     G_INPUT_DEVICE_MOUSE->Acquire();
     G_INPUT_DEVICE_MOUSE->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
     DetectInputs_Mouse(mouseCurrState);
+
+    
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::ClearInputs()
@@ -75,6 +78,8 @@ void MInput::DetectInputs_Keyboard(const BYTE* _keyboardState)
 #ifdef _DEBUG
     KEYBOARD_CALL_FUNCTION(DIK_ESCAPE, PostQuitMessage(1))
 #endif
+
+    CGameScene* GameScene = MWorld::GetWorld()->OnKeyPressed();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 #undef KEYBOARD_CALL_FUNCTION

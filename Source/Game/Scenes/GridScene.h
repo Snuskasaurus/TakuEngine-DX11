@@ -2,7 +2,7 @@
 
 #include "../../Engine/Scene.h"
 
-class CTakumiScene final : public CGameScene
+class CGridScene final : public CGameScene
 {
 protected:
     virtual void OnCreate() override;

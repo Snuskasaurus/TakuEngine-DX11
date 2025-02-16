@@ -152,6 +152,7 @@
     <Content Include="Data\Shaders\PixelShader.hlsl" />
     <Content Include="Data\Shaders\VertexShader.hlsl" />
     <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
+    <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
     <ClCompile Include="Source\Engine\AssetList.cpp" />
     <ClCompile Include="Source\Engine\CommonEngine.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\WICTextureLoader.h" />
     <ClInclude Include="Source\Engine\World.h" />
+    <ClInclude Include="Source\Game\Scenes\GridScene.h" />
     <ClInclude Include="Source\Game\Scenes\TakumiScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -32,3 +32,10 @@ void MWorld::OnUpdate(const float& _dt)
     }
 }
 ///---------------------------------------------------------------------------------------------------------------------
+void MWorld::OnKeyPressed(EKeyCode _keyCode)
+{
+    if (CurrentGameScene == nullptr) return;
+
+    CurrentGameScene->OnKeyPressed();
+}
+///---------------------------------------------------------------------------------------------------------------------

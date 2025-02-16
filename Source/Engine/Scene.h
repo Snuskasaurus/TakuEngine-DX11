@@ -1,12 +1,14 @@
 ﻿#pragma once
 
 #include "IncludesExternal.h"
+#include "Inputmanager.h"
 #include "Graphics/Drawable.h"
 
 enum EGameSceneType
 {
     None,
     TakumiScene,
+    GridScene,
 };
 
 class CGameScene
@@ -18,10 +20,15 @@ public:
     static void ChangeGameScene(const EGameSceneType& _gameSceneType);
     
 protected:
-    ~CGameScene() = default;
-    virtual void OnCreate() {};
-    virtual void OnUpdate(const float& _dt) {};
-    virtual void OnDestroy() {};
+    virtual ~CGameScene() = default;
+
+protected:
+    virtual void OnCreate() {}
+    virtual void OnUpdate(const float& _dt) {}
+    virtual void OnDestroy() {}
+    
+    virtual void OnKeyPressed(EKeyCode _keyCode) {}
+    virtual void OnMouseMoved() {}
     
 private:
     void Create() { OnCreate(); }
