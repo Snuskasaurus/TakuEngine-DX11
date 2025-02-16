@@ -6,6 +6,7 @@
 
 #define MAX_INSTANCE_COUNT 1024
 
+class CDrawable_InstancedMesh;
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;
 
@@ -95,8 +96,7 @@ public:
     static void DrawPipeline();
     static void UninitializeGraphic();
 public:
-    static CMesh* AddMeshToDraw(const TTransform&, const char*);
-    static CInstancedMesh* AddInstancedMeshToDraw(const TTransform&, const char*);
+    static void FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawableInstancedMesh, const wchar_t* _textureFilename);
 private:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);
@@ -107,17 +107,17 @@ private:
     static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShader&);
     static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
     static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
-    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
-    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const SMeshData&);
-    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&);
+    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, const SMeshData&);
+    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, const SMeshData&);
+    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer);
 private:
-    static void SetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SGraphicResources_Mesh&, const std::vector<TTransform>& _transforms);
-    static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
+    static void SetVSConstantBuffer_Instanced(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms);
+    static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);
 private:
-    static void SetPixelShader(ID3D11DeviceContext*, const SGraphicResources_Mesh&);
+    static void SetPixelShader(ID3D11DeviceContext*, ID3D11ShaderResourceView** _textureView);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
 private:
-    static void SetPrimitiveAndDraw(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
+    static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
     static void Rasterize(ID3D11Device*, ID3D11DeviceContext*);
     static void ConfigureViewport(ID3D11DeviceContext*);
     static void PresentSwapChain(IDXGISwapChain*);

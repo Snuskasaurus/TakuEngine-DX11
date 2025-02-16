@@ -3,6 +3,7 @@
 #include "World.h"
 
 #include "../Game/Scenes/TakumiScene.h"
+#include "Graphics/Drawable.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
@@ -24,5 +25,44 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
     
     MWorld::GetWorld()->CurrentGameScene = NewWorldGameScene;
     NewWorldGameScene->Create();
+}
+//---------------------------------------------------------------------------------------------------------------------
+void CGameScene::Destroy()
+{
+    for (int i = 0; i < InstancedMeshes.size(); ++i)
+    {
+        delete InstancedMeshes[i];
+    }
+    InstancedMeshes.clear();
+    
+    OnDestroy();
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const TTransform& _transform, const char* _meshName)
+{
+#define GAME_DATA_PATH "Data/" // TODO Julien Rogel (14/02/2025): Temporary until i do a texture manager
+    
+    CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
+
+    InstancedMesh->Instances.push_back(_transform);
+
+    // Load the mesh data from file
+    {
+        InstancedMesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
+        assert(InstancedMesh->MeshData != nullptr);
+    }
+
+    // TODO Julien Rogel (14/02/2025): Rework texture loading
+    {
+        std::wstringstream TextureFilenameStream;
+        TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
+        MGraphic::FillGraphicResources_Instanced(InstancedMesh, TextureFilenameStream.str().c_str());
+    }
+    
+    InstancedMeshes.push_back(InstancedMesh);
+    return InstancedMesh;
+    
+#undef GAME_DATA_PATH
 }
 //---------------------------------------------------------------------------------------------------------------------

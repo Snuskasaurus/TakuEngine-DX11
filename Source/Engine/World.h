@@ -13,6 +13,7 @@ __declspec(align(16)) struct SWorldLight
 class MWorld
 {
     friend class CGameScene;
+    friend class MGraphic;
     
 private:
     static MWorld* Instance;

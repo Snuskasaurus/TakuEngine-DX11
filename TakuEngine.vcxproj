@@ -149,6 +149,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
     <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -543,6 +544,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Engine\AssetList.h" />
     <ClInclude Include="Source\Engine\CommonEngine.h" />
+    <ClInclude Include="Source\Engine\Graphics\Drawable.h" />
     <ClInclude Include="Source\Engine\IncludesExternal.h" />
     <ClInclude Include="Source\Engine\Debug\Profiling.h" />
     <ClInclude Include="Source\Engine\FreeLookCamera.h" />

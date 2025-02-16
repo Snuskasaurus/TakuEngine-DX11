@@ -11,5 +11,5 @@ protected:
     virtual void OnDestroy() override;
 
 private:
-    CInstancedMesh* InstancedMesh = nullptr;
+    CDrawable_InstancedMesh* InstancedMesh = nullptr;
 };
