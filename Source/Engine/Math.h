@@ -14,17 +14,21 @@ struct TMatrix4f;
 class MMath
 {
 public:
-    static float Square(const float _f);
-    static float Sin(const float _f);
-    static float Tan(const float _f);
-    static float Cos(const float _f);
-    static float Abs(const float _f);
-    static float Clamp(const float _f, const float _min, const float _max);
+    static float Square(float _f);
+    static float Sin(float _f);
+    static float Tan(float _f);
+    static float Cos(float _f);
+    static float Abs(float _f);
+    static float Clamp(float _f, float _min, float _max);
+
+    template<typename T> static T Max(T _t1, T _t2) { return (_t1 > _t2) ? _t1 : _t2; }
+    template<typename T> static T Min(T _t1, T _t2) { return (_t1 < _t2) ? _t1 : _t2; }
     
     static int RandomNumberIntegerInRange(int _min, int _max);
     static float RandomNumberIntegerInRange(float _min, float _max);
     static TVector3f RandomVectorIntegerInRange(TVector3f _min, TVector3f _max);
 };
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f
 {
