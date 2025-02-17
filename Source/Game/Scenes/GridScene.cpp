@@ -40,13 +40,23 @@ void CGridScene::OnCreate()
              || YTile > GridHeight - FullWaterBorder)
                 continue;
 
-            int LotOfWater = 10;
+            int LotOfWater = 6;
             if (XTile < LotOfWater
              || YTile < LotOfWater
              || XTile > GridWidth - LotOfWater
              || YTile > GridHeight - LotOfWater)
             {
                 if (MMath::RandomNumberIntegerInRange(0, 2) == 0)
+                    continue;
+            }
+            
+            int LessLotOfWater = 10;
+            if (XTile < LotOfWater
+             || YTile < LotOfWater
+             || XTile > GridWidth - LotOfWater
+             || YTile > GridHeight - LotOfWater)
+            {
+                if (MMath::RandomNumberIntegerInRange(0, 4) == 0)
                     continue;
             }
             
