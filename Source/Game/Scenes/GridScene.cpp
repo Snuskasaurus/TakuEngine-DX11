@@ -23,21 +23,48 @@ CDrawable_InstancedMesh* TileMesh_Water = nullptr;
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
-    GridTerrains.reserve(GridWidth * GridHeight);
-    GridTerrains.insert(GridTerrains.end(), GridWidth * GridHeight, ETerrainType::WATER);
-    for (int i = 1; i < GridWidth * GridHeight; ++i)
+    int nbTiles = GridWidth * GridHeight;
+    // Generate grid terrain
     {
-        GridTerrains[i] = (ETerrainType)MMath::RandomNumberIntegerInRange(WATER, HILL);
+        GridTerrains.reserve(nbTiles);
+        GridTerrains.insert(GridTerrains.end(), nbTiles, ETerrainType::WATER);
+        for (int i = 1; i < GridWidth * GridHeight; ++i)
+        {
+            int XTile = (i - 1) % GridWidth;
+            int YTile = (i - 1) / GridWidth;
+
+            int FullWaterBorder = 3;
+            if (XTile < FullWaterBorder
+             || YTile < FullWaterBorder
+             || XTile > GridWidth - FullWaterBorder
+             || YTile > GridHeight - FullWaterBorder)
+                continue;
+
+            int LotOfWater = 10;
+            if (XTile < LotOfWater
+             || YTile < LotOfWater
+             || XTile > GridWidth - LotOfWater
+             || YTile > GridHeight - LotOfWater)
+            {
+                if (MMath::RandomNumberIntegerInRange(0, 2) == 0)
+                    continue;
+            }
+            
+            if (MMath::RandomNumberIntegerInRange(0, 15) == 0)
+                continue;
+
+            GridTerrains[i] = ETerrainType::GROUND;
+        }
     }
 
-    // Generate grid mesh
+    // Generate grid meshes
     {
         TileMesh_Ground = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TILE_GROUND);
         TileMesh_Water = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TILE_WATER);
 
         float HalfWidthGrid = TileOffset * GridWidth / 2.0f;
         float HalfHeightGrid = TileOffset * GridHeight / 2.0f;
-        for (int i = 1; i < GridWidth * GridHeight; ++i)
+        for (int i = 1; i < nbTiles; ++i)
         {
             int XTile = (i - 1) % GridWidth;
             int YTile = (i - 1) / GridWidth;
