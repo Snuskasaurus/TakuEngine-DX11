@@ -50,13 +50,13 @@ void MGraphic::DrawPipeline()
 
         const UINT nbInstances = (UINT)MeshToDraw->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
-        while (nbInstancesRemainingToDraw > 1)
+        while (nbInstancesRemainingToDraw > 0)
         {
-            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT);
+            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
             const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
             
             MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &MeshToDraw->VSConstantBuffer, MeshToDraw->Instances, startInstances, nbInstancesToDraw);
-            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, MeshToDraw->MeshData->IndexCount, nbInstances);
+            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, MeshToDraw->MeshData->IndexCount, nbInstancesToDraw + 1);
             
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
         }

@@ -18,7 +18,7 @@ void MWorld::OnInit()
 {
     FreeLookCamera.SetPosition(TVector3f(0.0f, -10.0f, 6.0f));
     FreeLookCamera.SetRotation(TRotator(0.0f, -0.5f, 0.0f));
-    SunDirection = { 0.37f, -0.63f, 0.0 };
+    SunDirection = { 0.05f, -0.1f, 0.25f };
     
     CGameScene::ChangeGameScene(EGameSceneType::GridScene);
 }

@@ -8,10 +8,10 @@ constexpr int NbInstancedMesh = 6000;
 //---------------------------------------------------------------------------------------------------------------------
 void CTakumiScene::OnCreate()
 {
-    InstancedMesh = CTakumiScene::AddInstancedMeshToDraw({}, JU_ASSET_TAKUMI);
+    InstancedMesh = CTakumiScene::AddInstancedMeshToDraw(JU_ASSET_TAKUMI);
     const TVector3f MinPosition = TVector3f(-100.0f, -100.00f, -100.0f);
     const TVector3f MaxPosition = TVector3f(100.0f, 100.00f, 100.0f);
-    for (int i = 1; i < NbInstancedMesh; ++i)
+    for (int i = 0; i < NbInstancedMesh; ++i)
     {
         const float Yaw = MMath::RandomNumberIntegerInRange(-10.0f, 10.0f);
         TTransform NewTransform = { MMath::RandomVectorIntegerInRange(MinPosition, MaxPosition), Yaw, 0.0f, 0.0f };
@@ -40,7 +40,7 @@ void CTakumiScene::OnKeyPressed(EKeyCode _key)
     {
         PostQuitMessage(1);
     }
-    else if (_key == EKeyCode::KEY_BACKSPACE)
+    else if (_key == EKeyCode::KEY_F1)
     {
         ChangeGameScene(EGameSceneType::GridScene);
     }

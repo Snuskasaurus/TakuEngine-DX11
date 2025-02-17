@@ -8,7 +8,8 @@
 #define JU_ASSET_MONSTER   "Monster"
 #define JU_ASSET_TAKUMI    "Takumi"
 
-#define JU_ASSET_TILE    "Tiles/Tile"
+#define JU_ASSET_TILE_GROUND   "Tiles/TileGround"
+#define JU_ASSET_TILE_WATER    "Tiles/TileWater"
 
 class MAsset
 {

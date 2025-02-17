@@ -36,7 +36,7 @@ private:
     void NotifyKeyPressed(EKeyCode _keyCode) { OnKeyPressed(_keyCode); }
     
 protected:
-    CDrawable_InstancedMesh* AddInstancedMeshToDraw(const TTransform& _transform, const char* _meshName);
+    CDrawable_InstancedMesh* AddInstancedMeshToDraw(const char* _meshName);
     
 private:
     std::vector<CDrawable_InstancedMesh*> InstancedMeshes;

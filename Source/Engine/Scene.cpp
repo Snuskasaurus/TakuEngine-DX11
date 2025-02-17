@@ -42,13 +42,11 @@ void CGameScene::Destroy()
     OnDestroy();
 }
 //---------------------------------------------------------------------------------------------------------------------
-CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const TTransform& _transform, const char* _meshName)
+CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshName)
 {
 #define GAME_DATA_PATH "Data/" // TODO Julien Rogel (14/02/2025): Temporary until i do a texture manager
     
     CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
-
-    InstancedMesh->Instances.push_back(_transform);
 
     // Load the mesh data from file
     {
