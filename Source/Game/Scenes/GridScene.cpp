@@ -3,7 +3,7 @@
 #include "../../Engine/Math.h"
 #include "../../Engine/AssetList.h"
 
-constexpr int GridWidth = 100; // X
+constexpr int GridWidth = 200; // X
 constexpr int GridHeight = 100; // Y
 constexpr float TileOffset = 2.0f;
 
