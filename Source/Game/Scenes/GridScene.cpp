@@ -23,13 +23,6 @@ CDrawable_InstancedMesh* TileMesh_Water = nullptr;
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
-    {
-        TVector3f Position = { 0.0f, 0.0f, 0.0f };
-        TTransform Transform = { Position, 0.0f, 0.0f, 0.0f };
-        CDrawable_InstancedMesh* Takumi_placeholder = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TAKUMI);
-        Takumi_placeholder->Instances.push_back({Position });
-    }
-    
     GridTerrains.reserve(GridWidth * GridHeight);
     GridTerrains.insert(GridTerrains.end(), GridWidth * GridHeight, ETerrainType::WATER);
     for (int i = 1; i < GridWidth * GridHeight; ++i)
