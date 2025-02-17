@@ -44,7 +44,6 @@ void MGraphic::DrawPipeline()
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
         CDrawable_InstancedMesh* MeshToDraw = instancedMeshes[i];
-
         
         MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &MeshToDraw->VertexBuffer, MeshToDraw->IndexBuffer);
         MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, &MeshToDraw->TextureView);

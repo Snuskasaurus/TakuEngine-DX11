@@ -1,9 +1,12 @@
 ﻿#include "Scene.h"
 
+#include "Graphic.h"
 #include "World.h"
-
-#include "../Game/Scenes/TakumiScene.h"
 #include "Graphics/Drawable.h"
+#include "Resources/MeshResources.h"
+
+#include "../Game/Scenes/GridScene.h"
+#include "../Game/Scenes/TakumiScene.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
@@ -21,6 +24,7 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
     {
         case None: break;
         case TakumiScene: NewWorldGameScene = new CTakumiScene; break;
+        case GridScene: NewWorldGameScene = new CGridScene; break;
     }
     
     MWorld::GetWorld()->CurrentGameScene = NewWorldGameScene;
@@ -37,7 +41,6 @@ void CGameScene::Destroy()
     
     OnDestroy();
 }
-
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const TTransform& _transform, const char* _meshName)
 {

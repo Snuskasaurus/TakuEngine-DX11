@@ -2,6 +2,7 @@
 
 #include "Math.h"
 #include "FreeLookCamera.h"
+#include "Inputmanager.h"
 #include "Scene.h"
 
 __declspec(align(16)) struct SWorldLight
@@ -14,6 +15,7 @@ class MWorld
 {
     friend class CGameScene;
     friend class MGraphic;
+    friend class MInput;
     
 private:
     static MWorld* Instance;
@@ -24,12 +26,9 @@ public:
     static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
 
 public:
-    void ChangeGameScene(const EGameSceneType& _gameSceneType);
-    
-public:
     TVector3f GetSunDirection() const { return SunDirection; }
     TMatrix4f GetInverseCameraMatrix() const { return FreeLookCamera.GetCameraWorldInverseMatrix(); }
-    
+
 private:
     void OnInit();
     void OnUpdate(const float& _dt);
