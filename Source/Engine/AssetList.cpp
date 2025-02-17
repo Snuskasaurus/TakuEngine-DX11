@@ -12,4 +12,6 @@ void MAsset::LoadMeshes()
     MMeshResources::CreateMeshDataFromFileName(JU_ASSET_CRATE);
     MMeshResources::CreateMeshDataFromFileName(JU_ASSET_MONSTER);
     MMeshResources::CreateMeshDataFromFileName(JU_ASSET_TAKUMI);
+    
+    MMeshResources::CreateMeshDataFromFileName(JU_ASSET_TILE);
 }

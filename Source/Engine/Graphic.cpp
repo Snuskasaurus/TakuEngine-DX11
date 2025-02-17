@@ -59,7 +59,6 @@ void MGraphic::DrawPipeline()
             MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, MeshToDraw->MeshData->IndexCount, nbInstances);
             
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
-            if (nbInstancesRemainingToDraw < 0) nbInstancesRemainingToDraw = 0;
         }
     }
     

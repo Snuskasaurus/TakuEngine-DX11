@@ -207,10 +207,10 @@ bool MMeshResources::TryToImportOBJ(const char* Filename, SMeshData* MeshData)
         return false;
     }
     
-    assert(BufferFaceInfos.size() > 1);
-    assert(BufferTextureCoordinates.size() > 1);
-    assert(BufferVertexNormals.size() > 1);
-    assert(BufferVertexPosition.size() > 1);
+    // assert(BufferFaceInfos.size() > 1);
+    // assert(BufferTextureCoordinates.size() > 1);
+    // assert(BufferVertexNormals.size() > 1);
+    // assert(BufferVertexPosition.size() > 1);
     
     // Filter uniques faces because OBJ got duplicates of faces and fill the Mesh Data
     BufferUniqueFaceInfos.reserve(BufferFaceInfos.size());

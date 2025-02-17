@@ -20,7 +20,7 @@ void MWorld::OnInit()
     FreeLookCamera.SetRotation(TRotator(0.0f, -0.5f, 0.0f));
     SunDirection = { 0.37f, -0.63f, 0.0 };
     
-    CGameScene::ChangeGameScene(EGameSceneType::TakumiScene);
+    CGameScene::ChangeGameScene(EGameSceneType::GridScene);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MWorld::OnUpdate(const float& _dt)

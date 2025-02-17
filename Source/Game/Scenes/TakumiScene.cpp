@@ -3,7 +3,7 @@
 #include "../../Engine/Math.h"
 #include "../../Engine/AssetList.h"
 
-constexpr int NbInstancedMesh = 3000;
+constexpr int NbInstancedMesh = 6000;
 
 //---------------------------------------------------------------------------------------------------------------------
 void CTakumiScene::OnCreate()
