@@ -3,10 +3,12 @@
 #include "../../Engine/Math.h"
 #include "../../Engine/AssetList.h"
 
-constexpr int GridWidth = 200; // X
+constexpr int GridWidth = 100; // X
 constexpr int GridHeight = 100; // Y
 constexpr float TileOffset = 2.0f;
 
+std::vector<std::string> TilesNames;
+ 
 enum ETerrainType
 {
     NONE,
@@ -69,8 +71,15 @@ void CGridScene::OnCreate()
 
     // Generate grid meshes
     {
-        TileMesh_Ground = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TILE_GROUND);
-        TileMesh_Water = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TILE_WATER);
+        TilesNames.push_back(JU_ASSET_TILE_G4);
+        TilesNames.push_back(JU_ASSET_TILE_G2W1G1);
+        TilesNames.push_back(JU_ASSET_TILE_G1W1G1W1);
+        TilesNames.push_back(JU_ASSET_TILE_G1W2G1);
+        TilesNames.push_back(JU_ASSET_TILE_G1W3);
+        TilesNames.push_back(JU_ASSET_TILE_W4);
+        
+        TileMesh_Ground = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TILE_G4);
+        TileMesh_Water = CGridScene::AddInstancedMeshToDraw(JU_ASSET_TILE_W4);
 
         float HalfWidthGrid = TileOffset * GridWidth / 2.0f;
         float HalfHeightGrid = TileOffset * GridHeight / 2.0f;
