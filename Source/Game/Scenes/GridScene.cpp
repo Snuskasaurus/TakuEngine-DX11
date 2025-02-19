@@ -21,8 +21,8 @@ enum ETerrainType
     HILL,
 };
 
-constexpr int GridWidth = 130; // X
-constexpr int GridHeight = 50; // Y
+constexpr int GridWidth = 320; // X
+constexpr int GridHeight = 150; // Y
 constexpr float TileSize = 2.0f;
 constexpr int nbTiles = GridWidth * GridHeight;
 constexpr int nbVisualTiles = (GridWidth + 1) * (GridHeight + 1);
@@ -84,7 +84,6 @@ TVisualMeshData* GetVisualMeshDataFromVisualGridIndex(const TVisualGridIndex& _v
     return &visualMeshDataMapIterator->second;
 }
 
-
 void InitVisualMeshDataMap()
 {
     CGameScene* GameScene = MWorld::GetWorld()->GetCurrentScene();
@@ -140,6 +139,35 @@ void InitVisualMeshDataMap()
     
     Mesh1111->Instances.push_back({{(TileSize + 1.0f) * 5, 0.0f, -20.0f }, 0.0f, 0.0f, 0.0f});
 }
+
+bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
+{
+    std::ifstream file("Data/Map.txt"); // Open the file
+    if (!file)
+        return false;
+    
+    int iTerrain = 0;
+    std::string line;
+    while(std::getline(file, line))
+    {
+        for (char c : line)
+        {
+            if (c == '0')
+            {
+                _terrains[iTerrain] = ETerrainType::WATER;
+                iTerrain++;
+            }
+            else if (c == '1')
+            {
+                _terrains[iTerrain] = ETerrainType::GROUND;
+                iTerrain++;
+            }
+        }
+    }
+    
+    file.close();
+    return true;
+}
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
@@ -147,43 +175,46 @@ void CGridScene::OnCreate()
     {
         GridTerrains.reserve(nbTiles);
         GridTerrains.insert(GridTerrains.end(), nbTiles, ETerrainType::WATER);
-        for (int i = 0; i < GridWidth * GridHeight; ++i)
-        {
-            int XTile = (i - 1) % GridWidth;
-            int YTile = (i - 1) / GridWidth;
-            
-            int FullWaterBorder = 3;
-            if (XTile < FullWaterBorder
-             || YTile < FullWaterBorder
-             || XTile > GridWidth - FullWaterBorder
-             || YTile > GridHeight - FullWaterBorder)
-                continue;
-            
-            int LotOfWater = 6;
-            if (XTile < LotOfWater
-             || YTile < LotOfWater
-             || XTile > GridWidth - LotOfWater
-             || YTile > GridHeight - LotOfWater)
-            {
-                if (MMath::RandomNumberIntegerInRange(0, 2) == 0)
-                    continue;
-            }
-            
-            int LessLotOfWater = 10;
-            if (XTile < LotOfWater
-             || YTile < LotOfWater
-             || XTile > GridWidth - LotOfWater
-             || YTile > GridHeight - LotOfWater)
-            {
-                if (MMath::RandomNumberIntegerInRange(0, 4) == 0)
-                    continue;
-            }
-            
-            if (MMath::RandomNumberIntegerInRange(0, 15) == 0)
-                continue;
+        bool Success = ReadMapAndFillTerrains(GridTerrains);
+        assert(Success);
 
-            GridTerrains[i] = ETerrainType::GROUND;
-        }
+        // for (int i = 0; i < GridWidth * GridHeight; ++i)
+        // {
+        //     int XTile = (i - 1) % GridWidth;
+        //     int YTile = (i - 1) / GridWidth;
+        //     
+        //     int FullWaterBorder = 3;
+        //     if (XTile < FullWaterBorder
+        //      || YTile < FullWaterBorder
+        //      || XTile > GridWidth - FullWaterBorder
+        //      || YTile > GridHeight - FullWaterBorder)
+        //         continue;
+        //     
+        //     int LotOfWater = 6;
+        //     if (XTile < LotOfWater
+        //      || YTile < LotOfWater
+        //      || XTile > GridWidth - LotOfWater
+        //      || YTile > GridHeight - LotOfWater)
+        //     {
+        //         if (MMath::RandomNumberIntegerInRange(0, 2) == 0)
+        //             continue;
+        //     }
+        //     
+        //     int LessLotOfWater = 10;
+        //     if (XTile < LotOfWater
+        //      || YTile < LotOfWater
+        //      || XTile > GridWidth - LotOfWater
+        //      || YTile > GridHeight - LotOfWater)
+        //     {
+        //         if (MMath::RandomNumberIntegerInRange(0, 4) == 0)
+        //             continue;
+        //     }
+        //     
+        //     if (MMath::RandomNumberIntegerInRange(0, 15) == 0)
+        //         continue;
+        //
+        //     GridTerrains[i] = ETerrainType::GROUND;
+        // }
     }
 
     // Generate grid meshes
@@ -204,7 +235,7 @@ void CGridScene::OnCreate()
             const int YTile = i / (GridWidth + 1);
 
             TVector3f position = { 
-                (float)(XTile) * TileSize + HalfWidthGrid, 
+                (float)(XTile) * TileSize - HalfWidthGrid, 
                 (float)(YTile) * -TileSize + HalfHeightGrid, 
                 0.0f 
             };
