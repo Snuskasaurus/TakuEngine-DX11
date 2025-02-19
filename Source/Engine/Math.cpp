@@ -76,11 +76,6 @@ float MMath::Abs(const float _f)
     return fabsf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
-float MMath::Clamp(const float _f, const float _min, const float _max)
-{
-    return (_f < _min) ? _min : ((_f > _max) ? _max : _f);
-}
-//----------------------------------------------------------------------------------------------------------------------
 int MMath::RandomNumberIntegerInRange(int _min, int _max)
 {
     if (_min == _max) return 0;

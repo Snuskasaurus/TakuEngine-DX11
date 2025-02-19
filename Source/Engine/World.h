@@ -28,7 +28,8 @@ public:
 public:
     TVector3f GetSunDirection() const { return SunDirection; }
     TMatrix4f GetInverseCameraMatrix() const { return FreeLookCamera.GetCameraWorldInverseMatrix(); }
-
+    CGameScene* GetCurrentScene() const { return CurrentGameScene; }
+    
 private:
     void OnInit();
     void OnUpdate(const float& _dt);

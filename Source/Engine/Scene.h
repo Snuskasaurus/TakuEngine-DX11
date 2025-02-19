@@ -35,7 +35,7 @@ private:
     void Destroy();
     void NotifyKeyPressed(EKeyCode _keyCode) { OnKeyPressed(_keyCode); }
     
-protected:
+public:
     CDrawable_InstancedMesh* AddInstancedMeshToDraw(const char* _meshName);
     
 private:

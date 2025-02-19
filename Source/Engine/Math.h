@@ -4,6 +4,7 @@
 
 #define MATH_EPSILON_FLOAT 1.19209290E-07F
 #define MATH_SMALL_NUMBER 0.005
+#define MATH_PI 3.1415926535f
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f;
@@ -19,10 +20,13 @@ public:
     static float Tan(float _f);
     static float Cos(float _f);
     static float Abs(float _f);
-    static float Clamp(float _f, float _min, float _max);
-
-    template<typename T> static T Max(T _t1, T _t2) { return (_t1 > _t2) ? _t1 : _t2; }
-    template<typename T> static T Min(T _t1, T _t2) { return (_t1 < _t2) ? _t1 : _t2; }
+    
+    template<typename T> FORCE_INLINE static T Clamp(T _f, T _min, T _max) { return (_f < _min) ? _min : ((_f > _max) ? _max : _f); }
+    template<typename T> FORCE_INLINE static T Max(T _t1, T _t2) { return (_t1 > _t2) ? _t1 : _t2; }
+    template<typename T> FORCE_INLINE static T Min(T _t1, T _t2) { return (_t1 < _t2) ? _t1 : _t2; }
+    
+    FORCE_INLINE static float Deg2Rad(float _deg) { return (_deg) * MATH_PI / 180.0f; }
+    FORCE_INLINE static float Rad2Deg(float _rad) { return _rad * (180.0f / MATH_PI); }
     
     static int RandomNumberIntegerInRange(int _min, int _max);
     static float RandomNumberIntegerInRange(float _min, float _max);
