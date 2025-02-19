@@ -21,11 +21,20 @@ enum ETerrainType
     HILL,
 };
 
-constexpr int GridWidth = 100; // X
-constexpr int GridHeight = 100; // Y
+constexpr int GridWidth = 130; // X
+constexpr int GridHeight = 50; // Y
 constexpr float TileSize = 2.0f;
 constexpr int nbTiles = GridWidth * GridHeight;
 constexpr int nbVisualTiles = (GridWidth + 1) * (GridHeight + 1);
+
+bool IsValidGridPosition(int row, int col)
+{
+    return row >= 0 && row < GridHeight && col >= 0 && col < GridWidth;
+}
+bool IsValidVisualGridPosition(int row, int col)
+{
+    return row >= 0 && row < GridHeight + 1 && col >= 0 && col < GridWidth + 1;
+}
 
 std::vector<ETerrainType> GridTerrains;
 std::map<TTerrainIndex, TVisualMeshData> VisualMeshDataMap;
@@ -44,28 +53,35 @@ std::vector<TVisualGridIndex> GridIndex_To_VisualGridIndex(const TGridIndex& _gr
 
 std::vector<TGridIndex> VisualGridIndex_To_GridIndex(const TVisualGridIndex& _visualGridIndex)
 {
-    int row = _visualGridIndex / (GridWidth + 1);
-    int col = _visualGridIndex % (GridWidth + 1);
-
+    const int row = _visualGridIndex / (GridWidth + 1);
+    const int col = _visualGridIndex % (GridWidth + 1);
+    
+    const TGridIndex TopLeft = IsValidGridPosition(row - 1, col - 1) ? (row - 1) * GridWidth + (col - 1) : -1;
+    const TGridIndex TopRight = IsValidGridPosition(row - 1, col) ? (row - 1) * GridWidth + col : -1;
+    const TGridIndex BotRight = IsValidGridPosition(row, col) ? row * GridWidth + col : -1;
+    const TGridIndex BotLeft = IsValidGridPosition(row, col - 1) ? row * GridWidth + (col - 1) : -1;
+    
     return {
-        MMath::Clamp(row * GridWidth + col, 0, nbTiles - 1),
-        MMath::Clamp(row * GridWidth + (col - 1), 0, nbTiles - 1),
-        MMath::Clamp((row - 1) * GridWidth + col, 0, nbTiles - 1),
-        MMath::Clamp((row - 1) * GridWidth + (col - 1), 0, nbTiles - 1),
+        TopLeft,
+        TopRight,
+        BotRight,
+        BotLeft
     };
 }
 
 TVisualMeshData* GetVisualMeshDataFromVisualGridIndex(const TVisualGridIndex& _visualGridIndex)
 {
     std::vector<TGridIndex> TileIndexes = VisualGridIndex_To_GridIndex(_visualGridIndex);
-    char TileTerrainIndex = 0x0;
-
     TTerrainIndex terrainIndex = 0;
     for (int i = 0; i < 4; i++) {
-        const TTerrainIndex TerrainType = (TTerrainIndex)GridTerrains[TileIndexes[i]];
+        const TTerrainIndex TerrainType = TileIndexes[i] >= 0 ? (TTerrainIndex)GridTerrains[TileIndexes[i]] : 0;
         terrainIndex = terrainIndex * 10 + TerrainType;
     }
-    return &VisualMeshDataMap.find(terrainIndex)->second;
+    const auto visualMeshDataMapIterator = VisualMeshDataMap.find(terrainIndex);
+    if (visualMeshDataMapIterator == VisualMeshDataMap.end())
+        return nullptr;
+
+    return &visualMeshDataMapIterator->second;
 }
 
 
@@ -83,24 +99,46 @@ void InitVisualMeshDataMap()
     VisualMeshDataMap.insert({0, {Mesh0000, 0.0f}});
     
     VisualMeshDataMap.insert({1000, {Mesh1000, 0.0f}});
-    VisualMeshDataMap.insert({100, {Mesh1000, MMath::Deg2Rad(90.0f)}});
-    VisualMeshDataMap.insert({10, {Mesh1000, MMath::Deg2Rad(180.0f)}});
-    VisualMeshDataMap.insert({1, {Mesh1000, MMath::Deg2Rad(270.0f)}});
+    VisualMeshDataMap.insert({100, {Mesh1000, MMath::Deg2Rad(-90.0f)}});
+    VisualMeshDataMap.insert({10, {Mesh1000, MMath::Deg2Rad(-180.0f)}});
+    VisualMeshDataMap.insert({1, {Mesh1000, MMath::Deg2Rad(-270.0f)}});
     
     VisualMeshDataMap.insert({1001, {Mesh1001, 0.0f}});
-    VisualMeshDataMap.insert({1100, {Mesh1001, MMath::Deg2Rad(90.0f)}});
-    VisualMeshDataMap.insert({110, {Mesh1001, MMath::Deg2Rad(180.0f)}});
-    VisualMeshDataMap.insert({11, {Mesh1001, MMath::Deg2Rad(270.0f)}});
+    VisualMeshDataMap.insert({1100, {Mesh1001, MMath::Deg2Rad(-90.0f)}});
+    VisualMeshDataMap.insert({110, {Mesh1001, MMath::Deg2Rad(-180.0f)}});
+    VisualMeshDataMap.insert({11, {Mesh1001, MMath::Deg2Rad(-270.0f)}});
     
     VisualMeshDataMap.insert({1010, {Mesh1010, 0.0f}});
-    VisualMeshDataMap.insert({101, {Mesh1010, MMath::Deg2Rad(90.0f)}});
+    VisualMeshDataMap.insert({101, {Mesh1010, MMath::Deg2Rad(-90.0f)}});
     
     VisualMeshDataMap.insert({1101, {Mesh1101, 0.0f}});
-    VisualMeshDataMap.insert({1110, {Mesh1101, MMath::Deg2Rad(90.0f)}});
-    VisualMeshDataMap.insert({111, {Mesh1101, MMath::Deg2Rad(180.0f)}});
-    VisualMeshDataMap.insert({1011, {Mesh1101, MMath::Deg2Rad(270.0f)}});
+    VisualMeshDataMap.insert({1110, {Mesh1101, MMath::Deg2Rad(-90.0f)}});
+    VisualMeshDataMap.insert({111, {Mesh1101, MMath::Deg2Rad(-180.0f)}});
+    VisualMeshDataMap.insert({1011, {Mesh1101, MMath::Deg2Rad(-270.0f)}});
     
     VisualMeshDataMap.insert({1111, {Mesh1111, 0.0f}});
+    
+    Mesh0000->Instances.push_back({{(TileSize + 1.0f) * 0, 0.0f, -20.0f }, 0.0f, 0.0f, 0.0f});
+
+    Mesh1000->Instances.push_back({{(TileSize + 1.0f) * 1, -(TileSize + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(TileSize + 1.0f) * 1, -(TileSize + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(TileSize + 1.0f) * 1, -(TileSize + 1.0f) * 2, -20.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(TileSize + 1.0f) * 1, -(TileSize + 1.0f) * 3, -20.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+
+    Mesh1001->Instances.push_back({{(TileSize + 1.0f) * 2, -(TileSize + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1001->Instances.push_back({{(TileSize + 1.0f) * 2, -(TileSize + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1001->Instances.push_back({{(TileSize + 1.0f) * 2, -(TileSize + 1.0f) * 2, -20.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
+    Mesh1001->Instances.push_back({{(TileSize + 1.0f) * 2, -(TileSize + 1.0f) * 3, -20.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+    
+    Mesh1010->Instances.push_back({{(TileSize + 1.0f) * 3, -(TileSize + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1010->Instances.push_back({{(TileSize + 1.0f) * 3, -(TileSize + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    
+    Mesh1101->Instances.push_back({{(TileSize + 1.0f) * 4, -(TileSize + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(TileSize + 1.0f) * 4, -(TileSize + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(TileSize + 1.0f) * 4, -(TileSize + 1.0f) * 2, -20.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(TileSize + 1.0f) * 4, -(TileSize + 1.0f) * 3, -20.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+    
+    Mesh1111->Instances.push_back({{(TileSize + 1.0f) * 5, 0.0f, -20.0f }, 0.0f, 0.0f, 0.0f});
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
@@ -109,18 +147,18 @@ void CGridScene::OnCreate()
     {
         GridTerrains.reserve(nbTiles);
         GridTerrains.insert(GridTerrains.end(), nbTiles, ETerrainType::WATER);
-        for (int i = 1; i < GridWidth * GridHeight; ++i)
+        for (int i = 0; i < GridWidth * GridHeight; ++i)
         {
             int XTile = (i - 1) % GridWidth;
             int YTile = (i - 1) / GridWidth;
-
+            
             int FullWaterBorder = 3;
             if (XTile < FullWaterBorder
              || YTile < FullWaterBorder
              || XTile > GridWidth - FullWaterBorder
              || YTile > GridHeight - FullWaterBorder)
                 continue;
-
+            
             int LotOfWater = 6;
             if (XTile < LotOfWater
              || YTile < LotOfWater
@@ -151,24 +189,32 @@ void CGridScene::OnCreate()
     // Generate grid meshes
     {
         InitVisualMeshDataMap();
-        
+    
         float HalfTileSize = TileSize * 0.5f;
-        float HalfWidthGrid = HalfTileSize * GridWidth - HalfTileSize;
-        float HalfHeightGrid = HalfTileSize * GridHeight - HalfTileSize;
-        
-        for (int i = 1; i < nbVisualTiles; ++i)
+        float HalfWidthGrid = HalfTileSize * (GridWidth + 1);
+        float HalfHeightGrid = HalfTileSize * (GridHeight + 1);
+
+        for (int i = 0; i < nbVisualTiles; ++i)
         {
             const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i);
-            
-            const int XTile = (i - 1) % GridWidth;
-            const int YTile = (i - 1) / GridWidth;
-            TVector3f position = { (float)(XTile) * TileSize - HalfWidthGrid, (float)(YTile) * TileSize - HalfHeightGrid, 0.0f };
+            if (visualMeshData == nullptr)
+                continue;
+
+            const int XTile = i % (GridWidth + 1);
+            const int YTile = i / (GridWidth + 1);
+
+            TVector3f position = { 
+                (float)(XTile) * TileSize + HalfWidthGrid, 
+                (float)(YTile) * -TileSize + HalfHeightGrid, 
+                0.0f 
+            };
             TTransform Transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
-            
+
             visualMeshData->InstancedMesh->Instances.push_back(Transform);
         }
     }
 }
+
 void CGridScene::OnKeyPressed(EKeyCode _key)
 {
     if (_key == EKeyCode::KEY_ESCAPE)
