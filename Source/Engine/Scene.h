@@ -39,5 +39,5 @@ public:
     CDrawable_InstancedMesh* AddInstancedMeshToDraw(const char* _meshName);
     
 private:
-    std::vector<CDrawable_InstancedMesh*> InstancedMeshes;
+    std::vector<CDrawable_Base*> Meshes;
 };

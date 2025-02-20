@@ -51,10 +51,10 @@ struct SPixelShader
 class MShaderResources
 {
 public:
-    static ID3DBlob* CreateBlobFromFileName(const char* _filename, EShaderType ShaderType);
-    static ID3DBlob* GetBlobFromFileName(const char* _filename);
+    static ID3DBlob* CreateBlobFromFileName(const char*, EShaderType);
+    static ID3DBlob* GetBlobFromFileName(const char*);
 public:
     static void DeleteAllBlobs();
 private:
-    static void CompileShader(const char* _fileName, const char* _target, ID3DBlob** _shaderOut);
+    static void CompileShader(const char*, const char*, ID3DBlob**);
 };

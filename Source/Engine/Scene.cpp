@@ -1,6 +1,6 @@
 ﻿#include "Scene.h"
 
-#include "Graphic.h"
+#include "Graphics/Graphic.h"
 #include "World.h"
 #include "Graphics/Drawable.h"
 #include "Resources/MeshResources.h"
@@ -34,11 +34,11 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Destroy()
 {
-    for (int i = 0; i < InstancedMeshes.size(); ++i)
+    for (int i = 0; i < Meshes.size(); ++i)
     {
-        delete InstancedMeshes[i];
+        delete Meshes[i];
     }
-    InstancedMeshes.clear();
+    Meshes.clear();
     
     OnDestroy();
 }
@@ -60,7 +60,7 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshNam
         MGraphic::FillGraphicResources_Instanced(InstancedMesh, TextureFilenameStream.str().c_str());
     }
     
-    InstancedMeshes.push_back(InstancedMesh);
+    Meshes.push_back(InstancedMesh);
     return InstancedMesh;
 }
 //---------------------------------------------------------------------------------------------------------------------

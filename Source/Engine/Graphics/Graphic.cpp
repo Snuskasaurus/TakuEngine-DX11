@@ -3,25 +3,26 @@
 #include <d3d11.h>
 #include <d3dcommon.h>
 
-#include "AssetList.h"
-#include "GameWindow.h"
-#include "HResultHandler.h"
-#include "Resources/MeshResources.h"
-#include "Resources/ShadersResources.h"
-#include "WICTextureLoader.h"
-#include "World.h"
-#include "Debug/Profiling.h"
+#include "../AssetList.h"
+#include "../GameWindow.h"
+#include "../HResultHandler.h"
+#include "../Resources/MeshResources.h"
+#include "../Resources/ShadersResources.h"
+#include "../WICTextureLoader.h"
+#include "../World.h"
+#include "../Debug/Profiling.h"
 
+///---------------------------------------------------------------------------------------------------------------------
 #define RESOLUTION_WIDTH    1920
 #define RESOLUTION_HEIGHT   1080
+///---------------------------------------------------------------------------------------------------------------------
 int GetResolutionWidth() { return RESOLUTION_WIDTH; }
 int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
-
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
 SVertexShaderConstantBuffer G_VS_CONSTANT_BUFFER;
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::StartDrawPipeline()
+void MGraphic::SetupDraw()
 {
     MGraphic::CreateDeviceAndSwapChain(&G_PIPELINE.Device, &G_PIPELINE.DeviceContext, &G_PIPELINE.SwapChain);
     MGraphic::CreateAndSetDepthStencilState(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.DepthStencilState);
@@ -34,30 +35,14 @@ void MGraphic::StartDrawPipeline()
     MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::DrawPipeline()
+void MGraphic::Draw()
 {
     MGraphic::SetPixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 
-    const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
+    const std::vector<CDrawable_Base*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->Meshes;
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
-        CDrawable_InstancedMesh* MeshToDraw = instancedMeshes[i];
-        
-        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &MeshToDraw->VertexBuffer, MeshToDraw->IndexBuffer);
-        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, &MeshToDraw->TextureView);
-
-        const UINT nbInstances = (UINT)MeshToDraw->Instances.size();
-        UINT nbInstancesRemainingToDraw = nbInstances;
-        while (nbInstancesRemainingToDraw > 0)
-        {
-            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
-            const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
-            
-            MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &MeshToDraw->VSConstantBuffer, MeshToDraw->Instances, startInstances, nbInstancesToDraw);
-            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, MeshToDraw->MeshData->IndexCount, nbInstancesToDraw + 1);
-            
-            nbInstancesRemainingToDraw -= nbInstancesToDraw;
-        }
+       instancedMeshes[i]->Draw(G_PIPELINE.Device, G_PIPELINE.DeviceContext);
     }
     
     MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
@@ -69,7 +54,7 @@ void MGraphic::DrawPipeline()
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::InitializeGraphic()
 {
-    MGraphic::StartDrawPipeline();
+    MGraphic::SetupDraw();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::UninitializeGraphic()

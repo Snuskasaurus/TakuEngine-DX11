@@ -2,7 +2,7 @@
 
 #include "IncludesExternal.h"
 
-#include "Graphic.h"
+#include "Graphics/Graphic.h"
 
 ///---------------------------------------------------------------------------------------------------------------------
 MWorld* MWorld::Instance = nullptr;

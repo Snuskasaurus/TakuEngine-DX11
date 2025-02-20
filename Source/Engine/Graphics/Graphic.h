@@ -1,8 +1,7 @@
 ﻿#pragma once
 
-#include "Math.h"
-#include "Resources/MeshResources.h"
-#include "Resources/ShadersResources.h"
+#include "../Resources/MeshResources.h"
+#include "../Resources/ShadersResources.h"
 
 #define MAX_INSTANCE_COUNT 1024u
 
@@ -41,12 +40,12 @@ class MGraphic
 {
 public:
     static void InitializeGraphic();
-    static void StartDrawPipeline();
-    static void DrawPipeline();
+    static void SetupDraw();
+    static void Draw();
     static void UninitializeGraphic();
 public:
     static void FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawableInstancedMesh, const wchar_t* _textureFilename);
-private:
+public:
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);
     static void CreateDepthStencilTexture(ID3D11Device*, ID3D11Texture2D**);
@@ -59,13 +58,13 @@ private:
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, const SMeshData&);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, const SMeshData&);
     static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer);
-private:
+public:
     static void SetVSConstantBuffer_Instanced(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances);
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);
-private:
+public:
     static void SetPixelShader(ID3D11DeviceContext*, ID3D11ShaderResourceView** _textureView);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
-private:
+public:
     static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
     static void Rasterize(ID3D11Device*, ID3D11DeviceContext*);
     static void ConfigureViewport(ID3D11DeviceContext*);

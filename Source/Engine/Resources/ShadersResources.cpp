@@ -9,7 +9,7 @@
 // TODO Julien Rogel (20/02/2025): Change this data structure to use an array and avoid allocation for each shader data
 static std::map<std::string, ID3DBlob*> G_BLOB_MAP;
 
-ID3DBlob* MShaderResources::CreateBlobFromFileName(const char* _filename, EShaderType ShaderType)
+ID3DBlob* MShaderResources::CreateBlobFromFileName(const char* _filename, EShaderType _shaderType)
 {
     ID3DBlob* NewBlob = nullptr;
     const std::string fileNameAsString = _filename;
@@ -17,7 +17,7 @@ ID3DBlob* MShaderResources::CreateBlobFromFileName(const char* _filename, EShade
     OBJFilenameStream << GAME_DATA_SHADER_PATH << _filename << ".hlsl";
 
     std::string target;
-    switch (ShaderType)
+    switch (_shaderType)
     {
         case VERTEX_SHADER: target = "vs_5_0"; break;
         case PIXEL_SHADER: target = "ps_5_0"; break;
