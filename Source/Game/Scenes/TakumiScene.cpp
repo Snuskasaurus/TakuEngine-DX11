@@ -8,7 +8,7 @@ constexpr int NbInstancedMesh = 6000;
 //---------------------------------------------------------------------------------------------------------------------
 void CTakumiScene::OnCreate()
 {
-    InstancedMesh = CTakumiScene::AddInstancedMeshToDraw(JU_ASSET_TAKUMI);
+    InstancedMesh = CTakumiScene::AddInstancedMeshToDraw(TAKU_ASSET_MESH_TAKUMI);
     const TVector3f MinPosition = TVector3f(-100.0f, -100.00f, -100.0f);
     const TVector3f MaxPosition = TVector3f(100.0f, 100.00f, 100.0f);
     for (int i = 0; i < NbInstancedMesh; ++i)

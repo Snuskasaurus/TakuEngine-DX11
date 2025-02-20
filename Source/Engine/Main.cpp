@@ -13,6 +13,7 @@ namespace TakuEngine
 void LoadAssets()
 {
 	MAsset::LoadMeshes();
+	MAsset::LoadShaders();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)

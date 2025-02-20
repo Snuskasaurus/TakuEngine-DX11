@@ -7,6 +7,7 @@
 
 #include "../Game/Scenes/GridScene.h"
 #include "../Game/Scenes/TakumiScene.h"
+#include "Resources/GamePath.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
@@ -44,8 +45,6 @@ void CGameScene::Destroy()
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshName)
 {
-#define GAME_DATA_PATH "Data/" // TODO Julien Rogel (14/02/2025): Temporary until i do a texture manager
-    
     CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
 
     // Load the mesh data from file
@@ -63,7 +62,5 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshNam
     
     InstancedMeshes.push_back(InstancedMesh);
     return InstancedMesh;
-    
-#undef GAME_DATA_PATH
 }
 //---------------------------------------------------------------------------------------------------------------------

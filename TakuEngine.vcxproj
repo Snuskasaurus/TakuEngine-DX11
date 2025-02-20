@@ -185,6 +185,7 @@
     <ClInclude Include="Source\Engine\Inputmanager.h" />
     <ClInclude Include="Source\Engine\Math.h" />
     <ClInclude Include="Source\Engine\Graphic.h" />
+    <ClInclude Include="Source\Engine\Resources\GamePath.h" />
     <ClInclude Include="Source\Engine\Resources\MeshResources.h" />
     <ClInclude Include="Source\Engine\Resources\ShadersResources.h" />
     <ClInclude Include="Source\Engine\Scene.h" />

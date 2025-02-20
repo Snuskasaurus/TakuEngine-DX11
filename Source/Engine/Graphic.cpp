@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <d3dcommon.h>
 
+#include "AssetList.h"
 #include "GameWindow.h"
 #include "HResultHandler.h"
 #include "Resources/MeshResources.h"
@@ -10,9 +11,6 @@
 #include "WICTextureLoader.h"
 #include "World.h"
 #include "Debug/Profiling.h"
-
-#define GAME_DATA_PATH "Data/"
-#define GAME_DATA_SHADER_PATH "Data/Shaders/"
 
 #define RESOLUTION_WIDTH    1920
 #define RESOLUTION_HEIGHT   1080
@@ -234,7 +232,7 @@ void MGraphic::ClearDepthStencil(ID3D11DeviceContext* _deviceContext, ID3D11Dept
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShader& _vertexShader)
 {
-    MShaderResources::CompileShader(GAME_DATA_SHADER_PATH L"VertexShader.hlsl", "vs_5_0", &_vertexShader.Blob);
+    _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_BASE);
     CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
     // VertexShader Input Layout
     {
@@ -255,7 +253,7 @@ void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceConte
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
 {
-    MShaderResources::CompileShader(GAME_DATA_SHADER_PATH L"PixelShader.hlsl", "ps_5_0", &_pixelShader.Blob);
+    _pixelShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_PS_BASE);
     CHECK_HRESULT(_device->CreatePixelShader(_pixelShader.Blob->GetBufferPointer(), _pixelShader.Blob->GetBufferSize(), nullptr, &_pixelShader.Shader));
     _deviceContext->PSSetShader(_pixelShader.Shader, nullptr, 0u);
     

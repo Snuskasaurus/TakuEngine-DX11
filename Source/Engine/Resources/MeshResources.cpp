@@ -1,10 +1,10 @@
 ﻿#include "MeshResources.h"
 
+#include "GamePath.h"
 #include "../IncludesExternal.h"
 
 #include "ShadersResources.h"
 
-#define GAME_DATA_PATH "Data/"
 #define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
 
 // TODO Julien Rogel (11/02/2025): Change this data structure to use an array and avoid allocation for each mesh data
@@ -114,12 +114,10 @@ bool MMeshResources::TryToImportOBJ(const char* Filename, SMeshData* MeshData)
     while(true)
     {
         // Read the first 
+        const int resultHeaderScan = fscanf_s(fileStream, "%s", bufferHeader, (unsigned int)sizeof(bufferHeader));
+        if (resultHeaderScan == EOF)
         {
-            const int resultHeaderScan = fscanf_s(fileStream, "%s", bufferHeader, (unsigned int)sizeof(bufferHeader));
-            if (resultHeaderScan == EOF)
-            {
-                break;
-            }
+            break;
         }
 
         // Read the rest of line depending on the header

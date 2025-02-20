@@ -6,6 +6,12 @@
 #include "../IncludesExternal.h"
 #include "MeshResources.h"
 
+enum EShaderType
+{
+    VERTEX_SHADER,
+    PIXEL_SHADER,
+};
+
 struct SVertexShader
 {
     ID3DBlob* Blob = nullptr;
@@ -14,9 +20,6 @@ struct SVertexShader
 
     void Release()
     {
-        Blob->Release();
-        Blob = nullptr;
-        
         Input->Release();
         Input = nullptr;
 
@@ -34,9 +37,6 @@ struct SPixelShader
 
     void Release()
     {
-        Blob->Release();
-        Blob = nullptr;
-        
         Shader->Release();
         Shader = nullptr;
         
@@ -51,5 +51,10 @@ struct SPixelShader
 class MShaderResources
 {
 public:
-    static void CompileShader(LPCWSTR _fileName, const char* _target, ID3DBlob** _shaderOut);
+    static ID3DBlob* CreateBlobFromFileName(const char* _filename, EShaderType ShaderType);
+    static ID3DBlob* GetBlobFromFileName(const char* _filename);
+public:
+    static void DeleteAllBlobs();
+private:
+    static void CompileShader(const char* _fileName, const char* _target, ID3DBlob** _shaderOut);
 };
