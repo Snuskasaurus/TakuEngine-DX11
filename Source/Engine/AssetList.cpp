@@ -14,12 +14,15 @@ void MAsset::LoadMeshes()
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_MONSTER);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TAKUMI);
     
+    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_BORDER);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1001);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1010);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1101);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1111);
+    
+    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE);
 }
 
 void MAsset::LoadShaders()

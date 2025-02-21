@@ -21,8 +21,8 @@ enum ETerrainType
     HILL,
 };
 
-constexpr int GridWidth = 320; // X
-constexpr int GridHeight = 150; // Y
+constexpr int GridWidth = 20; // X
+constexpr int GridHeight = 20; // Y
 constexpr float TileSize = 2.0f;
 constexpr int nbTiles = GridWidth * GridHeight;
 constexpr int nbVisualTiles = (GridWidth + 1) * (GridHeight + 1);
@@ -177,54 +177,16 @@ void CGridScene::OnCreate()
         GridTerrains.insert(GridTerrains.end(), nbTiles, ETerrainType::WATER);
         bool Success = ReadMapAndFillTerrains(GridTerrains);
         assert(Success);
-
-        // for (int i = 0; i < GridWidth * GridHeight; ++i)
-        // {
-        //     int XTile = (i - 1) % GridWidth;
-        //     int YTile = (i - 1) / GridWidth;
-        //     
-        //     int FullWaterBorder = 3;
-        //     if (XTile < FullWaterBorder
-        //      || YTile < FullWaterBorder
-        //      || XTile > GridWidth - FullWaterBorder
-        //      || YTile > GridHeight - FullWaterBorder)
-        //         continue;
-        //     
-        //     int LotOfWater = 6;
-        //     if (XTile < LotOfWater
-        //      || YTile < LotOfWater
-        //      || XTile > GridWidth - LotOfWater
-        //      || YTile > GridHeight - LotOfWater)
-        //     {
-        //         if (MMath::RandomNumberIntegerInRange(0, 2) == 0)
-        //             continue;
-        //     }
-        //     
-        //     int LessLotOfWater = 10;
-        //     if (XTile < LotOfWater
-        //      || YTile < LotOfWater
-        //      || XTile > GridWidth - LotOfWater
-        //      || YTile > GridHeight - LotOfWater)
-        //     {
-        //         if (MMath::RandomNumberIntegerInRange(0, 4) == 0)
-        //             continue;
-        //     }
-        //     
-        //     if (MMath::RandomNumberIntegerInRange(0, 15) == 0)
-        //         continue;
-        //
-        //     GridTerrains[i] = ETerrainType::GROUND;
-        // }
     }
-
+    
+    float HalfTileSize = TileSize * 0.5f;
+    float HalfWidthGrid = HalfTileSize * (GridWidth + 1);
+    float HalfHeightGrid = HalfTileSize * (GridHeight + 1);
+    
     // Generate grid meshes
     {
         InitVisualMeshDataMap();
-    
-        float HalfTileSize = TileSize * 0.5f;
-        float HalfWidthGrid = HalfTileSize * (GridWidth + 1);
-        float HalfHeightGrid = HalfTileSize * (GridHeight + 1);
-
+        
         for (int i = 0; i < nbVisualTiles; ++i)
         {
             const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i);
@@ -235,13 +197,44 @@ void CGridScene::OnCreate()
             const int YTile = i / (GridWidth + 1);
 
             TVector3f position = { 
-                (float)(XTile) * TileSize - HalfWidthGrid, 
-                (float)(YTile) * -TileSize + HalfHeightGrid, 
+                (float)(XTile) * TileSize - HalfWidthGrid - HalfTileSize, 
+                (float)(YTile) * -TileSize + HalfHeightGrid + HalfTileSize, 
                 0.0f 
             };
             TTransform Transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
-
             visualMeshData->InstancedMesh->Instances.push_back(Transform);
+        }
+    }
+    
+    CDrawable_InstancedMesh* TreeMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE);
+    CDrawable_InstancedMesh* TileBorderMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_BORDER);
+    
+    for (int i = 0; i < nbTiles; ++i)
+    {
+        const int XTile = i % GridWidth;
+        const int YTile = i / GridWidth;
+
+        TVector3f position = { (float)(XTile) * TileSize - HalfWidthGrid, (float)(YTile) * -TileSize + HalfHeightGrid, 0.5f };
+        TTransform Transform = { position, { 0.0f, 0.0f, 0.0f }};
+        
+        TileBorderMesh->Instances.push_back(Transform);
+        
+        if (GridTerrains[i] != ETerrainType::GROUND)
+            continue;
+        
+        //if (MMath::RandomNumberIntegerInRange(0, 4) >= 1)
+        if (true)
+        {
+            int nbTree = MMath::RandomNumberIntegerInRange(10, 20);
+            for (int i = 0; i < nbTree; ++i)
+            {
+                float size = HalfTileSize * 0.25f;
+                float offsetX = MMath::RandomNumberIntegerInRange(-size * 100.0f, size * 100.0f) / 100.0f;
+                float offsetY = MMath::RandomNumberIntegerInRange(-size * 100.0f, size * 100.0f) / 100.0f;
+                Transform.Position += TVector3f(offsetX, offsetY, 0.0f);
+                Transform.Rotator.Yaw = MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f));
+                TreeMesh->Instances.push_back(Transform);
+            }
         }
     }
 }
