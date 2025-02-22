@@ -29,7 +29,7 @@ constexpr int G_NB_TILES = G_GRID_WIDTH * G_GRID_HEIGHT;
 constexpr int G_NB_TILES_VISUAL = (G_GRID_WIDTH + 1) * (G_GRID_HEIGHT + 1);
 constexpr float G_GRID_WIDTH_HALF = G_TILE_SIZE_HALF * (G_GRID_WIDTH + 1);
 constexpr float G_GRID_HEIGHT_HALF = G_TILE_SIZE_HALF * (G_GRID_HEIGHT + 1);
-constexpr bool G_DRAW_TILE_BORDER = true;
+bool G_DRAW_TILE_BORDER = false;
 
 bool IsValidGridPosition(int row, int col)
 {
@@ -210,7 +210,6 @@ void CGridScene::OnCreate()
     CDrawable_InstancedMesh* TreeMesh1 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_01);
     CDrawable_InstancedMesh* TreeMesh2 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_02);
     CDrawable_InstancedMesh* TreeMesh3 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_03);
-    CDrawable_InstancedMesh* TileBorderMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_BORDER);
     
     for (int i = 0; i < G_NB_TILES; ++i)
     {
@@ -219,13 +218,6 @@ void CGridScene::OnCreate()
 
         TVector3f tilePosition = { (float)(XTile) * G_TILE_SIZE - G_GRID_WIDTH_HALF, (float)(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF, 0.0f };
         TTransform tileTransform = { tilePosition, { 0.0f, 0.0f, 0.0f }};
-
-        if (G_DRAW_TILE_BORDER)
-        {
-            TVector3f tileBorderPosition = tilePosition + TVector3f(0.0f, 0.0f, 0.45f);
-            TTransform tileBorderTransform = { tileBorderPosition, { 0.0f, 0.0f, 0.0f }};
-            TileBorderMesh->Instances.push_back(tileBorderTransform);
-        }
         
         if (GridTerrains[i] != ETerrainType::GROUND)
             continue;
@@ -264,6 +256,32 @@ void CGridScene::OnCreate()
     }
 }
 
+void CGridScene::ToggleDisplayingGrid()
+{
+    if (G_DRAW_TILE_BORDER == false)
+    {
+        G_DRAW_TILE_BORDER = true;
+        
+        if (TileBorderMesh == nullptr)
+            TileBorderMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_BORDER);
+
+        for (int i = 0; i < G_NB_TILES; ++i)
+        {
+            const int XTile = i % G_GRID_WIDTH;
+            const int YTile = i / G_GRID_WIDTH;
+            TVector3f tilePosition = { (float)(XTile) * G_TILE_SIZE - G_GRID_WIDTH_HALF, (float)(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF, 0.0f };
+            TVector3f tileBorderPosition = tilePosition + TVector3f(0.0f, 0.0f, 0.45f);
+            TTransform tileBorderTransform = { tileBorderPosition, { 0.0f, 0.0f, 0.0f }};
+            TileBorderMesh->Instances.push_back(tileBorderTransform);
+        }
+    }
+    else
+    {
+        G_DRAW_TILE_BORDER = false;
+        TileBorderMesh->Instances.clear();
+    }
+}
+
 void CGridScene::OnKeyPressed(EKeyCode _key)
 {
     if (_key == EKeyCode::KEY_ESCAPE)
@@ -272,11 +290,7 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
     }
     else if (_key == EKeyCode::KEY_F1)
     {
-        ChangeGameScene(EGameSceneType::TakumiScene);
-    }
-    else if (_key == EKeyCode::KEY_F2)
-    {
-        ChangeGameScene(EGameSceneType::GridScene);
+        ToggleDisplayingGrid();
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
