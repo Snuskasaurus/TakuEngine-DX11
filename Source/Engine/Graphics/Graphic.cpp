@@ -33,6 +33,7 @@ void MGraphic::SetupDraw()
     MGraphic::CreateAndSetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.VertexShaderData);
     MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
     MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
+    MGraphic::CreateRasterizerState(G_PIPELINE.Device, &G_PIPELINE.rasterizerState);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Draw()
@@ -62,7 +63,7 @@ void MGraphic::Draw()
     }
     
     MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
-    MGraphic::Rasterize(G_PIPELINE.Device, G_PIPELINE.DeviceContext);
+    MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
     MGraphic::PresentSwapChain(G_PIPELINE.SwapChain);
     MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_PIPELINE.RenderTargetView);
     MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_PIPELINE.DepthStencilView);
@@ -113,6 +114,25 @@ void MGraphic::FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawable
     MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VertexBuffer, *_drawableInstancedMesh->MeshData);
     MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->IndexBuffer, *_drawableInstancedMesh->MeshData);
     MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VSConstantBuffer);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState)
+{
+    D3D11_RASTERIZER_DESC rasterizerDesc = {};
+        {
+        rasterizerDesc.AntialiasedLineEnable = true;
+        rasterizerDesc.CullMode = D3D11_CULL_BACK;
+        rasterizerDesc.DepthBias = 0;
+        rasterizerDesc.DepthBiasClamp = 0.0f;
+        rasterizerDesc.DepthClipEnable = true;
+        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+        rasterizerDesc.FrontCounterClockwise = true;
+        rasterizerDesc.MultisampleEnable = false;
+        rasterizerDesc.ScissorEnable = false;
+        rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+        }
+    
+    CHECK_HRESULT(_device->CreateRasterizerState(&rasterizerDesc, _rasterizerState));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceContext** _deviceContext, IDXGISwapChain** _swapChain)
@@ -394,25 +414,9 @@ void MGraphic::SetVSConstantBuffer_Instanced(ID3D11Device* _device, ID3D11Device
     _deviceContext->VSSetConstantBuffers(0u, 1u, _objectBuffer);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::Rasterize(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext)
+void MGraphic::Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState)
 {
-    D3D11_RASTERIZER_DESC rasterizerDesc = {};
-    {
-        rasterizerDesc.AntialiasedLineEnable = true;
-        rasterizerDesc.CullMode = D3D11_CULL_BACK;
-        rasterizerDesc.DepthBias = 0;
-        rasterizerDesc.DepthBiasClamp = 0.0f;
-        rasterizerDesc.DepthClipEnable = true;
-        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-        rasterizerDesc.FrontCounterClockwise = true;
-        rasterizerDesc.MultisampleEnable = false;
-        rasterizerDesc.ScissorEnable = false;
-        rasterizerDesc.SlopeScaledDepthBias = 0.0f;
-    }
-    
-    ID3D11RasterizerState* rasterizerState = nullptr;
-    CHECK_HRESULT(_device->CreateRasterizerState(&rasterizerDesc, &rasterizerState));
-    _deviceContext->RSSetState(rasterizerState);
+    _deviceContext->RSSetState(_rasterizerState);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::ConfigureViewport(ID3D11DeviceContext* _deviceContext)

@@ -23,6 +23,7 @@ struct SGraphicResources_Pipeline
     
     SVertexShader VertexShaderData;
     SPixelShader PixelShaderData;
+    ID3D11RasterizerState* rasterizerState = nullptr;
 };
 
 __declspec(align(16)) struct SVertexShaderConstantBuffer
@@ -45,7 +46,9 @@ public:
     static void UninitializeGraphic();
 public:
     static void FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawableInstancedMesh, const wchar_t* _textureFilename);
+
 public:
+    static void CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState);
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateAndSetDepthStencilState(ID3D11Device*, ID3D11DeviceContext*, ID3D11DepthStencilState**);
     static void CreateDepthStencilTexture(ID3D11Device*, ID3D11Texture2D**);
@@ -60,13 +63,14 @@ public:
     static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer);
 public:
     static void SetVSConstantBuffer_Instanced(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances);
+    
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);
 public:
     static void SetPixelShader(ID3D11DeviceContext*, ID3D11ShaderResourceView** _textureView);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
 public:
     static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
-    static void Rasterize(ID3D11Device*, ID3D11DeviceContext*);
+    static void Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState);
     static void ConfigureViewport(ID3D11DeviceContext*);
     static void PresentSwapChain(IDXGISwapChain*);
     static void ClearRenderTarget(ID3D11DeviceContext*, ID3D11RenderTargetView*);
