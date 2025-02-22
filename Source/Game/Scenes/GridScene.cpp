@@ -207,7 +207,9 @@ void CGridScene::OnCreate()
         }
     }
     
-    CDrawable_InstancedMesh* TreeMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE);
+    CDrawable_InstancedMesh* TreeMesh1 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_01);
+    CDrawable_InstancedMesh* TreeMesh2 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_02);
+    CDrawable_InstancedMesh* TreeMesh3 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_03);
     CDrawable_InstancedMesh* TileBorderMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_BORDER);
     
     for (int i = 0; i < G_NB_TILES; ++i)
@@ -228,9 +230,9 @@ void CGridScene::OnCreate()
         if (GridTerrains[i] != ETerrainType::GROUND)
             continue;
         
-        if (MMath::RandomNumberIntegerInRange(0, 4) >= 1)
+        if (MMath::RandomNumberIntegerInRange(0, 2) >= 1)
         {
-            int nbTree = MMath::RandomNumberIntegerInRange(10, 50);
+            int nbTree = MMath::RandomNumberIntegerInRange(3, 10);
             for (int i = 0; i < nbTree; ++i)
             {
                 float size = G_TILE_SIZE_HALF * 0.8f;
@@ -238,7 +240,15 @@ void CGridScene::OnCreate()
                 float offsetY = MMath::RandomNumberIntegerInRange(-size * 100.0f, size * 100.0f) / 100.0f;
                 TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.35f);
                 TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), 0.0f, 0.0f };
-                TreeMesh->Instances.push_back({positionTree, rotationTree });
+
+                int varTree = MMath::RandomNumberIntegerInRange(1, 4);
+                switch (varTree)
+                {
+                    case 1: TreeMesh1->Instances.push_back({positionTree, rotationTree }); break;
+                    case 2: TreeMesh2->Instances.push_back({positionTree, rotationTree }); break;
+                    case 3: TreeMesh3->Instances.push_back({positionTree, rotationTree }); break;
+                }
+                
             }
         }
     }

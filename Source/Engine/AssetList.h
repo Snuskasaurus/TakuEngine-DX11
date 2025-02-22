@@ -16,7 +16,9 @@
 #define TAKU_ASSET_MESH_TILE_1101  "Tiles/Tile1101"
 #define TAKU_ASSET_MESH_TILE_1111  "Tiles/Tile1111"
 
-#define TAKU_ASSET_MESH_TREE  "Tree"
+#define TAKU_ASSET_MESH_TREE_01  "Tree01"
+#define TAKU_ASSET_MESH_TREE_02  "Tree02"
+#define TAKU_ASSET_MESH_TREE_03  "Tree03"
 
 #define TAKU_ASSET_VS_BASE  "VertexShader"
 #define TAKU_ASSET_PS_BASE  "PixelShader"

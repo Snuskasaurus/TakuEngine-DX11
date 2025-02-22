@@ -22,7 +22,9 @@ void MAsset::LoadMeshes()
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1101);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1111);
     
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE);
+    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_01);
+    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_02);
+    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_03);
 }
 
 void MAsset::LoadShaders()
