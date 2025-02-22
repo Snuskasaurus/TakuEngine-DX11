@@ -29,7 +29,7 @@ constexpr int G_NB_TILES = G_GRID_WIDTH * G_GRID_HEIGHT;
 constexpr int G_NB_TILES_VISUAL = (G_GRID_WIDTH + 1) * (G_GRID_HEIGHT + 1);
 constexpr float G_GRID_WIDTH_HALF = G_TILE_SIZE_HALF * (G_GRID_WIDTH + 1);
 constexpr float G_GRID_HEIGHT_HALF = G_TILE_SIZE_HALF * (G_GRID_HEIGHT + 1);
-constexpr bool G_DRAW_TILE_BORDER = false;
+constexpr bool G_DRAW_TILE_BORDER = true;
 
 bool IsValidGridPosition(int row, int col)
 {
