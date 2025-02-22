@@ -232,23 +232,33 @@ void CGridScene::OnCreate()
          
         if (MMath::RandomNumberIntegerInRange(0, 8) >= 1)
         {
-            int nbTree = MMath::RandomNumberIntegerInRange(3, 10);
-            for (int i = 0; i < nbTree; ++i)
+            float sizeChange = G_TILE_SIZE / 9 * 3.0f;
+            float halfSizeChange = G_TILE_SIZE / 9 * 3.0f * 0.5f;
+            float startOffsetX = -G_TILE_SIZE_HALF + halfSizeChange ;
+            float startOffsetY = -G_TILE_SIZE_HALF + halfSizeChange ;
+            for (int xOffset = 0; xOffset < 3; ++xOffset)
             {
-                float size = G_TILE_SIZE_HALF * 0.8f;
-                float offsetX = MMath::RandomNumberIntegerInRange(-size * 100.0f, size * 100.0f) / 100.0f;
-                float offsetY = MMath::RandomNumberIntegerInRange(-size * 100.0f, size * 100.0f) / 100.0f;
-                TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.35f);
-                TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), 0.0f, 0.0f };
-
-                int varTree = MMath::RandomNumberIntegerInRange(1, 4);
-                switch (varTree)
+                for (int yOffset = 0; yOffset < 3; ++yOffset)
                 {
-                    case 1: TreeMesh1->Instances.push_back({positionTree, rotationTree }); break;
-                    case 2: TreeMesh2->Instances.push_back({positionTree, rotationTree }); break;
-                    case 3: TreeMesh3->Instances.push_back({positionTree, rotationTree }); break;
-                }
+                    if (MMath::RandomNumberIntegerInRange(0, 8) == 0)
+                        continue;
+                    
+                    float randomOffsetX = MMath::RandomNumberIntegerInRange(sizeChange * halfSizeChange * 100.0f, sizeChange * halfSizeChange * 100.0f) / 100.0f;
+                    float randomOffsetY = MMath::RandomNumberIntegerInRange(-sizeChange * halfSizeChange * 100.0f, sizeChange * halfSizeChange * 100.0f) / 100.0f;
+                    
+                    float offsetX = startOffsetX + sizeChange * (float)xOffset + randomOffsetX;
+                    float offsetY = startOffsetY + sizeChange * (float)yOffset + randomOffsetY;
+                    TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.35f);
+                    TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), 0.0f, 0.0f };
                 
+                    int varTree = MMath::RandomNumberIntegerInRange(1, 4);
+                    switch (varTree)
+                    {
+                        case 1: TreeMesh1->Instances.push_back({positionTree, rotationTree }); break;
+                        case 2: TreeMesh2->Instances.push_back({positionTree, rotationTree }); break;
+                        case 3: TreeMesh3->Instances.push_back({positionTree, rotationTree }); break;
+                    }
+                }
             }
         }
     }
