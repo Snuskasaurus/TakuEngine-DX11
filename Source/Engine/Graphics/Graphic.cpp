@@ -39,10 +39,26 @@ void MGraphic::Draw()
 {
     MGraphic::SetPixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 
-    const std::vector<CDrawable_Base*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->Meshes;
+    const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
-       instancedMeshes[i]->Draw(G_PIPELINE.Device, G_PIPELINE.DeviceContext);
+        CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
+        
+        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer);
+        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, &instancedMesh->TextureView);
+
+        const UINT nbInstances = (UINT)instancedMesh->Instances.size();
+        UINT nbInstancesRemainingToDraw = nbInstances;
+        while (nbInstancesRemainingToDraw > 0)
+        {
+            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
+            const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
+            
+            MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &instancedMesh->VSConstantBuffer, instancedMesh->Instances, startInstances, nbInstancesToDraw);
+            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
+            
+            nbInstancesRemainingToDraw -= nbInstancesToDraw;
+        }
     }
     
     MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);

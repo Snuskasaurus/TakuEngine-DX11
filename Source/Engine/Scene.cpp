@@ -34,11 +34,11 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Destroy()
 {
-    for (int i = 0; i < Meshes.size(); ++i)
+    for (int i = 0; i < InstancedMeshes.size(); ++i)
     {
-        delete Meshes[i];
+        delete InstancedMeshes[i];
     }
-    Meshes.clear();
+    InstancedMeshes.clear();
     
     OnDestroy();
 }
@@ -60,7 +60,7 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshNam
         MGraphic::FillGraphicResources_Instanced(InstancedMesh, TextureFilenameStream.str().c_str());
     }
     
-    Meshes.push_back(InstancedMesh);
+    InstancedMeshes.push_back(InstancedMesh);
     return InstancedMesh;
 }
 //---------------------------------------------------------------------------------------------------------------------

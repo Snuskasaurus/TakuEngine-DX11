@@ -11,28 +11,13 @@ struct ID3D11Buffer;
 struct SMeshData;
 struct TTransform;
 
-class CDrawable_Base
-{
-    friend class MGraphic;
-
-public:
-    virtual ~CDrawable_Base() = default;
-    void virtual CreateVertexShader(ID3D11Device*, ID3D11DeviceContext*) {};
-    void virtual CreatePixelShader(ID3D11Device*, ID3D11DeviceContext*) {};
-    void virtual Draw(ID3D11Device*, ID3D11DeviceContext*) {};
-};
-
-class CDrawable_InstancedMesh : public CDrawable_Base
+class CDrawable_InstancedMesh
 {
     friend class MGraphic;
     friend class CGameScene;
 public:
     CDrawable_InstancedMesh();
-    ~CDrawable_InstancedMesh() override;
-public:
-    void virtual CreateVertexShader(ID3D11Device*, ID3D11DeviceContext*) override;
-    void virtual CreatePixelShader(ID3D11Device*, ID3D11DeviceContext*) override;
-    void virtual Draw(ID3D11Device*, ID3D11DeviceContext*) override;
+    ~CDrawable_InstancedMesh();
 public:
     std::vector<TTransform> Instances;
 private:

@@ -229,7 +229,7 @@ void CGridScene::OnCreate()
         
         if (GridTerrains[i] != ETerrainType::GROUND)
             continue;
-        
+         
         if (MMath::RandomNumberIntegerInRange(0, 8) >= 1)
         {
             int nbTree = MMath::RandomNumberIntegerInRange(3, 10);
