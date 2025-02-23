@@ -26,5 +26,5 @@ private:
     ID3D11Buffer* VSConstantBuffer = nullptr;
     ID3D11Resource* Texture = nullptr;
     ID3D11ShaderResourceView* TextureView = nullptr;
-    SMeshData* MeshData;
+    SMeshData* MeshData = nullptr;
 };

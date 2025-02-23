@@ -385,12 +385,7 @@ void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceConte
         bufferDesc.StructureByteStride = 0u;
     }
     
-    D3D11_SUBRESOURCE_DATA subResourceData = {};
-    {
-        subResourceData.pSysMem = VertexConstantBuffer;
-    }
-    
-    CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, VertexConstantBuffer));
+    CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, VertexConstantBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetVSConstantBuffer_Instanced(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances)
