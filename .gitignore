@@ -32,7 +32,6 @@
 
 #Folders
 Intermediates/
-x64/
 .idea/
 .vs/
 __pycache__
