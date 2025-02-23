@@ -3,7 +3,7 @@
 #include "../Resources/MeshResources.h"
 #include "../Resources/ShadersResources.h"
 
-#define MAX_INSTANCE_COUNT 1024u
+#define MAX_INSTANCE_COUNT 512u
 
 class CDrawable_InstancedMesh;
 struct ID3D11Resource;
@@ -28,13 +28,19 @@ struct SGraphicResources_Pipeline
 
 __declspec(align(16)) struct SVertexShaderConstantBuffer
 {
-    TMatrix4f WorldViewProjection[MAX_INSTANCE_COUNT]; 
+    struct SInstancedObject
+    {
+        TMatrix4f wvp; 
+        TMatrix4f world; 
+    };
+    SInstancedObject instancedObject[MAX_INSTANCE_COUNT];
 };
 
 __declspec(align(16)) struct SPixelShaderConstantBuffer
 {
-    TVector3f SunDirection;
-    float SunAmbient;
+    TVector3f sunDir;
+    TVector3f sunDiffuse;
+    float sunAmbient;
 };
 
 class MGraphic

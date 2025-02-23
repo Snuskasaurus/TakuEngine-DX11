@@ -3,7 +3,7 @@
 #include <array>
 #include <Windows.h>
 
-struct TColorF
+struct __declspec(align(16)) TColorF
 {
     float r, g, b, a;
     

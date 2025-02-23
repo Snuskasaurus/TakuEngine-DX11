@@ -222,8 +222,8 @@ bool MMeshResources::TryToImportOBJ(const char* Filename, SMeshData* MeshData)
             SVertex NewVertex =
                 {
                     BufferVertexPosition[FaceInfo.GeometryIndex],
+                    BufferVertexNormals[FaceInfo.NormalIndex],
                     BufferTextureCoordinates[FaceInfo.TextureIndex],
-                    BufferVertexNormals[FaceInfo.NormalIndex]
                 };
             MeshData->VertexBuffer.emplace_back(NewVertex);
         }

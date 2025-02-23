@@ -7,11 +7,11 @@
 
 using TVertexIndex = unsigned short;
 
-struct alignas(16) SVertex
+struct SVertex
 {
     TVector3f vp;
-    TVector2f vt;
     TVector3f vn;
+    TVector2f vt;
 };
 
 struct SMeshData

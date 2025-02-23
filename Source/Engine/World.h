@@ -36,6 +36,6 @@ private:
     
 private:
     CGameScene* CurrentGameScene = nullptr;
-    TVector3f SunDirection = TVector3f::Zero;
+    TVector3f SunDirection = TVector3f::Down;
     TFreeLookCamera FreeLookCamera;
 };

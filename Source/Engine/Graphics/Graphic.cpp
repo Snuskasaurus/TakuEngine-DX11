@@ -259,11 +259,10 @@ void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceConte
     {
         constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
         {
-            { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-            { "UV",        0u,  DXGI_FORMAT_R32G32_FLOAT,     0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-            { "NORMAL",    0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
-
-            { "SV_InstanceID",    0u,  DXGI_FORMAT_R32_UINT,  1u,  D3D11_APPEND_ALIGNED_ELEMENT,  D3D11_INPUT_PER_INSTANCE_DATA, 0u },
+            { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  0u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "NORMAL",    0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  16u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "TEXCOORD",  0u,  DXGI_FORMAT_R32G32_FLOAT,     0u,  32u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "SV_InstanceID",    0u,  DXGI_FORMAT_R32_UINT,  1u,  40u,  D3D11_INPUT_PER_INSTANCE_DATA, 0u },
             };
         UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
         CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
@@ -296,16 +295,6 @@ void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContex
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
 {
-    SPixelShaderConstantBuffer ConstantBufferPixelShader;
-    {
-        ConstantBufferPixelShader.SunDirection = TVector3f::Zero;
-        ConstantBufferPixelShader.SunAmbient = 0.0f;
-    }
-    D3D11_SUBRESOURCE_DATA subResourceData = {};
-    {
-        subResourceData.pSysMem = &ConstantBufferPixelShader;
-    }
-    
     D3D11_BUFFER_DESC bufferDesc = {};
     {
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -316,15 +305,18 @@ void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11Devi
         bufferDesc.StructureByteStride = 0u;
     }
     
-    CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, &_pixelShader.ConstantBuffer));
+    CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, &_pixelShader.ConstantBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShader& _pixelShader)
 {
+    TColorF SunColor = { 1.0f, 0.992156f, 0.815686f, 1.0f };
     SPixelShaderConstantBuffer ConstantBufferPixelShader;
     {
-        ConstantBufferPixelShader.SunDirection = MWorld::GetWorld()->GetSunDirection();
-        ConstantBufferPixelShader.SunAmbient = 0.2f;
+        //ConstantBufferPixelShader.light.dir = TVector3f::Normalize(MWorld::GetWorld()->GetSunDirection());
+        ConstantBufferPixelShader.sunDir = TVector3f::Normalize(TVector3f::Left + TVector3f::Up);
+        ConstantBufferPixelShader.sunDiffuse = { SunColor.r, SunColor.g, SunColor.b };
+        ConstantBufferPixelShader.sunAmbient = 0.36f;
     }
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     CHECK_HRESULT(_deviceContext->Map(_pixelShader.ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
@@ -399,7 +391,8 @@ void MGraphic::SetVSConstantBuffer_Instanced(ID3D11Device* _device, ID3D11Device
     {
         const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transforms[i]);
         indexGlobal++;
-        G_VS_CONSTANT_BUFFER.WorldViewProjection[indexGlobal] = TMatrix4f::Transpose(objectWorldMatrix * invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
+        G_VS_CONSTANT_BUFFER.instancedObject[indexGlobal].wvp = TMatrix4f::Transpose(objectWorldMatrix * invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
+        G_VS_CONSTANT_BUFFER.instancedObject[indexGlobal].world = TMatrix4f::Transpose(objectWorldMatrix);
     }
 
     D3D11_MAPPED_SUBRESOURCE mappedResource;
