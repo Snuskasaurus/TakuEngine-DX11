@@ -7,6 +7,7 @@ class TFreeLookCamera
 
 public:
     void UpdateCamera(const float dt);
+    TVector3f GetCameraWorldViewDir() const { return -CamForward; }
     TMatrix4f GetCameraWorldMatrix() const { return CamMatrix; }
     TMatrix4f GetCameraWorldInverseMatrix() const { return TMatrix4f::Inverse(CamMatrix); }
     void SetPosition(TVector3f _newPosition) { Position = _newPosition; }

@@ -26,8 +26,6 @@ public:
     static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
 
 public:
-    TVector3f GetSunDirection() const { return SunDirection; }
-    TMatrix4f GetInverseCameraMatrix() const { return FreeLookCamera.GetCameraWorldInverseMatrix(); }
     CGameScene* GetCurrentScene() const { return CurrentGameScene; }
     
 private:
@@ -36,6 +34,5 @@ private:
     
 private:
     CGameScene* CurrentGameScene = nullptr;
-    TVector3f SunDirection = TVector3f::Down;
     TFreeLookCamera FreeLookCamera;
 };

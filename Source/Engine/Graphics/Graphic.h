@@ -43,6 +43,7 @@ struct SVSConstantBuffer_Frame
 
 __declspec(align(16)) struct SPixelShaderConstantBuffer
 {
+    TVector3f cameraDir;
     TVector3f sunDir;
     TVector3f sunDiffuse;
     float sunAmbient;

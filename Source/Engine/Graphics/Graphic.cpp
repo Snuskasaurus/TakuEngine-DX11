@@ -317,6 +317,7 @@ void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceC
     const SLightInfo& lightInfo = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight()->GetSceneLightInfo();
     SPixelShaderConstantBuffer ConstantBufferPixelShader;
     {
+        ConstantBufferPixelShader.cameraDir = MWorld::GetWorld()->FreeLookCamera.GetCameraWorldViewDir();
         ConstantBufferPixelShader.sunDir = lightInfo.Direction;
         ConstantBufferPixelShader.sunDiffuse = { lightInfo.Diffuse.r, lightInfo.Diffuse.g, lightInfo.Diffuse.b };
         ConstantBufferPixelShader.sunAmbient = lightInfo.Ambient;
@@ -384,7 +385,7 @@ void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceConte
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetVSConstantBuffer_Frame(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer)
 {
-    const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->GetInverseCameraMatrix();
+    const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->FreeLookCamera.GetCameraWorldInverseMatrix();
     const TMatrix4f perspectiveMatrix = MGameWindow::GetPerspectiveMatrix();
     
     SVSConstantBuffer_Frame buffer;
