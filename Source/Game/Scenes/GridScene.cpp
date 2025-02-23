@@ -23,7 +23,7 @@ enum ETerrainType
 
 constexpr int G_GRID_WIDTH = 20; // X
 constexpr int G_GRID_HEIGHT = 20; // Y
-constexpr float G_TILE_SIZE = 2.0f;
+constexpr float G_TILE_SIZE = 10.0f;
 constexpr float G_TILE_SIZE_HALF = G_TILE_SIZE * 0.5f;
 constexpr int G_NB_TILES = G_GRID_WIDTH * G_GRID_HEIGHT;
 constexpr int G_NB_TILES_VISUAL = (G_GRID_WIDTH + 1) * (G_GRID_HEIGHT + 1);
@@ -225,9 +225,11 @@ void CGridScene::OnCreate()
         if (MMath::RandomNumberIntegerInRange(0, 8) >= 1)
         {
             float sizeChange = G_TILE_SIZE / 9 * 3.0f;
-            float halfSizeChange = G_TILE_SIZE / 9 * 3.0f * 0.5f;
-            float startOffsetX = -G_TILE_SIZE_HALF + halfSizeChange ;
-            float startOffsetY = -G_TILE_SIZE_HALF + halfSizeChange ;
+            float startOffsetX = -G_TILE_SIZE_HALF + sizeChange * 0.5f;
+            float startOffsetY = -G_TILE_SIZE_HALF + sizeChange * 0.5f;
+
+            float MaxRandOffset = sizeChange * 0.35f;
+            
             for (int xOffset = 0; xOffset < 3; ++xOffset)
             {
                 for (int yOffset = 0; yOffset < 3; ++yOffset)
@@ -235,11 +237,11 @@ void CGridScene::OnCreate()
                     if (MMath::RandomNumberIntegerInRange(0, 8) == 0)
                         continue;
                     
-                    float randomOffsetX = MMath::RandomNumberIntegerInRange(sizeChange * halfSizeChange * 100.0f, sizeChange * halfSizeChange * 100.0f) / 100.0f;
-                    float randomOffsetY = MMath::RandomNumberIntegerInRange(-sizeChange * halfSizeChange * 100.0f, sizeChange * halfSizeChange * 100.0f) / 100.0f;
+                    float randOffsetX = MMath::RandomNumberIntegerInRange(-MaxRandOffset * 100.0f, MaxRandOffset * 100.0f) / 100.0f;
+                    float randOffsetY = MMath::RandomNumberIntegerInRange(-MaxRandOffset * 100.0f, MaxRandOffset * 100.0f) / 100.0f;
                     
-                    float offsetX = startOffsetX + sizeChange * (float)xOffset + randomOffsetX;
-                    float offsetY = startOffsetY + sizeChange * (float)yOffset + randomOffsetY;
+                    float offsetX = startOffsetX + sizeChange * (float)xOffset + randOffsetX;
+                    float offsetY = startOffsetY + sizeChange * (float)yOffset + randOffsetY;
                     TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.35f);
                     TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), 0.0f, 0.0f };
                 
@@ -270,7 +272,7 @@ void CGridScene::ToggleDisplayingGrid()
             const int XTile = i % G_GRID_WIDTH;
             const int YTile = i / G_GRID_WIDTH;
             TVector3f tilePosition = { (float)(XTile) * G_TILE_SIZE - G_GRID_WIDTH_HALF, (float)(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF, 0.0f };
-            TVector3f tileBorderPosition = tilePosition + TVector3f(0.0f, 0.0f, 0.45f);
+            TVector3f tileBorderPosition = tilePosition + TVector3f(0.0f, 0.0f, 0.0f);
             TTransform tileBorderTransform = { tileBorderPosition, { 0.0f, 0.0f, 0.0f }};
             TileBorderMesh->Instances.push_back(tileBorderTransform);
         }

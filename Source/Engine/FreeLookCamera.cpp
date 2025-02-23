@@ -9,7 +9,7 @@ void TFreeLookCamera::UpdateCamera(const float dt)
 {
     // Inputs ----------------------------------------------------------------------------------------------------------
 
-    SpeedMovement += GET_INPUT(CameraSpeed) * 0.25f * dt;
+    SpeedMovement += GET_INPUT(CameraSpeedModifier) * AddedSpeedMovementByCameraSpeedModifier * dt;
     if (SpeedMovement <= 0.0f)
         SpeedMovement = 0.0f;
     

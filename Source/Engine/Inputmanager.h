@@ -111,7 +111,7 @@ struct TInputHolder
     float CameraUp = 0.0f;
     float CameraPitch = 0.0f;
     float CameraYaw = 0.0f;
-    float CameraSpeed = 0.0f;
+    float CameraSpeedModifier = 0.0f;
 };
 
 class MInput
