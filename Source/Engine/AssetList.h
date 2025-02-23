@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define TAKU_ASSET_MESH_DEBUG_ARROW    "Debugs/Arrow"
+
 #define TAKU_ASSET_MESH_SQUARE    "Square"
 #define TAKU_ASSET_MESH_CUBE      "Cube"
 #define TAKU_ASSET_MESH_SPHERE    "Sphere"

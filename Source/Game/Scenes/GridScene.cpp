@@ -219,6 +219,10 @@ bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
+    
+    CDrawable_InstancedMesh* DebugArrowMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_DEBUG_ARROW);
+    DebugArrowMesh->Instances.push_back(TTransform({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}));
+    
     // Generate grid terrain
     {
         GridTerrains.reserve(G_NB_TILES);
