@@ -158,8 +158,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Content Include="Data\Shaders\PixelShader.hlsl" />
-    <Content Include="Data\Shaders\VertexShader.hlsl" />
+    <ClCompile Include="Game\Data\Shaders\PixelShader.hlsl" />
+    <ClCompile Include="Game\Data\Shaders\VertexShader.hlsl" />
     <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
