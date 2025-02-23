@@ -242,7 +242,7 @@ void CGridScene::OnCreate()
                     
                     float offsetX = startOffsetX + sizeChange * (float)xOffset + randOffsetX;
                     float offsetY = startOffsetY + sizeChange * (float)yOffset + randOffsetY;
-                    TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.35f);
+                    TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.0f);
                     TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), 0.0f, 0.0f };
                 
                     int varTree = MMath::RandomNumberIntegerInRange(1, 4);
