@@ -164,17 +164,23 @@ TMatrix4f TMatrix4f::MatrixPerspectiveFovRH(const float _fovAngleY, const float 
 {
     return FromDirectXMatrix(DirectX::XMMatrixPerspectiveFovRH(_fovAngleY, _aspectRatio, _nearZ, _farZ));
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::Transpose(const TMatrix4f& _m)
 {
     const DirectX::XMMATRIX matrix = ToDirectXMatrix(_m);
     return FromDirectXMatrix(DirectX::XMMatrixTranspose(matrix));
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::Inverse(const TMatrix4f& _m)
 {
     const DirectX::XMMATRIX matrix = ToDirectXMatrix(_m);
     return FromDirectXMatrix(DirectX::XMMatrixInverse(nullptr, matrix));
 }
-
 //----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------- TTransform
+//----------------------------------------------------------------------------------------------------------------------
+const TTransform TTransform::Identity =
+{
+    { 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f}
+};

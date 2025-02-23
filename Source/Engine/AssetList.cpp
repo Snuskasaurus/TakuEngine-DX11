@@ -7,6 +7,7 @@
 void MAsset::LoadMeshes()
 {
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_DEBUG_ARROW);
+    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_DEBUG_GIZMO);
     
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SQUARE);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_CUBE);

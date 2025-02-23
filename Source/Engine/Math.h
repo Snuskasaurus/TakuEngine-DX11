@@ -264,6 +264,8 @@ struct TRotator
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TTransform
 {
+    static const TTransform Identity;
+    
     static TMatrix4f ToMatrix(const TTransform& _t)
     {
         // TODO Julien Rogel (01/02/2025): Optimize by removing unnecessary matrix multiplication when rotation values are 0

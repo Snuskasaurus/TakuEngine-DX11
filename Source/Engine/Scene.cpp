@@ -1,5 +1,6 @@
 ﻿#include "Scene.h"
 
+#include "AssetList.h"
 #include "Graphics/Graphic.h"
 #include "World.h"
 #include "Graphics/Drawable.h"
@@ -35,6 +36,10 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
 void CGameScene::Create()
 {
     SceneLight.Initialize();
+
+    CDrawable_InstancedMesh* Gizmo = AddInstancedMeshToDraw(TAKU_ASSET_MESH_DEBUG_GIZMO);
+    Gizmo->Instances.push_back(TTransform::Identity);
+    
     OnCreate();
 }
 //---------------------------------------------------------------------------------------------------------------------

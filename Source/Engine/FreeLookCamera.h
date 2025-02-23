@@ -19,7 +19,7 @@ private: // Transform
     TVector3f CamForward = TVector3f::Forward;
     TVector3f CamRight = TVector3f::Right;
     TVector3f CamUp = TVector3f::Up;
-    TVector3f Position = { 0.0f, 0.0f, 0.0f };
+    TVector3f Position = { 0.0f, 0.0f, .0f };
     float CamYaw = 0.0f;
     float CamPitch = 0.0f;
 private:
