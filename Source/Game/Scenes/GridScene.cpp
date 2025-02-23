@@ -120,28 +120,31 @@ void InitVisualMeshDataMap()
     VisualMeshDataMap.insert({1011, {Mesh1101, MMath::Deg2Rad(-270.0f)}});
     
     VisualMeshDataMap.insert({1111, {Mesh1111, 0.0f}});
-    
-    Mesh0000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 0, 0.0f, -20.0f }, 0.0f, 0.0f, 0.0f});
 
-    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
-    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
-    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 2, -20.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
-    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 3, -20.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+#if _DEBUG // Draw all the available tiles at the bottom of the map
+    Mesh0000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 0, 0.0f, -200.0f }, 0.0f, 0.0f, 0.0f});
 
-    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
-    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
-    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 2, -20.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
-    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 3, -20.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 0, -200.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 1, -200.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 2, -200.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
+    Mesh1000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 1, -(G_TILE_SIZE + 1.0f) * 3, -200.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+
+    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 0, -200.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 1, -200.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 2, -200.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
+    Mesh1001->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 2, -(G_TILE_SIZE + 1.0f) * 3, -200.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
     
-    Mesh1010->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 3, -(G_TILE_SIZE + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
-    Mesh1010->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 3, -(G_TILE_SIZE + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1010->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 3, -(G_TILE_SIZE + 1.0f) * 0, -200.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1010->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 3, -(G_TILE_SIZE + 1.0f) * 1, -200.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
     
-    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 0, -20.0f }, 0.0f, 0.0f, 0.0f});
-    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 1, -20.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
-    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 2, -20.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
-    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 3, -20.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 0, -200.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 1, -200.0f }, MMath::Deg2Rad(-90.0f), 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 2, -200.0f }, MMath::Deg2Rad(-180.0f), 0.0f, 0.0f});
+    Mesh1101->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 4, -(G_TILE_SIZE + 1.0f) * 3, -200.0f }, MMath::Deg2Rad(-270.0f), 0.0f, 0.0f});
     
-    Mesh1111->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 5, 0.0f, -20.0f }, 0.0f, 0.0f, 0.0f});
+    Mesh1111->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 5, 0.0f, -200.0f }, 0.0f, 0.0f, 0.0f});
+#endif
+    
 }
 
 bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
