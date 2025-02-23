@@ -361,9 +361,9 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
     else if (_key == EKeyCode::KEY_KEYPAD_2)
         SceneLight.AddPitch(-10.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_4)
-        SceneLight.AddYaw(10.0f);
-    else if (_key == EKeyCode::KEY_KEYPAD_6)
         SceneLight.AddYaw(-10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_6)
+        SceneLight.AddYaw(10.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnUpdate(const float& _dt)
