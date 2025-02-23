@@ -33,7 +33,7 @@ void CSceneLight::AddPitch(float _pitch)
 
 void CSceneLight::Initialize()
 {
-    DebugArrowMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDraw(TAKU_ASSET_MESH_DEBUG_ARROW);
+    DebugArrowMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData(G_ASSET_ARROW);
     DebugArrowMesh->Instances.push_back(TTransform({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}));
     UpdateOnChanges();
 }

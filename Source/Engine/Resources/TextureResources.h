@@ -18,4 +18,5 @@ class MTextureResources
 public:
     static STextureData* CreateTextureDataFromFileName(const char*);
     static STextureData* GetTextureDataFromFileName(const char*); 
+    static STextureData* GetOrCreateTextureDataFromFileName(const char*); 
 };

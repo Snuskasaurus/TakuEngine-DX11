@@ -21,8 +21,8 @@ struct SGraphicResources_Pipeline
     ID3D11Texture2D* DepthStencilTexture = nullptr;
     ID3D11DepthStencilView* DepthStencilView = nullptr;
     
-    SVertexShader VertexShaderData;
-    SPixelShader PixelShaderData;
+    SVertexShaderData VertexShaderData;
+    SPixelShaderData PixelShaderData;
     ID3D11RasterizerState* rasterizerState = nullptr;
     
     ID3D11Buffer* VSConstantBuffer_Frame = nullptr;
@@ -67,9 +67,9 @@ public:
     static void CreateDepthStencilView(ID3D11Device*, ID3D11Texture2D*, ID3D11DepthStencilView**);
     static void CreateRenderTargetView(ID3D11Device*, IDXGISwapChain*, ID3D11Resource**, ID3D11RenderTargetView**);
     static void SetDepthStencilViewToRenderTargetView(ID3D11DeviceContext*, ID3D11RenderTargetView**, ID3D11DepthStencilView*);
-    static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShader&);
-    static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
-    static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
+    static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShaderData&);
+    static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShaderData&);
+    static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShaderData&);
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, const SMeshData&);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, const SMeshData&);
     static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer, UINT _size);
@@ -80,7 +80,7 @@ public:
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);
 public:
     static void SetPixelShader(ID3D11DeviceContext*, ID3D11ShaderResourceView** _textureView);
-    static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShader&);
+    static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShaderData&);
 public:
     static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
     static void Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState);

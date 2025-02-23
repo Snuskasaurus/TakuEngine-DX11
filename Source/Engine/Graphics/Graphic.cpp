@@ -226,7 +226,7 @@ void MGraphic::ClearDepthStencil(ID3D11DeviceContext* _deviceContext, ID3D11Dept
     _deviceContext->ClearDepthStencilView(_stencilView, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShader& _vertexShader)
+void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShaderData& _vertexShader)
 {
     _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_BASE);
     CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
@@ -246,7 +246,7 @@ void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceConte
     _deviceContext->IASetInputLayout(_vertexShader.Input);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
+void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShaderData& _pixelShader)
 {
     _pixelShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_PS_BASE);
     CHECK_HRESULT(_device->CreatePixelShader(_pixelShader.Blob->GetBufferPointer(), _pixelShader.Blob->GetBufferSize(), nullptr, &_pixelShader.Shader));
@@ -268,7 +268,7 @@ void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContex
     _deviceContext->PSSetSamplers(0, 1, &_pixelShader.TextureSamplerState);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShader& _pixelShader)
+void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShaderData& _pixelShader)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -283,7 +283,7 @@ void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11Devi
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, &_pixelShader.ConstantBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShader& _pixelShader)
+void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShaderData& _pixelShader)
 {
     const SLightInfo& lightInfo = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight()->GetSceneLightInfo();
     SPixelShaderConstantBuffer ConstantBufferPixelShader;

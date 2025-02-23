@@ -12,27 +12,27 @@ enum EShaderType
     PIXEL_SHADER,
 };
 
-struct SVertexShader
+struct SVertexShaderData
 {
     ID3DBlob* Blob = nullptr;
     ID3D11InputLayout* Input = nullptr;
     ID3D11VertexShader* Shader = nullptr;
 
-    ~SVertexShader()
+    ~SVertexShaderData()
     {
         Input->Release();
         Shader->Release();
     }
 };
 
-struct SPixelShader
+struct SPixelShaderData
 {
     ID3DBlob* Blob = nullptr;
     ID3D11PixelShader* Shader = nullptr;
     ID3D11Buffer* ConstantBuffer;
     ID3D11SamplerState* TextureSamplerState;
 
-    ~SPixelShader()
+    ~SPixelShaderData()
     {
         Shader->Release();
         ConstantBuffer->Release();

@@ -14,10 +14,13 @@ namespace TakuEngine
 void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 {
 	MGameWindow::InitializeGameWindow(hInstance);
+	
 	MMeshResources::InitializeMeshResources();
 	MAsset::LoadMeshes();
 	MAsset::LoadShaders();
 	MAsset::LoadTextures();
+	MAsset::LoadDrawables();
+	
 	MGraphic::SetupDraw();
 	MTime::InitializeTime();
 	MInput::InitializeInput(hInstance);

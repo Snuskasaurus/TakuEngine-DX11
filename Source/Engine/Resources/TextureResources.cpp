@@ -47,6 +47,13 @@ STextureData* MTextureResources::GetTextureDataFromFileName(const char* _filenam
     return result->second;
 }
 //--------------------------------------------------------------------------------------
+STextureData* MTextureResources::GetOrCreateTextureDataFromFileName(const char* _filename)
+{
+    STextureData* textureData = GetTextureDataFromFileName(_filename);
+    if (textureData == nullptr) textureData = CreateTextureDataFromFileName(_filename);
+    return textureData;
+}
+//--------------------------------------------------------------------------------------
 // Function for loading a WIC image and creating a Direct3D 11 runtime texture for it
 // (auto-generating mipmaps if possible)
 //

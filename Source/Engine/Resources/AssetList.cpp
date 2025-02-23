@@ -2,14 +2,12 @@
 #include "../IncludesExternal.h"
 
 #include "MeshResources.h"
+#include "DrawableResources.h"
 #include "ShadersResources.h"
 #include "TextureResources.h"
 
 void MAsset::LoadMeshes()
 {
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_DEBUG_ARROW);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_DEBUG_GIZMO);
-    
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SQUARE);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_CUBE);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SPHERE);
@@ -17,7 +15,6 @@ void MAsset::LoadMeshes()
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_CRATE);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_MONSTER);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TAKUMI);
-    
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_BORDER);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
@@ -30,7 +27,6 @@ void MAsset::LoadMeshes()
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2020);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2202);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2222);
-    
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_01);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_02);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_03);
@@ -44,17 +40,7 @@ void MAsset::LoadShaders()
 
 void MAsset::LoadTextures()
 {
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_DEBUG_ARROW);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_DEBUG_GIZMO);
-    
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_SQUARE);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_CUBE);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_SPHERE);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_SUZANNE);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_CRATE);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_MONSTER);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TAKUMI);
-    
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_BORDER);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
@@ -67,8 +53,14 @@ void MAsset::LoadTextures()
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2020);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2202);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2222);
-    
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_01);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_02);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_03);
 }
+
+void MAsset::LoadDrawables()
+{
+    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, G_ASSET_TEXT_DEBUG, "", ""});
+    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, G_ASSET_TEXT_DEBUG, "", ""});
+}
+

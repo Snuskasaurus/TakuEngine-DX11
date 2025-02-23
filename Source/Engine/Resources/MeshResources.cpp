@@ -4,6 +4,7 @@
 #include "../IncludesExternal.h"
 
 #include "ShadersResources.h"
+#include "TextureResources.h"
 
 #define TRIGGER_ERROR() assert(false) // TODO Julien Rogel (06/11/2024): Replace with MessageBox
 
@@ -26,6 +27,7 @@ static std::vector<TVector2f> BufferTextureCoordinates;
 static std::vector<SFaceInfo> BufferFaceInfos;
 static std::vector<SFaceInfo> BufferUniqueFaceInfos;
 
+//--------------------------------------------------------------------------------------
 void MMeshResources::InitializeMeshResources()
 {
     BufferVertexPosition.reserve(1024);
@@ -34,7 +36,7 @@ void MMeshResources::InitializeMeshResources()
     BufferFaceInfos.reserve(4024);
     BufferUniqueFaceInfos.reserve(4024);
 }
-
+//--------------------------------------------------------------------------------------
 void MMeshResources::UninitializeMeshResources()
 {
     BufferUniqueFaceInfos.shrink_to_fit();
@@ -43,7 +45,7 @@ void MMeshResources::UninitializeMeshResources()
     BufferVertexNormals.shrink_to_fit();
     BufferVertexPosition.shrink_to_fit();
 }
-
+//--------------------------------------------------------------------------------------
 SMeshData* MMeshResources::CreateMeshDataFromFileName(const char* _filename)
 {
 #ifdef _DEBUG
@@ -65,7 +67,7 @@ SMeshData* MMeshResources::CreateMeshDataFromFileName(const char* _filename)
     G_MESH_DATA_MAP.insert({ fileNameAsString, NewMeshData });
     return NewMeshData;
 }
-
+//--------------------------------------------------------------------------------------
 SMeshData* MMeshResources::GetMeshDataFromFileName(const char* _filename)
 {
     const std::string fileNameAsString = _filename;
@@ -74,7 +76,14 @@ SMeshData* MMeshResources::GetMeshDataFromFileName(const char* _filename)
         return nullptr;
     return result->second;
 }
-
+//--------------------------------------------------------------------------------------
+SMeshData* MMeshResources::GetOrCreateMeshDataFromFileName(const char* _filename)
+{
+    SMeshData* textureData = GetMeshDataFromFileName(_filename);
+    if (textureData == nullptr) textureData = CreateMeshDataFromFileName(_filename);
+    return textureData;
+}
+//--------------------------------------------------------------------------------------
 bool CreateOrGetUniqueFaceIndex(const SFaceInfo& FaceInfo, int* UniqueIndex)
 {
     for (size_t i = 0; i < BufferUniqueFaceInfos.size(); ++i)

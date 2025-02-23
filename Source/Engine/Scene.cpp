@@ -8,6 +8,7 @@
 
 #include "../Game/Scenes/GridScene.h"
 #include "../Game/Scenes/TakumiScene.h"
+#include "Resources/DrawableResources.h"
 #include "Resources/GamePath.h"
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ void CGameScene::Create()
 {
     SceneLight.Initialize();
 
-    CDrawable_InstancedMesh* Gizmo = AddInstancedMeshToDraw(TAKU_ASSET_MESH_DEBUG_GIZMO);
+    CDrawable_InstancedMesh* Gizmo = AddInstancedMeshToDrawFromDrawableData(G_ASSET_GIZMO);
     Gizmo->Instances.push_back(TTransform::Identity);
     
     OnCreate();
@@ -68,7 +69,23 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshNam
     
     MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, *InstancedMesh->MeshData);
     MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, *InstancedMesh->MeshData);
-    MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));
+    MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));  
+    
+    InstancedMeshes.push_back(InstancedMesh);
+    return InstancedMesh;
+}
+//---------------------------------------------------------------------------------------------------------------------
+CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDrawFromDrawableData(const char* _meshName)
+{
+    CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
+    
+    SDrawableData* DrawableData = MDrawableResources::GetDrawableData(_meshName);
+    InstancedMesh->MeshData = DrawableData->MeshData;
+    InstancedMesh->ColorTexture = DrawableData->ColorTextureData;
+    
+    MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, *InstancedMesh->MeshData);
+    MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, *InstancedMesh->MeshData);
+    MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));  
     
     InstancedMeshes.push_back(InstancedMesh);
     return InstancedMesh;

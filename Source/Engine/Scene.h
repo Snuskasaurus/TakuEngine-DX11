@@ -41,7 +41,8 @@ private:
     
 public:
     CDrawable_InstancedMesh* AddInstancedMeshToDraw(const char* _meshName);
-    
+    CDrawable_InstancedMesh* AddInstancedMeshToDrawFromDrawableData(const char* _meshName);
+
 protected:
     CSceneLight SceneLight;
     

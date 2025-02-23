@@ -1,7 +1,12 @@
 ﻿#pragma once
 
-#define TAKU_ASSET_MESH_DEBUG_ARROW    "Debugs/Arrow"
-#define TAKU_ASSET_MESH_DEBUG_GIZMO    "Debugs/Gizmo"
+#include "../IncludesExternal.h"
+
+inline const char* G_ASSET_ARROW = "Arrow";
+inline const char* G_ASSET_GIZMO = "Gizmo";
+inline const char* G_ASSET_TEXT_DEBUG = "Debugs/TC_Debug";
+inline const char* G_ASSET_MESH_ARROW = "Debugs/Arrow";
+inline const char* G_ASSET_MESH_GIZMO = "Debugs/Gizmo";
 
 #define TAKU_ASSET_MESH_SQUARE    "Square"
 #define TAKU_ASSET_MESH_CUBE      "Cube"
@@ -31,17 +36,11 @@
 #define TAKU_ASSET_VS_BASE  "VertexShader"
 #define TAKU_ASSET_PS_BASE  "PixelShader"
 
-struct SDrawableImportData
-{
-    struct SMeshData* MeshData;
-    struct SPixelShader* VertexShader;
-    struct SPixelShader* PixelShader;
-};
-
 class MAsset
 {
 public:
     static void LoadMeshes();
     static void LoadShaders();
     static void LoadTextures();
+    static void LoadDrawables();
 };

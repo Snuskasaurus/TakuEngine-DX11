@@ -245,6 +245,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Resources\DrawableResources.cpp" />
     <ClCompile Include="Source\Engine\Resources\TextureResources.cpp" />
     <ClCompile Include="Source\Engine\Sun.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="Source\Engine\Resources\AssetList.h" />
     <ClInclude Include="Source\Engine\Resources\GamePath.h" />
     <ClInclude Include="Source\Engine\Resources\MeshResources.h" />
+    <ClInclude Include="Source\Engine\Resources\DrawableResources.h" />
     <ClInclude Include="Source\Engine\Resources\ShadersResources.h" />
     <ClInclude Include="Source\Engine\Resources\TextureResources.h" />
     <ClInclude Include="Source\Engine\Scene.h" />
