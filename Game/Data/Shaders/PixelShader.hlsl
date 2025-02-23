@@ -21,7 +21,7 @@ float4 Main(PS_Input input) : SV_Target
     input.normal = normalize(input.normal);
 
     // Textures
-    float tex_spec = 0.1; // TODO: read from a texture
+    float tex_spec = 0.35f; // TODO: read from a texture
     float3 tex_color = texColor.Sample(samplerState, input.uv).rgb;
 
     // Ambient
@@ -32,7 +32,7 @@ float4 Main(PS_Input input) : SV_Target
 
     // Specular
     float3 halfwayDir = normalize(sunDir.rgb + camDir.rgb);
-    float3 specular = sunDiffuse * tex_spec * pow(max(dot(input.normal, halfwayDir), 0.0), 32.0);
+    float3 specular = sunDiffuse * 0.3 * tex_spec * pow(max(dot(input.normal, halfwayDir), 0.0), 32.0);
 
     // Output
     float3 finalColor = ambient + diffuse + specular;
