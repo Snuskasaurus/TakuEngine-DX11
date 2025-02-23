@@ -23,7 +23,7 @@ public:
 private:
     ID3D11Buffer* VertexBuffer = nullptr;
     ID3D11Buffer* IndexBuffer = nullptr;
-    ID3D11Buffer* VSConstantBuffer = nullptr;
+    ID3D11Buffer* VSConstantBuffer_InstancedObject = nullptr;
     ID3D11Resource* Texture = nullptr;
     ID3D11ShaderResourceView* TextureView = nullptr;
     SMeshData* MeshData = nullptr;

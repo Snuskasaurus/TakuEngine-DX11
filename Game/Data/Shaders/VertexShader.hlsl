@@ -1,4 +1,4 @@
-#define MAX_INSTANCE_COUNT 512
+#define MAX_INSTANCE_COUNT 1024
 
 struct VS_Input
 {
@@ -17,11 +17,15 @@ struct VS_Output
 
 struct instancedObject
 {
-    matrix wvp;
     matrix world;
 };
 
-cbuffer cbuffer_object : register(b0)
+cbuffer cbuffer_frame : register(b0)
+{
+    matrix cameraViewProjection;
+};
+
+cbuffer cbuffer_object : register(b1)
 {
     instancedObject instances[MAX_INSTANCE_COUNT];
 };
@@ -29,9 +33,11 @@ cbuffer cbuffer_object : register(b0)
 VS_Output Main(VS_Input input)
 {
     VS_Output output;
+
+    matrix wvp = mul(instances[input.instanceID].world, cameraViewProjection);
     
     output.uv = input.uv;
-    output.position = mul(float4(input.position, 1.0f), instances[input.instanceID].wvp);
+    output.position = mul(float4(input.position, 1.0f), wvp);
     output.normal = mul(input.normal, instances[input.instanceID].world).rgb;
     
     return output;

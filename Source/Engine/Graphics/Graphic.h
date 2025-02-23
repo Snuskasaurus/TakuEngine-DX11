@@ -3,7 +3,7 @@
 #include "../Resources/MeshResources.h"
 #include "../Resources/ShadersResources.h"
 
-#define MAX_INSTANCE_COUNT 512u
+#define MAX_INSTANCE_COUNT 1024u
 
 class CDrawable_InstancedMesh;
 struct ID3D11Resource;
@@ -24,16 +24,21 @@ struct SGraphicResources_Pipeline
     SVertexShader VertexShaderData;
     SPixelShader PixelShaderData;
     ID3D11RasterizerState* rasterizerState = nullptr;
+    
+    ID3D11Buffer* VSConstantBuffer_Frame = nullptr;
 };
 
-__declspec(align(16)) struct SVertexShaderConstantBuffer
+struct SVSConstantBuffer_InstanceObject
 {
     struct SInstancedObject
     {
-        TMatrix4f wvp; 
         TMatrix4f world; 
     };
     SInstancedObject instancedObject[MAX_INSTANCE_COUNT];
+};
+struct SVSConstantBuffer_Frame
+{
+    TMatrix4f CameraViewProjection;
 };
 
 __declspec(align(16)) struct SPixelShaderConstantBuffer
@@ -66,8 +71,9 @@ public:
     static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShader&);
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, const SMeshData&);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, const SMeshData&);
-    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer);
+    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer, UINT _size);
 public:
+    static void SetVSConstantBuffer_Frame(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer);
     static void SetVSConstantBuffer_Instanced(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances);
     
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);

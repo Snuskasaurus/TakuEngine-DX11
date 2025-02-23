@@ -17,8 +17,8 @@ CDrawable_InstancedMesh::~CDrawable_InstancedMesh()
     IndexBuffer->Release();
     IndexBuffer = nullptr;
     
-    VSConstantBuffer->Release();
-    VSConstantBuffer = nullptr;
+    VSConstantBuffer_InstancedObject->Release();
+    VSConstantBuffer_InstancedObject = nullptr;
     
     Texture->Release();
     Texture = nullptr;

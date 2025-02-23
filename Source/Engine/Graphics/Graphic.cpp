@@ -20,7 +20,7 @@ int GetResolutionWidth() { return RESOLUTION_WIDTH; }
 int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
-SVertexShaderConstantBuffer G_VS_CONSTANT_BUFFER;
+SVSConstantBuffer_InstanceObject G_VS_CONSTANT_BUFFER;
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetupDraw()
 {
@@ -34,12 +34,16 @@ void MGraphic::SetupDraw()
     MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
     MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
     MGraphic::CreateRasterizerState(G_PIPELINE.Device, &G_PIPELINE.rasterizerState);
+
+    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device,G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Frame, sizeof(SVSConstantBuffer_Frame));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Draw()
 {
     MGraphic::SetPixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 
+    SetVSConstantBuffer_Frame(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Frame);
+    
     const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
@@ -55,7 +59,7 @@ void MGraphic::Draw()
             const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
             const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
             
-            MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &instancedMesh->VSConstantBuffer, instancedMesh->Instances, startInstances, nbInstancesToDraw);
+            MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &instancedMesh->VSConstantBuffer_InstancedObject, instancedMesh->Instances, startInstances, nbInstancesToDraw);
             MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
             
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
@@ -113,7 +117,7 @@ void MGraphic::FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawable
     CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, _textureFilename, &_drawableInstancedMesh->Texture, &_drawableInstancedMesh->TextureView, 0));
     MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VertexBuffer, *_drawableInstancedMesh->MeshData);
     MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->IndexBuffer, *_drawableInstancedMesh->MeshData);
-    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VSConstantBuffer);
+    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState)
@@ -364,7 +368,7 @@ void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _de
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, _indexBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** VertexConstantBuffer)
+void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** VertexConstantBuffer, UINT _size)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -372,33 +376,43 @@ void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceConte
         bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = sizeof(SVertexShaderConstantBuffer);
+        bufferDesc.ByteWidth = _size;
         bufferDesc.StructureByteStride = 0u;
     }
-    
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, VertexConstantBuffer));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::SetVSConstantBuffer_Frame(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer)
+{
+    const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->GetInverseCameraMatrix();
+    const TMatrix4f perspectiveMatrix = MGameWindow::GetPerspectiveMatrix();
+    
+    SVSConstantBuffer_Frame buffer;
+    buffer.CameraViewProjection = TMatrix4f::Transpose(invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
+    
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    CHECK_HRESULT(_deviceContext->Map(*_objectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+    memcpy(mappedResource.pData, &buffer, sizeof(SVSConstantBuffer_Frame));
+    _deviceContext->Unmap(*_objectBuffer, 0);
+    _deviceContext->VSSetConstantBuffers(0u, 1u, _objectBuffer);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetVSConstantBuffer_Instanced(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances)
 {
-    const TMatrix4f invertedCameraMatrix = MWorld::GetWorld()->GetInverseCameraMatrix();
-    const TMatrix4f perspectiveMatrix = MGameWindow::GetPerspectiveMatrix();
-
     int indexGlobal = 0;
     const UINT End = _start + _nbInstances;
     for (UINT i = _start; i < End ; ++i)
     {
         const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transforms[i]);
         indexGlobal++;
-        G_VS_CONSTANT_BUFFER.instancedObject[indexGlobal].wvp = TMatrix4f::Transpose(objectWorldMatrix * invertedCameraMatrix * TMatrix4f::View * perspectiveMatrix);
         G_VS_CONSTANT_BUFFER.instancedObject[indexGlobal].world = TMatrix4f::Transpose(objectWorldMatrix);
     }
 
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     CHECK_HRESULT(_deviceContext->Map(*_objectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-    memcpy(mappedResource.pData, &G_VS_CONSTANT_BUFFER, sizeof(SVertexShaderConstantBuffer));
+    memcpy(mappedResource.pData, &G_VS_CONSTANT_BUFFER, sizeof(SVSConstantBuffer_InstanceObject));
     _deviceContext->Unmap(*_objectBuffer, 0);
-    _deviceContext->VSSetConstantBuffers(0u, 1u, _objectBuffer);
+    _deviceContext->VSSetConstantBuffers(1u, 1u, _objectBuffer);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState)
