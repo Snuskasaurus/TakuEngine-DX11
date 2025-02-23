@@ -310,13 +310,12 @@ void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11Devi
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShader& _pixelShader)
 {
-    TColorF SunColor = { 1.0f, 0.992156f, 0.815686f, 1.0f };
+    const SLightInfo& lightInfo = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight()->GetSceneLightInfo();
     SPixelShaderConstantBuffer ConstantBufferPixelShader;
     {
-        //ConstantBufferPixelShader.light.dir = TVector3f::Normalize(MWorld::GetWorld()->GetSunDirection());
-        ConstantBufferPixelShader.sunDir = TVector3f::Normalize(TVector3f::Left + TVector3f::Up);
-        ConstantBufferPixelShader.sunDiffuse = { SunColor.r, SunColor.g, SunColor.b };
-        ConstantBufferPixelShader.sunAmbient = 0.36f;
+        ConstantBufferPixelShader.sunDir = lightInfo.Direction;
+        ConstantBufferPixelShader.sunDiffuse = { lightInfo.Diffuse.r, lightInfo.Diffuse.g, lightInfo.Diffuse.b };
+        ConstantBufferPixelShader.sunAmbient = lightInfo.Ambient;
     }
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     CHECK_HRESULT(_deviceContext->Map(_pixelShader.ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));

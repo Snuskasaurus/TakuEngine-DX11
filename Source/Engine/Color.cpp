@@ -1,15 +1,15 @@
 ﻿#include "Color.h"
 
-TColorF TColorF::White = TColorF{1.0f, 1.0f, 1.0f, 1.0f};
-TColorF TColorF::Black = TColorF{0u, 0u, 0u, 1.0f};
+TColorf TColorf::White = TColorf{1.0f, 1.0f, 1.0f, 1.0f};
+TColorf TColorf::Black = TColorf{0u, 0u, 0u, 1.0f};
 
-TColorF TColorF::Red = TColorF{1.0f, 0.0f, 0.0f, 1.0f};
-TColorF TColorF::Green = TColorF{0.0f, 1.0f, 0.0f, 1.0f};
-TColorF TColorF::Blue = TColorF{0.0f, 0.0f, 1.0f, 1.0f};
+TColorf TColorf::Red = TColorf{1.0f, 0.0f, 0.0f, 1.0f};
+TColorf TColorf::Green = TColorf{0.0f, 1.0f, 0.0f, 1.0f};
+TColorf TColorf::Blue = TColorf{0.0f, 0.0f, 1.0f, 1.0f};
 
-TColorF TColorF::Magenta = TColorF{1.0f, 0.0f, 1.0f, 1.0f};
-TColorF TColorF::Yellow = TColorF{1.0f, 1.0f, 0.0f, 1.0f};
-TColorF TColorF::Cyan = TColorF{0.0f, 1.0f, 1.0f, 1.0f};
+TColorf TColorf::Magenta = TColorf{1.0f, 0.0f, 1.0f, 1.0f};
+TColorf TColorf::Yellow = TColorf{1.0f, 1.0f, 0.0f, 1.0f};
+TColorf TColorf::Cyan = TColorf{0.0f, 1.0f, 1.0f, 1.0f};
 
 TColorI TColorI::White = TColorI{255u, 255u, 255u, 255u};
 TColorI TColorI::Black = TColorI{0u, 0u, 0u, 255u};

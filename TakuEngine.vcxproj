@@ -170,6 +170,7 @@
     </FxCompile>
     <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
+    <ClCompile Include="Source\Engine\Sun.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
     <ClCompile Include="Source\Engine\AssetList.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="Source\Engine\Resources\MeshResources.h" />
     <ClInclude Include="Source\Engine\Resources\ShadersResources.h" />
     <ClInclude Include="Source\Engine\Scene.h" />
+    <ClInclude Include="Source\Engine\Sun.h" />
     <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\WICTextureLoader.h" />
     <ClInclude Include="Source\Engine\World.h" />

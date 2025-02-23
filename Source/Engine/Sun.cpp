@@ -1,0 +1,48 @@
+﻿#include "Sun.h"
+
+#include "AssetList.h"
+#include "Scene.h"
+#include "World.h"
+#include "Graphics/Drawable.h"
+
+
+ SLightInfo CSceneLight::GetSceneLightInfo() const
+{
+    const TMatrix4f CamRotationMatrix = TMatrix4f::MatrixRotationPitch(MMath::Deg2Rad(CurrentPitch))
+                                      * TMatrix4f::MatrixRotationYaw(MMath::Deg2Rad(CurrentYaw))
+                                      * TMatrix4f::MatrixRotationRoll(0.0f);
+    
+    TVector3f lightDirection = TVector3f::TransformCoord(TVector3f::Forward, CamRotationMatrix);
+    lightDirection = TVector3f::Normalize(lightDirection);
+
+    return { lightDirection, DiffuseColor, Ambient };
+}
+
+void CSceneLight::AddYaw(float _yaw)
+{
+    CurrentYaw += _yaw;
+    UpdateOnChanges();
+}
+
+void CSceneLight::AddPitch(float _pitch)
+{
+    CurrentPitch += _pitch;
+    CurrentPitch = MMath::Clamp(CurrentPitch, 10.0f, 170.0f);
+    UpdateOnChanges();
+}
+
+void CSceneLight::Initialize()
+{
+    DebugArrowMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDraw(TAKU_ASSET_MESH_DEBUG_ARROW);
+    DebugArrowMesh->Instances.push_back(TTransform({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}));
+    UpdateOnChanges();
+}
+
+void CSceneLight::Uninitialize()
+{
+}
+
+void CSceneLight::UpdateOnChanges()
+{
+    DebugArrowMesh->Instances[0] = {{0.0f, 0.0f, 10.0f}, { MMath::Deg2Rad(CurrentYaw), MMath::Deg2Rad(CurrentPitch), 0.0f }};
+}

@@ -32,15 +32,23 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
     NewWorldGameScene->Create();
 }
 //---------------------------------------------------------------------------------------------------------------------
+void CGameScene::Create()
+{
+    SceneLight.Initialize();
+    OnCreate();
+}
+//---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Destroy()
 {
+    OnDestroy();
+    
+    SceneLight.Uninitialize();
+    
     for (int i = 0; i < InstancedMeshes.size(); ++i)
     {
         delete InstancedMeshes[i];
     }
     InstancedMeshes.clear();
-    
-    OnDestroy();
 }
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshName)

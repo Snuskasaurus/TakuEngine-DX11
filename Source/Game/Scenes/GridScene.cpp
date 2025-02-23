@@ -219,10 +219,6 @@ bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
-    
-    CDrawable_InstancedMesh* DebugArrowMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_DEBUG_ARROW);
-    DebugArrowMesh->Instances.push_back(TTransform({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}));
-    
     // Generate grid terrain
     {
         GridTerrains.reserve(G_NB_TILES);
@@ -360,6 +356,14 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
     {
         ToggleDisplayingGrid();
     }
+    else if (_key == EKeyCode::KEY_KEYPAD_8)
+        SceneLight.AddPitch(10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_2)
+        SceneLight.AddPitch(-10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_4)
+        SceneLight.AddYaw(10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_6)
+        SceneLight.AddYaw(-10.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnUpdate(const float& _dt)

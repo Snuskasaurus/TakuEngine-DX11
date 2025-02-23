@@ -21,8 +21,7 @@ float4 Main(PS_Input input) : SV_Target
 
     float3 diffuse = texColor.Sample(samplerState, input.uv).rgb;
     
-    float3 finalColor = diffuse * sunAmbient;
-    finalColor += saturate(dot(sunDir, input.normal) * sunDiffuse * diffuse);
+    float3 finalColor = diffuse * sunAmbient + saturate(dot(sunDir, input.normal) * sunDiffuse * diffuse);
     
     //return float4(input.normal, 1.0f);
     //return float4(diffuse, 1.0f);

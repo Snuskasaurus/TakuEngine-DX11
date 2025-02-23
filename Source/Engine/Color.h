@@ -3,18 +3,18 @@
 #include <array>
 #include <Windows.h>
 
-struct __declspec(align(16)) TColorF
+struct __declspec(align(16)) TColorf
 {
     float r, g, b, a;
     
-    static TColorF White;
-    static TColorF Black;
-    static TColorF Red;
-    static TColorF Green;
-    static TColorF Blue;
-    static TColorF Magenta;
-    static TColorF Yellow;
-    static TColorF Cyan;
+    static TColorf White;
+    static TColorf Black;
+    static TColorf Red;
+    static TColorf Green;
+    static TColorf Blue;
+    static TColorf Magenta;
+    static TColorf Yellow;
+    static TColorf Cyan;
 };
 
 struct TColorI
@@ -30,5 +30,5 @@ struct TColorI
     static TColorI Yellow;
     static TColorI Cyan;
 
-    TColorF ToFloat() const { return {(float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f}; }
+    TColorf ToFloat() const { return {(float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f}; }
 };
