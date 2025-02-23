@@ -18,7 +18,7 @@ enum ETerrainType
 {
     WATER,
     GROUND,
-    HILL,
+    MOUNTAIN,
 };
 
 constexpr int G_GRID_WIDTH = 20; // X
@@ -73,12 +73,15 @@ std::vector<TGridIndex> VisualGridIndex_To_GridIndex(const TVisualGridIndex& _vi
     };
 }
 
-TVisualMeshData* GetVisualMeshDataFromVisualGridIndex(const TVisualGridIndex& _visualGridIndex)
+TVisualMeshData* GetVisualMeshDataFromVisualGridIndex(const TVisualGridIndex& _visualGridIndex, bool IsMountain)
 {
     std::vector<TGridIndex> TileIndexes = VisualGridIndex_To_GridIndex(_visualGridIndex);
     TTerrainIndex terrainIndex = 0;
     for (int i = 0; i < 4; i++) {
-        const TTerrainIndex TerrainType = TileIndexes[i] >= 0 ? (TTerrainIndex)GridTerrains[TileIndexes[i]] : 0;
+        TTerrainIndex TerrainType = TileIndexes[i] >= 0 ? (TTerrainIndex)GridTerrains[TileIndexes[i]] : 0;
+        if (TerrainType == ETerrainType::MOUNTAIN && !IsMountain)   TerrainType = (TTerrainIndex)ETerrainType::GROUND;
+        if (TerrainType == ETerrainType::GROUND && IsMountain)      TerrainType = (TTerrainIndex)ETerrainType::WATER;
+        
         terrainIndex = terrainIndex * 10 + TerrainType;
     }
     const auto visualMeshDataMapIterator = VisualMeshDataMap.find(terrainIndex);
@@ -98,28 +101,61 @@ void InitVisualMeshDataMap()
     CDrawable_InstancedMesh* Mesh1010 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1010);
     CDrawable_InstancedMesh* Mesh1101 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1101);
     CDrawable_InstancedMesh* Mesh1111 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1111);
+    CDrawable_InstancedMesh* Mesh2000 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2000);
+    CDrawable_InstancedMesh* Mesh2002 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2002);
+    CDrawable_InstancedMesh* Mesh2020 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2020);
+    CDrawable_InstancedMesh* Mesh2202 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2202);
+    CDrawable_InstancedMesh* Mesh2222 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2222);
     
     VisualMeshDataMap.insert({0, {Mesh0000, 0.0f}});
+
+    // Ground tiles
+    {
+        VisualMeshDataMap.insert({1000, {Mesh1000, 0.0f}});
+        VisualMeshDataMap.insert({100,  {Mesh1000, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({10,   {Mesh1000, MMath::Deg2Rad(-180.0f)}});
+        VisualMeshDataMap.insert({1,    {Mesh1000, MMath::Deg2Rad(-270.0f)}});
     
-    VisualMeshDataMap.insert({1000, {Mesh1000, 0.0f}});
-    VisualMeshDataMap.insert({100, {Mesh1000, MMath::Deg2Rad(-90.0f)}});
-    VisualMeshDataMap.insert({10, {Mesh1000, MMath::Deg2Rad(-180.0f)}});
-    VisualMeshDataMap.insert({1, {Mesh1000, MMath::Deg2Rad(-270.0f)}});
+        VisualMeshDataMap.insert({1001, {Mesh1001, 0.0f}});
+        VisualMeshDataMap.insert({1100, {Mesh1001, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({110,  {Mesh1001, MMath::Deg2Rad(-180.0f)}});
+        VisualMeshDataMap.insert({11,   {Mesh1001, MMath::Deg2Rad(-270.0f)}});
     
-    VisualMeshDataMap.insert({1001, {Mesh1001, 0.0f}});
-    VisualMeshDataMap.insert({1100, {Mesh1001, MMath::Deg2Rad(-90.0f)}});
-    VisualMeshDataMap.insert({110, {Mesh1001, MMath::Deg2Rad(-180.0f)}});
-    VisualMeshDataMap.insert({11, {Mesh1001, MMath::Deg2Rad(-270.0f)}});
+        VisualMeshDataMap.insert({1010, {Mesh1010, 0.0f}});
+        VisualMeshDataMap.insert({101,  {Mesh1010, MMath::Deg2Rad(-90.0f)}});
     
-    VisualMeshDataMap.insert({1010, {Mesh1010, 0.0f}});
-    VisualMeshDataMap.insert({101, {Mesh1010, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({1101, {Mesh1101, 0.0f}});
+        VisualMeshDataMap.insert({1110, {Mesh1101, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({111,  {Mesh1101, MMath::Deg2Rad(-180.0f)}});
+        VisualMeshDataMap.insert({1011, {Mesh1101, MMath::Deg2Rad(-270.0f)}});
+        
+        VisualMeshDataMap.insert({1111, {Mesh1111, 0.0f}});
+    }
+
+    // Mountain tiles
+    {
+        VisualMeshDataMap.insert({2000, {Mesh2000, 0.0f}});
+        VisualMeshDataMap.insert({200,  {Mesh2000, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({20,   {Mesh2000, MMath::Deg2Rad(-180.0f)}});
+        VisualMeshDataMap.insert({2, 	  {Mesh2000, MMath::Deg2Rad(-270.0f)}});
+									 
+        VisualMeshDataMap.insert({2002, {Mesh2002, 0.0f}});
+        VisualMeshDataMap.insert({2200, {Mesh2002, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({220,  {Mesh2002, MMath::Deg2Rad(-180.0f)}});
+        VisualMeshDataMap.insert({22,   {Mesh2002, MMath::Deg2Rad(-270.0f)}});
+									 
+        VisualMeshDataMap.insert({2020, {Mesh2020, 0.0f}});
+        VisualMeshDataMap.insert({202,  {Mesh2020, MMath::Deg2Rad(-90.0f)}});
+									 
+        VisualMeshDataMap.insert({2202, {Mesh2202, 0.0f}});
+        VisualMeshDataMap.insert({2220, {Mesh2202, MMath::Deg2Rad(-90.0f)}});
+        VisualMeshDataMap.insert({222,  {Mesh2202, MMath::Deg2Rad(-180.0f)}});
+        VisualMeshDataMap.insert({2022, {Mesh2202, MMath::Deg2Rad(-270.0f)}});
+
+        VisualMeshDataMap.insert({2222, {Mesh2222, 0.0f}});
+    }
+
     
-    VisualMeshDataMap.insert({1101, {Mesh1101, 0.0f}});
-    VisualMeshDataMap.insert({1110, {Mesh1101, MMath::Deg2Rad(-90.0f)}});
-    VisualMeshDataMap.insert({111, {Mesh1101, MMath::Deg2Rad(-180.0f)}});
-    VisualMeshDataMap.insert({1011, {Mesh1101, MMath::Deg2Rad(-270.0f)}});
-    
-    VisualMeshDataMap.insert({1111, {Mesh1111, 0.0f}});
 
 #if _DEBUG // Draw all the available tiles at the bottom of the map
     Mesh0000->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 0, 0.0f, -200.0f }, 0.0f, 0.0f, 0.0f});
@@ -169,6 +205,11 @@ bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
                 _terrains[iTerrain] = ETerrainType::GROUND;
                 iTerrain++;
             }
+            else if (c == '2')
+            {
+                _terrains[iTerrain] = ETerrainType::MOUNTAIN;
+                iTerrain++;
+            }
         }
     }
     
@@ -186,16 +227,12 @@ void CGridScene::OnCreate()
         assert(Success);
     }
     
-    
     // Generate grid meshes
     {
         InitVisualMeshDataMap();
         
         for (int i = 0; i < G_NB_TILES_VISUAL; ++i)
         {
-            const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i);
-            if (visualMeshData == nullptr)
-                continue;
 
             const int XTile = i % (G_GRID_WIDTH + 1);
             const int YTile = i / (G_GRID_WIDTH + 1);
@@ -205,8 +242,26 @@ void CGridScene::OnCreate()
                 (float)(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF + G_TILE_SIZE_HALF, 
                 0.0f 
             };
-            TTransform Transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
-            visualMeshData->InstancedMesh->Instances.push_back(Transform);
+
+            // Add ground/water tiles
+            { 
+                const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i, false);
+                if (visualMeshData != nullptr)
+                {
+                    TTransform transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
+                    visualMeshData->InstancedMesh->Instances.push_back(transform);
+                }
+            }
+
+            // Add Mountain tiles
+            {
+                const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i, true);
+                if (visualMeshData != nullptr)
+                {
+                    TTransform transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
+                    visualMeshData->InstancedMesh->Instances.push_back(transform);
+                }
+            }
         }
     }
     
@@ -293,7 +348,7 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
     {
         PostQuitMessage(1);
     }
-    else if (_key == EKeyCode::KEY_F1)
+    else if (_key == EKeyCode::KEY_G)
     {
         ToggleDisplayingGrid();
     }
