@@ -53,7 +53,6 @@
     </ClCompile>
     <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
-    <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
     <ClCompile Include="Source\Engine\Main.cpp" />
     <ClCompile Include="Source\Engine\Resources\MeshResources.cpp" />
@@ -106,5 +105,13 @@
     <ClInclude Include="Source\Engine\Scene.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />
     <ClInclude Include="Source\Game\Scenes\TakumiScene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Game\Data\Shaders\VertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\PixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

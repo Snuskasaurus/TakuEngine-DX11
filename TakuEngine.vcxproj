@@ -158,8 +158,16 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game\Data\Shaders\PixelShader.hlsl" />
-    <ClCompile Include="Game\Data\Shaders\VertexShader.hlsl" />
+    <FxCompile Include="Game\Data\Shaders\PixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\VertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </FxCompile>
     <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
     <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
