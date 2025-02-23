@@ -27,19 +27,10 @@
     <ClCompile Include="Source\Engine\GameWindow.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Graphic.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\HResultHandler.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Inputmanager.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Shaders.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Test.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\TimeManager.cpp">
@@ -51,21 +42,23 @@
     <ClCompile Include="Source\Engine\World.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Debug\Profiling.cpp">
       <Filter>Source\Engine\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\AssetList.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\MeshResources.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Math.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
+    <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
+    <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
+    <ClCompile Include="Source\Engine\Main.cpp" />
+    <ClCompile Include="Source\Engine\Resources\MeshResources.cpp" />
+    <ClCompile Include="Source\Engine\Resources\ShadersResources.cpp" />
+    <ClCompile Include="Source\Engine\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\CommonEngine.h">
@@ -80,9 +73,6 @@
     <ClInclude Include="Source\Engine\GameWindow.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Graphic.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\HResultHandler.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
@@ -90,12 +80,6 @@
       <Filter>Source\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Math.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\Shaders.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Test.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\TimeManager.h">
@@ -113,8 +97,14 @@
     <ClInclude Include="Source\Engine\AssetList.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\MeshResources.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
+    <ClInclude Include="Source\Engine\Graphics\Drawable.h" />
+    <ClInclude Include="Source\Engine\Graphics\Graphic.h" />
+    <ClInclude Include="Source\Engine\IncludesExternal.h" />
+    <ClInclude Include="Source\Engine\Resources\GamePath.h" />
+    <ClInclude Include="Source\Engine\Resources\MeshResources.h" />
+    <ClInclude Include="Source\Engine\Resources\ShadersResources.h" />
+    <ClInclude Include="Source\Engine\Scene.h" />
+    <ClInclude Include="Source\Game\Scenes\GridScene.h" />
+    <ClInclude Include="Source\Game\Scenes\TakumiScene.h" />
   </ItemGroup>
 </Project>

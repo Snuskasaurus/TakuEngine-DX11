@@ -70,6 +70,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(SolutionDir)\Intermediates\$(Configuration)</IntDir>
+    <OutDir>$(SolutionDir)\Game\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(SolutionDir)\Intermediates\$(Configuration)</IntDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
+    <OutDir>$(SolutionDir)\Game\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -152,7 +161,7 @@
     <Content Include="Data\Shaders\PixelShader.hlsl" />
     <Content Include="Data\Shaders\VertexShader.hlsl" />
     <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
-    <ClCompile Include="Source\Engine\Graphics\Graphic.cpp"/>
+    <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
     <ClCompile Include="Source\Engine\AssetList.cpp" />
