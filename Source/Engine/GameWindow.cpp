@@ -71,7 +71,7 @@ void MGameWindow::InitializeGameWindow(const HINSTANCE hInstance)
     
     ShowWindow(GameWindowHandle, SW_SHOW);
     
-    MGraphic::InitializeGraphic();
+    MGraphic::CreateDirectXWindow();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void MGameWindow::UninitializeGameWindow()

@@ -2,7 +2,7 @@
 
 #include "../../Engine/World.h"
 #include "../../Engine/Math.h"
-#include "../../Engine/AssetList.h"
+#include "../../Engine/Resources/AssetList.h"
 
 typedef int TTerrainIndex;
 typedef int TGridIndex;

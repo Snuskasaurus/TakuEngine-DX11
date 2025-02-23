@@ -5,21 +5,20 @@
 #include "World.h"
 #include "GameWindow.h"
 #include "Inputmanager.h"
-#include "AssetList.h"
+#include "Graphics/Graphic.h"
+#include "Resources/AssetList.h"
 
 namespace TakuEngine
 {
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
-void LoadAssets()
-{
-	MAsset::LoadMeshes();
-	MAsset::LoadShaders();
-}
-///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 {
-	MMeshResources::InitializeMeshResources();
 	MGameWindow::InitializeGameWindow(hInstance);
+	MMeshResources::InitializeMeshResources();
+	MAsset::LoadMeshes();
+	MAsset::LoadShaders();
+	MAsset::LoadTextures();
+	MGraphic::SetupDraw();
 	MTime::InitializeTime();
 	MInput::InitializeInput(hInstance);
 	MWorld::InitializeWorld();
@@ -52,7 +51,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLin
 {
 	srand(static_cast<unsigned int>(time(nullptr)));
 	
-	TakuEngine::LoadAssets();
 	TakuEngine::Initialization(hInstance, hPrevInstance);
 	while (true)
 	{

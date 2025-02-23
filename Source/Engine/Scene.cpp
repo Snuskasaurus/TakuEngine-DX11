@@ -1,6 +1,6 @@
 ﻿#include "Scene.h"
 
-#include "AssetList.h"
+#include "Resources/AssetList.h"
 #include "Graphics/Graphic.h"
 #include "World.h"
 #include "Graphics/Drawable.h"
@@ -59,19 +59,16 @@ void CGameScene::Destroy()
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshName)
 {
     CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
+    
+    InstancedMesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
+    assert(InstancedMesh->MeshData != nullptr);
 
-    // Load the mesh data from file
-    {
-        InstancedMesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
-        assert(InstancedMesh->MeshData != nullptr);
-    }
-
-    // TODO Julien Rogel (14/02/2025): Rework texture loading
-    {
-        std::wstringstream TextureFilenameStream;
-        TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
-        MGraphic::FillGraphicResources_Instanced(InstancedMesh, TextureFilenameStream.str().c_str());
-    }
+    InstancedMesh->ColorTexture = MTextureResources::GetTextureDataFromFileName(_meshName);
+    assert(InstancedMesh->ColorTexture != nullptr);
+    
+    MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, *InstancedMesh->MeshData);
+    MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, *InstancedMesh->MeshData);
+    MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));
     
     InstancedMeshes.push_back(InstancedMesh);
     return InstancedMesh;

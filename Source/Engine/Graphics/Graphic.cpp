@@ -3,12 +3,12 @@
 #include <d3d11.h>
 #include <d3dcommon.h>
 
-#include "../AssetList.h"
-#include "../GameWindow.h"
-#include "../HResultHandler.h"
+#include "../Resources/AssetList.h"
 #include "../Resources/MeshResources.h"
 #include "../Resources/ShadersResources.h"
-#include "../WICTextureLoader.h"
+
+#include "../GameWindow.h"
+#include "../HResultHandler.h"
 #include "../World.h"
 #include "../Debug/Profiling.h"
 
@@ -22,10 +22,23 @@ int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
 static SGraphicResources_Pipeline G_PIPELINE;
 SVSConstantBuffer_InstanceObject G_VS_CONSTANT_BUFFER;
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetupDraw()
+ID3D11Device* MGraphic::GetDXDevice()
+{
+    return G_PIPELINE.Device;
+}
+///---------------------------------------------------------------------------------------------------------------------
+ID3D11DeviceContext* MGraphic::GetDXDeviceContext()
+{
+    return G_PIPELINE.DeviceContext;
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateDirectXWindow()
 {
     MGraphic::CreateDeviceAndSwapChain(&G_PIPELINE.Device, &G_PIPELINE.DeviceContext, &G_PIPELINE.SwapChain);
-    MGraphic::CreateAndSetDepthStencilState(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.DepthStencilState);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::SetupDraw()
+{
     MGraphic::CreateDepthStencilTexture(G_PIPELINE.Device, &G_PIPELINE.DepthStencilTexture);
     MGraphic::CreateDepthStencilView(G_PIPELINE.Device, G_PIPELINE.DepthStencilTexture, &G_PIPELINE.DepthStencilView);
     MGraphic::CreateRenderTargetView(G_PIPELINE.Device, G_PIPELINE.SwapChain, &G_PIPELINE.BackBufferResource, &G_PIPELINE.RenderTargetView);
@@ -50,7 +63,7 @@ void MGraphic::Draw()
         CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
         
         MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer);
-        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, &instancedMesh->TextureView);
+        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, &instancedMesh->ColorTexture->textureView);
 
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
@@ -73,51 +86,9 @@ void MGraphic::Draw()
     MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_PIPELINE.DepthStencilView);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::InitializeGraphic()
-{
-    MGraphic::SetupDraw();
-}
-///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::UninitializeGraphic()
 {
-    G_PIPELINE.VertexShaderData.Release();
-    G_PIPELINE.PixelShaderData.Release();
-}
-///---------------------------------------------------------------------------------------------------------------------
-// CMesh* MGraphic::AddMeshToDraw(const TTransform& _transform, const char* _meshName)
-// {
-//     CMesh* Mesh = new CMesh;
-//     
-//     Mesh->Transform = _transform;
-//
-//     // Load the mesh data from file
-//     {
-//         Mesh->MeshData = MMeshResources::GetMeshDataFromFileName(_meshName);
-//         assert(Mesh->MeshData != nullptr);
-//     }
-//     
-//     // Load the texture
-//     {
-//         std::wstringstream TextureFilenameStream;
-//         TextureFilenameStream << GAME_DATA_PATH << _meshName << ".bmp";
-//         CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, TextureFilenameStream.str().c_str(), &Mesh->GraphicResource.Texture, &Mesh->GraphicResource.TextureView, 0));
-//     }
-//     
-//     MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, Mesh->GraphicResource, *Mesh->MeshData);
-//     MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, Mesh->GraphicResource, *Mesh->MeshData);
-//     MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, Mesh->GraphicResource);
-//     
-//     G_MESH_TO_DRAW.push_back(Mesh);
-//
-//     return Mesh;
-// }
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawableInstancedMesh, const wchar_t* _textureFilename)
-{
-    CHECK_HRESULT(CreateWICTextureFromFile(G_PIPELINE.Device, G_PIPELINE.DeviceContext, _textureFilename, &_drawableInstancedMesh->Texture, &_drawableInstancedMesh->TextureView, 0));
-    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VertexBuffer, *_drawableInstancedMesh->MeshData);
-    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->IndexBuffer, *_drawableInstancedMesh->MeshData);
-    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &_drawableInstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));
+    
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState)

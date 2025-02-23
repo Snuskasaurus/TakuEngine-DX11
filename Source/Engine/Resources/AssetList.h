@@ -31,9 +31,17 @@
 #define TAKU_ASSET_VS_BASE  "VertexShader"
 #define TAKU_ASSET_PS_BASE  "PixelShader"
 
+struct SDrawableImportData
+{
+    struct SMeshData* MeshData;
+    struct SPixelShader* VertexShader;
+    struct SPixelShader* PixelShader;
+};
+
 class MAsset
 {
 public:
     static void LoadMeshes();
     static void LoadShaders();
+    static void LoadTextures();
 };

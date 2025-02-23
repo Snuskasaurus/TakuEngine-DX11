@@ -1,6 +1,6 @@
 ﻿#include "Sun.h"
 
-#include "AssetList.h"
+#include "Resources/AssetList.h"
 #include "Scene.h"
 #include "World.h"
 #include "Graphics/Drawable.h"

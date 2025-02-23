@@ -1,6 +1,52 @@
-﻿//--------------------------------------------------------------------------------------
-// File: WICTextureLoader.cpp
-//
+﻿#include "TextureResources.h"
+
+#include <dxgiformat.h>
+#include <d3dcommon.h>
+#include <assert.h>
+#pragma warning(push)
+#pragma warning(disable : 4005)
+#include <wincodec.h>
+#pragma warning(pop)
+#include <memory>
+
+#include "GamePath.h"
+#include "../HResultHandler.h"
+#include "../Graphics/Graphic.h"
+
+#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/) && !defined(DXGI_1_2_FORMATS)
+#define DXGI_1_2_FORMATS
+#endif
+
+HRESULT CreateWICTextureFromMemory(_In_ ID3D11Device*, _In_opt_ ID3D11DeviceContext*,_In_bytecount_(wicDataSize) const uint8_t*,_In_ size_t,_Out_opt_ ID3D11Resource**,_Out_opt_ ID3D11ShaderResourceView**,_In_ size_t maxsize = 0);
+HRESULT CreateWICTextureFromFile(_In_ ID3D11Device*,_In_opt_ ID3D11DeviceContext*,_In_z_ const wchar_t*,_Out_opt_ ID3D11Resource**,_Out_opt_ ID3D11ShaderResourceView**,_In_ size_t);
+
+//--------------------------------------------------------------------------------------
+// TODO Julien Rogel (11/02/2025): Change this data structure to use an array and avoid allocation for each mesh data
+static std::map<std::string, STextureData*> G_TEXTURE_DATA_MAP;
+//--------------------------------------------------------------------------------------
+STextureData* MTextureResources::CreateTextureDataFromFileName(const char* _filename)
+{
+#ifdef _DEBUG
+    assert(MTextureResources::GetTextureDataFromFileName(_filename) == nullptr);
+#endif
+
+    STextureData* NewTextureData = new STextureData();
+    std::wstringstream TextureFilenameStream;
+    TextureFilenameStream << GAME_DATA_PATH << _filename << ".bmp";
+    CHECK_HRESULT(CreateWICTextureFromFile(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), TextureFilenameStream.str().c_str(), &NewTextureData->texture, &NewTextureData->textureView, 0));
+    G_TEXTURE_DATA_MAP.insert({ _filename, NewTextureData });
+    return NewTextureData;
+}
+//--------------------------------------------------------------------------------------
+STextureData* MTextureResources::GetTextureDataFromFileName(const char* _filename)
+{
+    const std::string fileNameAsString = _filename;
+    const auto result = G_TEXTURE_DATA_MAP.find(fileNameAsString);
+    if (result == G_TEXTURE_DATA_MAP.end())
+        return nullptr;
+    return result->second;
+}
+//--------------------------------------------------------------------------------------
 // Function for loading a WIC image and creating a Direct3D 11 runtime texture for it
 // (auto-generating mipmaps if possible)
 //
@@ -23,28 +69,6 @@
 //
 // https://go.microsoft.com/fwlink/?LinkId=248926
 // https://go.microsoft.com/fwlink/?LinkId=248929
-//--------------------------------------------------------------------------------------
-
-// We could load multi-frame images (TIFF/GIF) into a texture array.
-// For now, we just load the first frame (note: DirectXTex supports multi-frame images)
-
-#include <dxgiformat.h>
-#include <d3dcommon.h>
-#include <assert.h>
-
-#pragma warning(push)
-#pragma warning(disable : 4005)
-#include <wincodec.h>
-#pragma warning(pop)
-
-#include <memory>
-
-#include "WICTextureLoader.h"
-
-#if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/) && !defined(DXGI_1_2_FORMATS)
-#define DXGI_1_2_FORMATS
-#endif
-
 //---------------------------------------------------------------------------------
 template<class T> class ScopedObject
 {
@@ -198,7 +222,6 @@ static WICConvert g_WICConvert[] =
 
     // We don't support n-channel formats
 };
-
 //--------------------------------------------------------------------------------------
 static IWICImagingFactory* _GetWIC()
 {
@@ -223,7 +246,6 @@ static IWICImagingFactory* _GetWIC()
 
     return s_Factory;
 }
-
 //---------------------------------------------------------------------------------
 static DXGI_FORMAT _WICToDXGI( const GUID& guid )
 {
@@ -235,7 +257,6 @@ static DXGI_FORMAT _WICToDXGI( const GUID& guid )
 
     return DXGI_FORMAT_UNKNOWN;
 }
-
 //---------------------------------------------------------------------------------
 static size_t _WICBitsPerPixel( REFGUID targetGuid )
 {
@@ -264,8 +285,7 @@ static size_t _WICBitsPerPixel( REFGUID targetGuid )
 
     return bpp;
 }
-
-//---------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 static HRESULT CreateTextureFromWIC( _In_ ID3D11Device* d3dDevice,
                                      _In_opt_ ID3D11DeviceContext* d3dContext,
                                      _In_ IWICBitmapFrameDecode *frame,
@@ -515,7 +535,6 @@ static HRESULT CreateTextureFromWIC( _In_ ID3D11Device* d3dDevice,
 
     return hr;
 }
-
 //--------------------------------------------------------------------------------------
 HRESULT CreateWICTextureFromMemory( _In_ ID3D11Device* d3dDevice,
                                     _In_opt_ ID3D11DeviceContext* d3dContext,
@@ -569,7 +588,6 @@ HRESULT CreateWICTextureFromMemory( _In_ ID3D11Device* d3dDevice,
     hr = CreateTextureFromWIC( d3dDevice, d3dContext, frame.Get(), texture, textureView, maxsize );
     return hr;
 }
-
 //--------------------------------------------------------------------------------------
 HRESULT CreateWICTextureFromFile( _In_ ID3D11Device* d3dDevice,
                                   _In_opt_ ID3D11DeviceContext* d3dContext,
@@ -601,3 +619,4 @@ HRESULT CreateWICTextureFromFile( _In_ ID3D11Device* d3dDevice,
     hr = CreateTextureFromWIC( d3dDevice, d3dContext, frame.Get(), texture, textureView, maxsize );
     return hr;
 }
+//--------------------------------------------------------------------------------------

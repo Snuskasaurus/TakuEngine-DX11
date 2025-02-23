@@ -52,13 +52,13 @@ __declspec(align(16)) struct SPixelShaderConstantBuffer
 class MGraphic
 {
 public:
-    static void InitializeGraphic();
+    static ID3D11Device* GetDXDevice();
+    static ID3D11DeviceContext* GetDXDeviceContext();
+public:
+    static void CreateDirectXWindow();
     static void SetupDraw();
     static void Draw();
     static void UninitializeGraphic();
-public:
-    static void FillGraphicResources_Instanced(CDrawable_InstancedMesh* _drawableInstancedMesh, const wchar_t* _textureFilename);
-
 public:
     static void CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState);
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);

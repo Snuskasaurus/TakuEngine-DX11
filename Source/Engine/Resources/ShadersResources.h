@@ -18,13 +18,10 @@ struct SVertexShader
     ID3D11InputLayout* Input = nullptr;
     ID3D11VertexShader* Shader = nullptr;
 
-    void Release()
+    ~SVertexShader()
     {
         Input->Release();
-        Input = nullptr;
-
         Shader->Release();
-        Shader = nullptr;
     }
 };
 
@@ -35,16 +32,11 @@ struct SPixelShader
     ID3D11Buffer* ConstantBuffer;
     ID3D11SamplerState* TextureSamplerState;
 
-    void Release()
+    ~SPixelShader()
     {
         Shader->Release();
-        Shader = nullptr;
-        
         ConstantBuffer->Release();
-        ConstantBuffer = nullptr;
-        
         TextureSamplerState->Release();
-        TextureSamplerState = nullptr;
     }
 };
 

@@ -1,7 +1,7 @@
 ﻿#include "TakumiScene.h"
 
 #include "../../Engine/Math.h"
-#include "../../Engine/AssetList.h"
+#include "../../Engine/Resources/AssetList.h"
 
 constexpr int NbInstancedMesh = 6000;
 
