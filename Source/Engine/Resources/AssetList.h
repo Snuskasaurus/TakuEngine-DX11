@@ -8,6 +8,18 @@ inline const char* G_ASSET_TEXT_DEBUG = "Debugs/TC_Debug";
 inline const char* G_ASSET_MESH_ARROW = "Debugs/Arrow";
 inline const char* G_ASSET_MESH_GIZMO = "Debugs/Gizmo";
 
+inline const char* G_DRAWABLE_MACHINE = "Machine";
+inline const char* G_DRAWABLE_MACHINE_BUTTONS = "Machine_Buttons";
+inline const char* G_DRAWABLE_MACHINE_PANELS = "Machine_Panels";
+inline const char* G_ASSET_MESH_MACHINE = "TestPBR/Machine/Machine";
+inline const char* G_ASSET_MESH_MACHINE_BUTTONS = "TestPBR/Machine/Machine_Buttons";
+inline const char* G_ASSET_MESH_MACHINE_PANELS = "TestPBR/Machine/Machine_Panels";
+inline const char* G_ASSET_TC_MACHINE_1 = "TestPBR/Machine/TC_Machine1";
+inline const char* G_ASSET_TC_MACHINE_2 = "TestPBR/Machine/TC_Machine2";
+inline const char* G_ASSET_TN_MACHINE_1 = "TestPBR/Machine/TN_Machine1";
+inline const char* G_ASSET_TN_MACHINE_2 = "TestPBR/Machine/TN_Machine2";
+
+
 #define TAKU_ASSET_MESH_SQUARE    "Square"
 #define TAKU_ASSET_MESH_CUBE      "Cube"
 #define TAKU_ASSET_MESH_SPHERE    "Sphere"

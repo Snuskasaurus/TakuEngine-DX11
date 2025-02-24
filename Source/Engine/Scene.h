@@ -10,6 +10,7 @@ enum EGameSceneType
     None,
     TakumiScene,
     GridScene,
+    TestPBRScene,
 };
 
 class CGameScene
@@ -31,8 +32,8 @@ protected:
     virtual void OnCreate() {}
     virtual void OnUpdate(const float& _dt) {}
     virtual void OnDestroy() {}
-    virtual void OnKeyPressed(EKeyCode _key) {}
-    
+    virtual void OnKeyPressed(EKeyCode _key);
+
 private:
     void Create();
     void Update(const float& _dt) { OnUpdate(_dt); }

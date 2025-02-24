@@ -60,7 +60,12 @@ void MAsset::LoadTextures()
 
 void MAsset::LoadDrawables()
 {
-    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, G_ASSET_TEXT_DEBUG, "", ""});
-    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, G_ASSET_TEXT_DEBUG, "", ""});
+    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_TEXT_DEBUG, "", ""});
+    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_TEXT_DEBUG, "", ""});
+
+    
+    MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE,         {G_ASSET_MESH_MACHINE, "", "", G_ASSET_TC_MACHINE_1, G_ASSET_TN_MACHINE_1, ""});
+    MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_PANELS,  {G_ASSET_MESH_MACHINE_PANELS, "", "", G_ASSET_TC_MACHINE_2, G_ASSET_TN_MACHINE_2, ""});
+    MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_BUTTONS, {G_ASSET_MESH_MACHINE_BUTTONS, "", "", G_ASSET_TC_MACHINE_2, G_ASSET_TN_MACHINE_2, ""});
 }
 

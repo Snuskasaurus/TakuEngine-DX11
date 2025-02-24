@@ -158,6 +158,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
+    <ClCompile Include="Source\Game\Scenes\TestPBRScene.cpp" />
     <FxCompile Include="Game\Data\Shaders\PixelShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -249,7 +251,6 @@
     <ClCompile Include="Source\Engine\Resources\TextureResources.cpp" />
     <ClCompile Include="Source\Engine\Sun.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
-    <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />
     <ClCompile Include="Source\Engine\CommonEngine.cpp" />
     <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
     <ClCompile Include="Source\Engine\FreeLookCamera.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="Source\Engine\World.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />
     <ClInclude Include="Source\Game\Scenes\TakumiScene.h" />
+    <ClInclude Include="Source\Game\Scenes\TestPBRScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

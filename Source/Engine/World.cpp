@@ -19,7 +19,7 @@ void MWorld::OnInit()
     FreeLookCamera.SetPosition(TVector3f(0.0f, -80.0f, 30.0f));
     FreeLookCamera.SetRotation(TRotator(0.0f, -0.5f, 0.0f));
     
-    CGameScene::ChangeGameScene(EGameSceneType::GridScene);
+    CGameScene::ChangeGameScene(EGameSceneType::TestPBRScene);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MWorld::OnUpdate(const float& _dt)

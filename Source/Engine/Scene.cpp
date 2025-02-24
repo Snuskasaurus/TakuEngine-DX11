@@ -6,10 +6,12 @@
 #include "Graphics/Drawable.h"
 #include "Resources/MeshResources.h"
 
-#include "../Game/Scenes/GridScene.h"
-#include "../Game/Scenes/TakumiScene.h"
 #include "Resources/DrawableResources.h"
 #include "Resources/GamePath.h"
+
+#include "../Game/Scenes/GridScene.h"
+#include "../Game/Scenes/TakumiScene.h"
+#include "../Game/Scenes/TestPBRScene.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
@@ -28,11 +30,29 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
         case None: break;
         case TakumiScene: NewWorldGameScene = new CTakumiScene; break;
         case GridScene: NewWorldGameScene = new CGridScene; break;
+        case TestPBRScene: NewWorldGameScene = new CTestPBRScene; break;
     }
     
     MWorld::GetWorld()->CurrentGameScene = NewWorldGameScene;
     NewWorldGameScene->Create();
 }
+
+void CGameScene::OnKeyPressed(EKeyCode _key)
+{
+    if (_key == EKeyCode::KEY_ESCAPE)
+    {
+        PostQuitMessage(1);
+    }
+    else if (_key == EKeyCode::KEY_KEYPAD_8)
+        SceneLight.AddPitch(10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_2)
+        SceneLight.AddPitch(-10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_4)
+        SceneLight.AddYaw(-10.0f);
+    else if (_key == EKeyCode::KEY_KEYPAD_6)
+        SceneLight.AddYaw(10.0f);
+}
+
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Create()
 {
@@ -80,8 +100,12 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDrawFromDrawableData(cons
     CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
     
     SDrawableData* DrawableData = MDrawableResources::GetDrawableData(_meshName);
+    
     InstancedMesh->MeshData = DrawableData->MeshData;
+    assert(InstancedMesh->MeshData != nullptr);
+    
     InstancedMesh->ColorTexture = DrawableData->ColorTextureData;
+    assert(InstancedMesh->ColorTexture != nullptr);
     
     MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, *InstancedMesh->MeshData);
     MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, *InstancedMesh->MeshData);
