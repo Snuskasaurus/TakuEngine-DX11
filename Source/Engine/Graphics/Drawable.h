@@ -27,4 +27,5 @@ private:
     ID3D11Buffer* VSConstantBuffer_InstancedObject = nullptr;
     SMeshData* MeshData = nullptr;
     STextureData* ColorTexture = nullptr;
+    STextureData* NormalTexture = nullptr;
 };

@@ -56,6 +56,7 @@ void MGraphic::Draw()
     MGraphic::SetPixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
 
     SetVSConstantBuffer_Frame(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Frame);
+
     
     const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
     for (int i = 0; i < instancedMeshes.size(); ++i)
@@ -63,7 +64,14 @@ void MGraphic::Draw()
         CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
         
         MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer);
-        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, &instancedMesh->ColorTexture->textureView);
+        
+        std::vector<ID3D11ShaderResourceView*> _textureViews;
+        _textureViews.push_back(instancedMesh->ColorTexture->textureView);
+        if (instancedMesh->NormalTexture != nullptr)
+        {
+            _textureViews.push_back(instancedMesh->NormalTexture->textureView);
+        }
+        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, _textureViews);
 
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
@@ -199,9 +207,9 @@ void MGraphic::SetVertexAndIndexBuffer(ID3D11DeviceContext* _deviceContext, ID3D
     _deviceContext->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R16_UINT, offset);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetPixelShader(ID3D11DeviceContext* _deviceContext, ID3D11ShaderResourceView** _textureView)
+void MGraphic::SetPixelShader(ID3D11DeviceContext* _deviceContext, const std::vector<ID3D11ShaderResourceView*>& _textureViews)
 {
-    _deviceContext->PSSetShaderResources(0u, 1u, _textureView);
+    _deviceContext->PSSetShaderResources(0u, (UINT)_textureViews.size(), _textureViews.data());
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext* _deviceContext, UINT _indexCountPerInstance, UINT _instanceCount)

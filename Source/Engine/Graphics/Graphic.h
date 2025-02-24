@@ -79,7 +79,7 @@ public:
     
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);
 public:
-    static void SetPixelShader(ID3D11DeviceContext*, ID3D11ShaderResourceView** _textureView);
+    static void SetPixelShader(ID3D11DeviceContext*, const std::vector<ID3D11ShaderResourceView*>& _textureViews);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShaderData&);
 public:
     static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
