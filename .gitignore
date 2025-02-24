@@ -25,7 +25,6 @@
 *.a
 
 # Executables
-*.exe
 *.out
 *.app
 *.pdb
@@ -35,3 +34,6 @@ Intermediates/
 .idea/
 .vs/
 __pycache__
+
+#specific files
+Game/*.exe
