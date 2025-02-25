@@ -219,6 +219,9 @@ bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
+    SceneLight.SetYaw(40.0f);
+    SceneLight.SetPitch(40.0f);
+    
     // Generate grid terrain
     {
         GridTerrains.reserve(G_NB_TILES);

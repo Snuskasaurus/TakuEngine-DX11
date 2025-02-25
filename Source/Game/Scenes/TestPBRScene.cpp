@@ -12,6 +12,9 @@ constexpr int NbInstancedMesh = 6000;
 //---------------------------------------------------------------------------------------------------------------------
 void CTestPBRScene::OnCreate()
 {
+    SceneLight.SetYaw(135.0f);
+    SceneLight.SetPitch(40.0f);
+    
     Mesh1 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MACHINE);
     Mesh1->Instances.push_back(TTransform::Identity);
     Mesh2 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MACHINE_BUTTONS);
@@ -22,9 +25,7 @@ void CTestPBRScene::OnCreate()
 //---------------------------------------------------------------------------------------------------------------------
 void CTestPBRScene::OnUpdate(const float& _dt)
 {
-    // Mesh1->Instances[0].Rotator.Yaw += 0.5f * _dt;
-    // Mesh2->Instances[0].Rotator.Yaw += 0.5f * _dt;
-    // Mesh3->Instances[0].Rotator.Yaw += 0.5f * _dt;
+    //SceneLight.AddYaw(15.0f * _dt);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CTestPBRScene::OnDestroy()

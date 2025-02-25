@@ -17,18 +17,16 @@
 
     return { lightDirection, DiffuseColor, Ambient };
 }
-
-void CSceneLight::AddYaw(float _yaw)
+void CSceneLight::SetYaw(float _yaw)
 {
-    CurrentYaw += _yaw;
+    CurrentYaw = _yaw;
     UpdateOnChanges();
 }
 
-void CSceneLight::AddPitch(float _pitch)
-{
-    CurrentPitch += _pitch;
-    CurrentPitch = MMath::Clamp(CurrentPitch, 10.0f, 170.0f);
-    UpdateOnChanges();
+void CSceneLight::SetPitch(float _pitch)
+ {
+     CurrentPitch = MMath::Clamp(CurrentPitch + _pitch, 10.0f, 170.0f);
+     UpdateOnChanges();
 }
 
 void CSceneLight::Initialize()

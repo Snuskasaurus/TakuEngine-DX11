@@ -57,7 +57,7 @@ class SimpleExportOperator(bpy.types.Operator):
                                 export_animation=False,
                                 start_frame=-2147483648,
                                 end_frame=2147483647,
-                                forward_axis='X',
+                                forward_axis='Y',
                                 up_axis='Z',
                                 global_scale=1.0,
                                 apply_modifiers=True,
