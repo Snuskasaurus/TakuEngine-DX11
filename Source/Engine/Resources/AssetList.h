@@ -19,6 +19,18 @@ inline const char* G_ASSET_TC_MACHINE_2 = "TestPBR/Machine/TC_Machine2";
 inline const char* G_ASSET_TN_MACHINE_1 = "TestPBR/Machine/TN_Machine1";
 inline const char* G_ASSET_TN_MACHINE_2 = "TestPBR/Machine/TN_Machine2";
 
+inline const char* G_DRAWABLE_MEDICAL_BED = "MedicalBed";
+inline const char* G_DRAWABLE_MEDICAL_BED_CABLES = "MedicalBed_Cables";
+inline const char* G_DRAWABLE_MEDICAL_BED_MACHINE = "MedicalBed_Machine";
+inline const char* G_DRAWABLE_MEDICAL_BED_DECALS = "MedicalBed_Decals";
+inline const char* G_DRAWABLE_MEDICAL_BED_SUPPORT = "MedicalBed_Support";
+inline const char* G_ASSET_MESH_MEDICAL_BED = "TestPBR/MedicalBed/MedicalBed";
+inline const char* G_ASSET_MESH_MEDICAL_BED_CABLES = "TestPBR/MedicalBed/MedicalBed_Cables";
+inline const char* G_ASSET_MESH_MEDICAL_BED_MACHINE = "TestPBR/MedicalBed/MedicalBed_Machine";
+inline const char* G_ASSET_MESH_MEDICAL_BED_DECALS = "TestPBR/MedicalBed/MedicalBed_Decals";
+inline const char* G_ASSET_MESH_MEDICAL_BED_SUPPORT = "TestPBR/MedicalBed/MedicalBed_Support";
+inline const char* G_ASSET_TC_MEDICAL_BED = "TestPBR/MedicalBed/TC_MedicalBed";
+inline const char* G_ASSET_TN_MEDICAL_BED = "TestPBR/MedicalBed/TN_MedicalBed";
 
 #define TAKU_ASSET_MESH_SQUARE    "Square"
 #define TAKU_ASSET_MESH_CUBE      "Cube"

@@ -63,9 +63,40 @@ void MAsset::LoadDrawables()
     MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_TEXT_DEBUG, "", ""});
     MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_TEXT_DEBUG, "", ""});
 
+    // Machine
+    {
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE,
+       {G_ASSET_MESH_MACHINE, "", "", G_ASSET_TC_MACHINE_1, G_ASSET_TN_MACHINE_1, ""});
+
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_PANELS,
+            {G_ASSET_MESH_MACHINE_PANELS, "", "", G_ASSET_TC_MACHINE_2, G_ASSET_TN_MACHINE_2, ""});
+
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_BUTTONS,
+            {G_ASSET_MESH_MACHINE_BUTTONS, "", "", G_ASSET_TC_MACHINE_2, G_ASSET_TN_MACHINE_2, ""});
+    }
+
+    // MedicalBed
+    {
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MEDICAL_BED,
+       {G_ASSET_MESH_MEDICAL_BED, "", "",
+           G_ASSET_TC_MEDICAL_BED, G_ASSET_TN_MEDICAL_BED, ""});
+        
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MEDICAL_BED_CABLES,
+       {G_ASSET_MESH_MEDICAL_BED_CABLES, "", "",
+           G_ASSET_TC_MEDICAL_BED, G_ASSET_TN_MEDICAL_BED, ""});
+        
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MEDICAL_BED_MACHINE,
+       {G_ASSET_MESH_MEDICAL_BED_MACHINE, "", "",
+           G_ASSET_TC_MEDICAL_BED, G_ASSET_TN_MEDICAL_BED, ""});
+        
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MEDICAL_BED_SUPPORT,
+       {G_ASSET_MESH_MEDICAL_BED_SUPPORT, "", "",
+           G_ASSET_TC_MEDICAL_BED, G_ASSET_TN_MEDICAL_BED, ""});
+        
+        MDrawableResources::CreateDrawableData(G_DRAWABLE_MEDICAL_BED_DECALS,
+       {G_ASSET_MESH_MEDICAL_BED_DECALS, "", "",
+           G_ASSET_TC_MEDICAL_BED, G_ASSET_TN_MEDICAL_BED, ""});
+    }
     
-    MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE,         {G_ASSET_MESH_MACHINE, "", "", G_ASSET_TC_MACHINE_1, G_ASSET_TN_MACHINE_1, ""});
-    MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_PANELS,  {G_ASSET_MESH_MACHINE_PANELS, "", "", G_ASSET_TC_MACHINE_2, G_ASSET_TN_MACHINE_2, ""});
-    MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_BUTTONS, {G_ASSET_MESH_MACHINE_BUTTONS, "", "", G_ASSET_TC_MACHINE_2, G_ASSET_TN_MACHINE_2, ""});
 }
 
