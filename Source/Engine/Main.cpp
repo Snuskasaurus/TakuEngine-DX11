@@ -15,7 +15,6 @@ void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 {
 	MGameWindow::InitializeGameWindow(hInstance);
 	
-	MMeshResources::InitializeMeshResources();
 	MAsset::LoadMeshes();
 	MAsset::LoadShaders();
 	MAsset::LoadTextures();
@@ -45,7 +44,6 @@ void Draw()
 void Uninitialization()
 {
 	MGameWindow::UninitializeGameWindow();
-	MMeshResources::UninitializeMeshResources();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 }

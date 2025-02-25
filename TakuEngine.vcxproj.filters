@@ -36,17 +36,11 @@
     <ClCompile Include="Source\Engine\TimeManager.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\WICTextureLoader.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\World.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Debug\Profiling.cpp">
       <Filter>Source\Engine\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\AssetList.cpp">
-      <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Math.cpp">
       <Filter>Source\Engine</Filter>
@@ -58,6 +52,12 @@
     <ClCompile Include="Source\Engine\Resources\MeshResources.cpp" />
     <ClCompile Include="Source\Engine\Resources\ShadersResources.cpp" />
     <ClCompile Include="Source\Engine\Scene.cpp" />
+    <ClCompile Include="Source\Game\Scenes\TestPBRScene.cpp" />
+    <ClCompile Include="Source\Engine\Resources\AssetList.cpp" />
+    <ClCompile Include="Source\Engine\Resources\DrawableResources.cpp" />
+    <ClCompile Include="Source\Engine\Resources\TextureResources.cpp" />
+    <ClCompile Include="Source\Engine\Sun.cpp" />
+    <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\CommonEngine.h">
@@ -84,17 +84,11 @@
     <ClInclude Include="Source\Engine\TimeManager.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\WICTextureLoader.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\World.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Debug\Profiling.h">
       <Filter>Source\Engine\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Engine\AssetList.h">
-      <Filter>Source\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Graphics\Drawable.h" />
     <ClInclude Include="Source\Engine\Graphics\Graphic.h" />
@@ -105,6 +99,11 @@
     <ClInclude Include="Source\Engine\Scene.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />
     <ClInclude Include="Source\Game\Scenes\TakumiScene.h" />
+    <ClInclude Include="Source\Engine\Resources\AssetList.h" />
+    <ClInclude Include="Source\Engine\Resources\DrawableResources.h" />
+    <ClInclude Include="Source\Engine\Resources\TextureResources.h" />
+    <ClInclude Include="Source\Engine\Sun.h" />
+    <ClInclude Include="Source\Game\Scenes\TestPBRScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Game\Data\Shaders\VertexShader.hlsl">

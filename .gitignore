@@ -13,7 +13,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -27,13 +26,9 @@
 # Executables
 *.out
 *.app
-*.pdb
 
 #Folders
 Intermediates/
 .idea/
 .vs/
 __pycache__
-
-#specific files
-Game/*.exe

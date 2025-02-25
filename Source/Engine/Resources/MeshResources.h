@@ -26,18 +26,14 @@ struct SMeshData
     std::vector<TVertexIndex> IndexBuffer;
 
     UINT IndexCount;
+
+    std::string DebugName;
 };
 
 class MMeshResources
 {
 public:
-    static void InitializeMeshResources();
-    static void UninitializeMeshResources();
-public:
     static SMeshData* CreateMeshDataFromFileName(const char*);
     static SMeshData* GetMeshDataFromFileName(const char*);
     static SMeshData* GetOrCreateMeshDataFromFileName(const char* _filename);
-
-private:
-    static bool TryToImportOBJ(const char*, SMeshData*);
 };
