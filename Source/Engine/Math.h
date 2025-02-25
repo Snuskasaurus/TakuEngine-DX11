@@ -242,7 +242,7 @@ struct alignas(16) TMatrix4f
 #pragma endregion // operator_region
     
     static const TMatrix4f Identity;
-    static const TMatrix4f View;
+    static const TMatrix4f World;
     
     static TMatrix4f MatrixTranslation(const TVector3f& _translation);
     static TMatrix4f MatrixRotationPitch(const float _pitch);

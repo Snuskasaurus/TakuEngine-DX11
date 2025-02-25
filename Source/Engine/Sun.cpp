@@ -25,7 +25,7 @@ void CSceneLight::SetYaw(float _yaw)
 
 void CSceneLight::SetPitch(float _pitch)
  {
-     CurrentPitch = MMath::Clamp(CurrentPitch + _pitch, 10.0f, 170.0f);
+     CurrentPitch = MMath::Clamp(_pitch, 10.0f, 170.0f);
      UpdateOnChanges();
 }
 

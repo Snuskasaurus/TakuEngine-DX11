@@ -87,10 +87,12 @@ SMeshData* TryToImportMesh(const std::string& _filename)
     meshData->VertexBuffer.resize(nbVertices);
     for (unsigned int i = 0; i < nbVertices; ++i)
     {
-        meshData->VertexBuffer[i].vp = ConvertAssimpVec3(assimpMesh->mVertices[i]);
-        meshData->VertexBuffer[i].vn = ConvertAssimpVec3(assimpMesh->mNormals[i]);
+        meshData->VertexBuffer[i].position = ConvertAssimpVec3(assimpMesh->mVertices[i]);
+        meshData->VertexBuffer[i].normal = ConvertAssimpVec3(assimpMesh->mNormals[i]);
+        meshData->VertexBuffer[i].tangent = ConvertAssimpVec3(assimpMesh->mTangents[i]);
+        
         assert(assimpMesh->mTextureCoords[0] != nullptr);
-        meshData->VertexBuffer[i].vt = ConvertAssimpVec2(assimpMesh->mTextureCoords[0][i]); // TODO Julien Rogel (25/02/2025): DANGEROUS !!!
+        meshData->VertexBuffer[i].uv = ConvertAssimpVec2(assimpMesh->mTextureCoords[0][i]); // TODO Julien Rogel (25/02/2025): DANGEROUS !!!
     }
 
     unsigned int nbIndex = assimpMesh->mNumFaces * 3;

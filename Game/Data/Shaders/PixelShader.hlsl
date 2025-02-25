@@ -2,6 +2,7 @@ struct PS_Input
 {
     float4 position : SV_POSITION;
     float3 normal : NORMAL;
+    float3 tan : TANGENT;
     float2 uv : TEXCOORD;
 };
 
@@ -19,23 +20,30 @@ cbuffer c_buffer : register(b0)
 
 float4 Main(PS_Input input) : SV_Target
 {
-    input.normal = normalize(input.normal);
-
     // Textures
-    float sampleSpec = 0.35f; // TODO: read from a texture
-    float3 sampleColor = texColor.Sample(samplerState, input.uv).rgb; 
-    float3 sampleNormal = texNormal.Sample(samplerState, input.uv).rgb;
-    
+    const float sampleSpec = 1.0f; // TODO: read from a texture
+    const float3 sampleColor = texColor.Sample(samplerState, input.uv).rgb; 
+
+    // Normal
+    const float3 sampleNormal = texNormal.Sample(samplerState, input.uv).rgb;
+    const float3 tangent = normalize(input.tan - dot(input.tan, input.normal) * input.normal);
+    const float3 biTangent = cross(input.normal, tangent);
+    const float3x3 normalTexSpace = float3x3(
+        normalize(tangent),
+        normalize(biTangent),
+        normalize(input.normal)
+    );
+    const float3 normal = normalize(mul((2.0f * sampleNormal) - 1.0f, normalTexSpace).rgb);
     
     // Ambient
     float3 ambient = sunDiffuse.rgb * sunAmbient * sampleColor;
 
     // Diffuse
-    float3 diffuse = max(dot(sunDir.rgb, input.normal), 0.0) * sampleColor;
+    float3 diffuse = max(dot(sunDir.rgb, normal), 0.0) * sampleColor;
 
     // Specular
     float3 halfwayDir = normalize(sunDir.rgb + camDir.rgb);
-    float3 specular = sunDiffuse * 0.3 * sampleSpec * pow(max(dot(input.normal, halfwayDir), 0.0), 32.0);
+    float3 specular = sunDiffuse * 0.3 * sampleSpec * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
 
     // Output
     float3 finalColor = ambient + diffuse + specular;

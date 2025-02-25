@@ -122,7 +122,7 @@ const TMatrix4f TMatrix4f::Identity =
     { 0.0f, 0.0f, 1.0f, 0.0f },
     { 0.0f, 0.0f, 0.0f, 1.0f },
 };
-const TMatrix4f TMatrix4f::View =
+const TMatrix4f TMatrix4f::World =
 {
     { 1.0f, 0.0f, 0.0f, 0.0f },
     { 0.0f, 0.0f, -1.0f, 0.0f },

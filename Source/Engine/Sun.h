@@ -28,5 +28,5 @@ private:
     float CurrentPitch = 0.0f;
     class CDrawable_InstancedMesh* DebugArrowMesh = nullptr;
     TColorf DiffuseColor = { 1.0f, 0.992156f, 0.815686f, 1.0f };
-    float Ambient = 0.26f;
+    float Ambient = 0.05f;
 };

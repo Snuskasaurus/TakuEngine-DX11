@@ -9,9 +9,10 @@ using TVertexIndex = unsigned short;
 
 struct SVertex
 {
-    TVector3f vp;
-    TVector3f vn;
-    TVector2f vt;
+    TVector3f position;
+    TVector3f normal;
+    TVector3f tangent;
+    TVector2f uv;
 };
 
 struct SMeshData
