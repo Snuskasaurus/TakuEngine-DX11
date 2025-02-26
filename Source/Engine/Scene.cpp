@@ -118,6 +118,13 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshNam
     InstancedMesh->ColorTexture = MTextureResources::GetTextureDataFromFileName(_meshName);
     assert(InstancedMesh->ColorTexture != nullptr);
     
+    InstancedMesh->NormalTexture = MTextureResources::GetOrCreateTextureDataFromFileName(G_ASSET_T_NONE_NORMAL);
+    assert(InstancedMesh->NormalTexture != nullptr);
+    InstancedMesh->EmissionTexture = MTextureResources::GetOrCreateTextureDataFromFileName(G_ASSET_T_NONE_DARK);
+    assert(InstancedMesh->EmissionTexture != nullptr);
+    InstancedMesh->MROTexture = MTextureResources::GetOrCreateTextureDataFromFileName(G_ASSET_T_NONE_WHITE);
+    assert(InstancedMesh->MROTexture != nullptr);
+    
     MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, *InstancedMesh->MeshData);
     MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, *InstancedMesh->MeshData);
     MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));  

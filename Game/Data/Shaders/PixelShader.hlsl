@@ -26,11 +26,13 @@ float4 Main(PS_Input input) : SV_Target
     const float3 sampleColor = tex_color.Sample(samplerState, input.uv).rgb; 
     const float3 sampleEmission = tex_emission.Sample(samplerState, input.uv).rgb; 
     const float3 sampleMRO = tex_mro.Sample(samplerState, input.uv).rgb; 
+    const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
+    
+    // values from textures samples
     const float AOFromSample = sampleMRO.b;
     const float SpecFromSample = 1.0f - sampleMRO.g;
     
     // Normal
-    const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
     const float3 tangent = normalize(input.tan - dot(input.tan, input.normal) * input.normal);
     const float3 biTangent = cross(input.normal, tangent);
     const float3x3 normalTexSpace = float3x3(
