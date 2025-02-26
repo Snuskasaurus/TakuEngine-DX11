@@ -69,7 +69,9 @@ void MGraphic::Draw()
         _textureViews.push_back(instancedMesh->ColorTexture->textureView);
         if (instancedMesh->NormalTexture != nullptr)
         {
-            _textureViews.push_back(instancedMesh->NormalTexture->textureView);
+            _textureViews.push_back(instancedMesh->NormalTexture == nullptr ? nullptr : instancedMesh->NormalTexture->textureView);
+            _textureViews.push_back(!instancedMesh->EmissionTexture ? nullptr : instancedMesh->EmissionTexture->textureView);
+            _textureViews.push_back(!instancedMesh->MROTexture ? nullptr : instancedMesh->MROTexture->textureView);
         }
         MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, _textureViews);
 

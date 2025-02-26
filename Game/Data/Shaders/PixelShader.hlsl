@@ -6,8 +6,10 @@ struct PS_Input
     float2 uv : TEXCOORD;
 };
 
-Texture2D texColor : register(t0);
-Texture2D texNormal : register(t1);
+Texture2D tex_color : register(t0);
+Texture2D tex_normal : register(t1);
+Texture2D tex_emission : register(t2);
+Texture2D tex_mro : register(t3);
 SamplerState samplerState;
 
 cbuffer c_buffer : register(b0)
@@ -22,10 +24,13 @@ float4 Main(PS_Input input) : SV_Target
 {
     // Textures
     const float sampleSpec = 1.0f; // TODO: read from a texture
-    const float3 sampleColor = texColor.Sample(samplerState, input.uv).rgb; 
-
+    const float3 sampleColor = tex_color.Sample(samplerState, input.uv).rgb; 
+    const float3 sampleEmission = tex_emission.Sample(samplerState, input.uv).rgb; 
+    const float3 sampleMRO = tex_mro.Sample(samplerState, input.uv).rgb; 
+    const float AmbientOcclusion = sampleMRO.b;
+    
     // Normal
-    const float3 sampleNormal = texNormal.Sample(samplerState, input.uv).rgb;
+    const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
     const float3 tangent = normalize(input.tan - dot(input.tan, input.normal) * input.normal);
     const float3 biTangent = cross(input.normal, tangent);
     const float3x3 normalTexSpace = float3x3(
@@ -46,6 +51,6 @@ float4 Main(PS_Input input) : SV_Target
     float3 specular = sunDiffuse * 0.3 * sampleSpec * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
 
     // Output
-    float3 finalColor = ambient + diffuse + specular;
+    float3 finalColor = sampleEmission + (ambient + diffuse + specular) * AmbientOcclusion;
     return float4(finalColor, 1.0f);
 }

@@ -20,27 +20,17 @@
 void CSceneLight::SetYaw(float _yaw)
 {
     CurrentYaw = _yaw;
-    UpdateOnChanges();
 }
 
 void CSceneLight::SetPitch(float _pitch)
  {
      CurrentPitch = MMath::Clamp(_pitch, 10.0f, 170.0f);
-     UpdateOnChanges();
 }
 
 void CSceneLight::Initialize()
 {
-    DebugArrowMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData(G_ASSET_ARROW);
-    DebugArrowMesh->Instances.push_back(TTransform({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}));
-    UpdateOnChanges();
 }
 
 void CSceneLight::Uninitialize()
 {
-}
-
-void CSceneLight::UpdateOnChanges()
-{
-    DebugArrowMesh->Instances[0] = {{0.0f, 0.0f, 0.0f}, { MMath::Deg2Rad(CurrentYaw), MMath::Deg2Rad(CurrentPitch), 0.0f }};
 }

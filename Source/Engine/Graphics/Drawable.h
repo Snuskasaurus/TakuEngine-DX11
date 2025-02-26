@@ -28,4 +28,6 @@ private:
     SMeshData* MeshData = nullptr;
     STextureData* ColorTexture = nullptr;
     STextureData* NormalTexture = nullptr;
+    STextureData* EmissionTexture = nullptr;
+    STextureData* MROTexture = nullptr;
 };

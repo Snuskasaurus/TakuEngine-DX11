@@ -9,15 +9,17 @@ struct SDrawableData_CreateInput
     std::string Filename_PixelShader;
     std::string Filename_ColorTexture;
     std::string Filename_NormalTexture;
-    std::string Filename_PBRTexture;
+    std::string Filename_EmissionTexture;
+    std::string Filename_MROTexture;
 };
 
 struct SDrawableData
 {
     struct SMeshData* MeshData = nullptr;
     struct STextureData* ColorTextureData = nullptr;
-    struct STextureData* PBRTextureData = nullptr;
     struct STextureData* NormalTextureData = nullptr;
+    struct STextureData* EmissionTextureData = nullptr;
+    struct STextureData* MROTextureData = nullptr;
     struct SVertexShaderData* VertexShaderData = nullptr;
     struct SPixelShaderData* PixelShaderData = nullptr;
 };

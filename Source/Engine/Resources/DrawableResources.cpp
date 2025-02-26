@@ -14,7 +14,8 @@ SDrawableData* MDrawableResources::CreateDrawableData(const char* _name, const S
     if (!_input.Filename_Mesh.empty()) newDrawableData->MeshData = MMeshResources::GetOrCreateMeshDataFromFileName(_input.Filename_Mesh.c_str());
     if (!_input.Filename_ColorTexture.empty()) newDrawableData->ColorTextureData = MTextureResources::GetOrCreateTextureDataFromFileName(_input.Filename_ColorTexture.c_str());
     if (!_input.Filename_NormalTexture.empty()) newDrawableData->NormalTextureData = MTextureResources::GetOrCreateTextureDataFromFileName(_input.Filename_NormalTexture.c_str());
-    if (!_input.Filename_PBRTexture.empty()) newDrawableData->PBRTextureData = MTextureResources::GetOrCreateTextureDataFromFileName(_input.Filename_PBRTexture.c_str());
+    if (!_input.Filename_MROTexture.empty()) newDrawableData->MROTextureData = MTextureResources::GetOrCreateTextureDataFromFileName(_input.Filename_MROTexture.c_str());
+    if (!_input.Filename_EmissionTexture.empty()) newDrawableData->EmissionTextureData = MTextureResources::GetOrCreateTextureDataFromFileName(_input.Filename_EmissionTexture.c_str());
     if (!_input.Filename_VertexShader.empty()) {} // TODO
     if (!_input.Filename_PixelShader.empty()) {} // TODO;
     

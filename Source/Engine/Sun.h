@@ -22,11 +22,10 @@ public:
 private:
     void Initialize();
     void Uninitialize();
-    void UpdateOnChanges();
 private:
     float CurrentYaw = 0.0f;
     float CurrentPitch = 0.0f;
     class CDrawable_InstancedMesh* DebugArrowMesh = nullptr;
-    TColorf DiffuseColor = { 1.0f, 0.992156f, 0.815686f, 1.0f };
-    float Ambient = 0.05f;
+    TColorf DiffuseColor = { 0.99215686274f, 0.98431372549f, 0.82745098039f, 1.0f };
+    float Ambient = 0.15f;
 };
