@@ -5,9 +5,9 @@
 struct SLightInfo
 {
     TVector3f Direction = TVector3f::Zero;
-    TColorf Diffuse = TColorf::White;
-    float Ambient = 0.0f;
-    float Intensity = 0.0f;
+    TColorf Color = TColorf::White;
+    float AmbientIntensity = 0.0f;
+    float ColorIntensity = 0.0f;
 };
 
 class CSceneLight

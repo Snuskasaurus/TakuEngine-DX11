@@ -301,9 +301,9 @@ void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceC
     {
         ConstantBufferPixelShader.camDir = MWorld::GetWorld()->FreeLookCamera.GetCameraWorldViewDir();
         ConstantBufferPixelShader.lightDir = lightInfo.Direction;
-        ConstantBufferPixelShader.lightDiffuse = { lightInfo.Diffuse.r, lightInfo.Diffuse.g, lightInfo.Diffuse.b };
-        ConstantBufferPixelShader.lightIntensity = lightInfo.Intensity;
-        ConstantBufferPixelShader.lightAmbient = lightInfo.Ambient;
+        ConstantBufferPixelShader.lightColor = { lightInfo.Color.r, lightInfo.Color.g, lightInfo.Color.b };
+        ConstantBufferPixelShader.lightColorIntensity = lightInfo.ColorIntensity;
+        ConstantBufferPixelShader.lightAmbientIntensity = lightInfo.AmbientIntensity;
     }
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     CHECK_HRESULT(_deviceContext->Map(_pixelShader.ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));

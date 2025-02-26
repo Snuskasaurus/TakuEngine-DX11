@@ -14,12 +14,38 @@ SamplerState samplerState;
 
 cbuffer c_buffer : register(b0)
 {
-    float4 camDir;
-    float4 lightDir;
-    float4 lightDiffuse;
-    float lightAmbient;
-    float lightIntensity;
+    float4 b_camDir;
+    float4 b_lightDir;
+    float4 b_lightColor;
+    float b_lightAmbientIntensity;
+    float b_lightColorIntensity;
 };
+
+float3 ComputePhongLighting(float3 _objectColor, float _spec, float3 _normalmap, float3 _normal, float3 _tangent, float _occlusion)
+{
+    // Normal
+    const float3 tangent = normalize(_tangent - dot(_tangent, _normal) * _normal);
+    const float3 biTangent = cross(_normal, tangent);
+    const float3x3 normalTexSpace = float3x3(
+        normalize(tangent),
+        normalize(biTangent),
+        normalize(_normal)
+    );
+    const float3 normal = normalize(mul((2.0f * _normalmap) - 1.0f, normalTexSpace).rgb);
+    
+    // Ambient
+    float3 ambient = b_lightColor.rgb * b_lightAmbientIntensity * _objectColor * _occlusion;
+
+    // Diffuse
+    float3 diffuse = max(dot(b_lightDir.rgb, normal), 0.0) * _objectColor;
+
+    // Specular
+    float3 halfwayDir = normalize(b_lightDir.rgb + b_camDir.rgb);
+    float3 specular = b_lightColor * b_lightColorIntensity * _spec * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
+
+    // Output
+    return ambient + diffuse + specular;
+}
 
 float4 Main(PS_Input input) : SV_Target
 {
@@ -29,31 +55,11 @@ float4 Main(PS_Input input) : SV_Target
     const float3 sampleMRO = tex_mro.Sample(samplerState, input.uv).rgb; 
     const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
     
-    // values from textures samples
-    const float AOFromSample = sampleMRO.b;
-    const float SpecFromSample = 1.0f - sampleMRO.g;
+    const float specFromSample = 1.0f - sampleMRO.g;
+    const float occlusionFromSample = sampleMRO.b;
     
-    // Normal
-    const float3 tangent = normalize(input.tan - dot(input.tan, input.normal) * input.normal);
-    const float3 biTangent = cross(input.normal, tangent);
-    const float3x3 normalTexSpace = float3x3(
-        normalize(tangent),
-        normalize(biTangent),
-        normalize(input.normal)
-    );
-    const float3 normal = normalize(mul((2.0f * sampleNormal) - 1.0f, normalTexSpace).rgb);
-    
-    // Ambient
-    float3 ambient = lightDiffuse.rgb * lightAmbient * sampleColor;
-
-    // Diffuse
-    float3 diffuse = max(dot(lightDir.rgb, normal), 0.0) * sampleColor;
-
-    // Specular
-    float3 halfwayDir = normalize(lightDir.rgb + camDir.rgb);
-    float3 specular = lightDiffuse * lightIntensity * SpecFromSample * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
-
     // Output
-    float3 finalColor = sampleEmission + (ambient + diffuse + specular) * AOFromSample;
+    const float3 lightingColor = ComputePhongLighting(sampleColor, specFromSample, sampleNormal, input.normal, input.tan, occlusionFromSample);
+    float3 finalColor = sampleEmission + lightingColor;
     return float4(finalColor, 1.0f);
 }

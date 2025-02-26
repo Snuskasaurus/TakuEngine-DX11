@@ -16,10 +16,10 @@
 
      SLightInfo lightInfo;
      {
-        lightInfo.Ambient = Ambient;
-        lightInfo.Intensity = Intensity;
+        lightInfo.AmbientIntensity = Ambient;
+        lightInfo.ColorIntensity = Intensity;
         lightInfo.Direction = lightDirection;
-        lightInfo.Diffuse = DiffuseColor;
+        lightInfo.Color = DiffuseColor;
      }
      return lightInfo;
 }

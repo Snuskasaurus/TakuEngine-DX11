@@ -45,9 +45,9 @@ __declspec(align(16)) struct SPixelShaderConstantBuffer
 {
     TVector3f camDir;
     TVector3f lightDir;
-    TVector3f lightDiffuse;
-    float lightAmbient;
-    float lightIntensity;
+    TVector3f lightColor;
+    float lightAmbientIntensity;
+    float lightColorIntensity;
 };
 
 class MGraphic
