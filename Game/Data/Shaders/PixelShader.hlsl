@@ -15,9 +15,10 @@ SamplerState samplerState;
 cbuffer c_buffer : register(b0)
 {
     float4 camDir;
-    float4 sunDir;
-    float4 sunDiffuse;
-    float sunAmbient;
+    float4 lightDir;
+    float4 lightDiffuse;
+    float lightAmbient;
+    float lightIntensity;
 };
 
 float4 Main(PS_Input input) : SV_Target
@@ -43,14 +44,14 @@ float4 Main(PS_Input input) : SV_Target
     const float3 normal = normalize(mul((2.0f * sampleNormal) - 1.0f, normalTexSpace).rgb);
     
     // Ambient
-    float3 ambient = sunDiffuse.rgb * sunAmbient * sampleColor;
+    float3 ambient = lightDiffuse.rgb * lightAmbient * sampleColor;
 
     // Diffuse
-    float3 diffuse = max(dot(sunDir.rgb, normal), 0.0) * sampleColor;
+    float3 diffuse = max(dot(lightDir.rgb, normal), 0.0) * sampleColor;
 
     // Specular
-    float3 halfwayDir = normalize(sunDir.rgb + camDir.rgb);
-    float3 specular = sunDiffuse * 0.3 * SpecFromSample * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
+    float3 halfwayDir = normalize(lightDir.rgb + camDir.rgb);
+    float3 specular = lightDiffuse * lightIntensity * SpecFromSample * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
 
     // Output
     float3 finalColor = sampleEmission + (ambient + diffuse + specular) * AOFromSample;

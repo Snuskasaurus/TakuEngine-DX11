@@ -7,6 +7,7 @@ struct SLightInfo
     TVector3f Direction = TVector3f::Zero;
     TColorf Diffuse = TColorf::White;
     float Ambient = 0.0f;
+    float Intensity = 0.0f;
 };
 
 class CSceneLight
@@ -28,4 +29,5 @@ private:
     class CDrawable_InstancedMesh* DebugArrowMesh = nullptr;
     TColorf DiffuseColor = { 0.99215686274f, 0.98431372549f, 0.82745098039f, 1.0f };
     float Ambient = 0.15f;
+    float Intensity = 0.5f;
 };
