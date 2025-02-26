@@ -27,32 +27,27 @@ void CTestPBRScene::OnCreate()
     MachineMesh2->Instances.push_back(TTransform::Identity);
     MachineMesh3 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MACHINE_PANELS);
     MachineMesh3->Instances.push_back(TTransform::Identity);
-    
-    // MedicalBedMesh1 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MEDICAL_BED);
-    // MedicalBedMesh1->Instances.push_back(TTransform(TVector3f::Right * 60.0f, TRotator(-5.0f, 0.0f, 0.0f)));
-    // MedicalBedMesh2 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MEDICAL_BED_CABLES);
-    // MedicalBedMesh2->Instances.push_back(TTransform(TVector3f::Right * 60.0f, TRotator(-5.0f, 0.0f, 0.0f)));
-    // MedicalBedMesh3 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MEDICAL_BED_DECALS);
-    // MedicalBedMesh3->Instances.push_back(TTransform(TVector3f::Right * 60.0f, TRotator(-5.0f, 0.0f, 0.0f)));
-    // MedicalBedMesh4 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MEDICAL_BED_SUPPORT);
-    // MedicalBedMesh4->Instances.push_back(TTransform(TVector3f::Right * 60.0f, TRotator(-5.0f, 0.0f, 0.0f)));
-    // MedicalBedMesh5 = CGameScene::AddInstancedMeshToDrawFromDrawableData(G_DRAWABLE_MEDICAL_BED_MACHINE);
-    // MedicalBedMesh5->Instances.push_back(TTransform(TVector3f::Right * 60.0f, TRotator(-5.0f, 0.0f, 0.0f)));
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CTestPBRScene::OnUpdate(const float& _dt)
 {
-    SceneLight.AddYaw(30.0f * _dt);
+    if (pauseLight == false)
+    {
+        SceneLight.AddYaw(30.0f * _dt);
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CTestPBRScene::OnDestroy()
 {
     
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 void CTestPBRScene::OnKeyPressed(EKeyCode _key)
 {
-    
+    if (_key == EKeyCode::KEY_P)
+    {
+        pauseLight = !pauseLight;
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -23,11 +23,11 @@ cbuffer c_buffer : register(b0)
 float4 Main(PS_Input input) : SV_Target
 {
     // Textures
-    const float sampleSpec = 1.0f; // TODO: read from a texture
     const float3 sampleColor = tex_color.Sample(samplerState, input.uv).rgb; 
     const float3 sampleEmission = tex_emission.Sample(samplerState, input.uv).rgb; 
     const float3 sampleMRO = tex_mro.Sample(samplerState, input.uv).rgb; 
-    const float AmbientOcclusion = sampleMRO.b;
+    const float AOFromSample = sampleMRO.b;
+    const float SpecFromSample = 1.0f - sampleMRO.g;
     
     // Normal
     const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
@@ -48,9 +48,9 @@ float4 Main(PS_Input input) : SV_Target
 
     // Specular
     float3 halfwayDir = normalize(sunDir.rgb + camDir.rgb);
-    float3 specular = sunDiffuse * 0.3 * sampleSpec * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
+    float3 specular = sunDiffuse * 0.3 * SpecFromSample * pow(max(dot(normal, halfwayDir), 0.0), 66.0);
 
     // Output
-    float3 finalColor = sampleEmission + (ambient + diffuse + specular) * AmbientOcclusion;
+    float3 finalColor = sampleEmission + (ambient + diffuse + specular) * AOFromSample;
     return float4(finalColor, 1.0f);
 }
