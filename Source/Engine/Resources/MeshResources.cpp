@@ -37,13 +37,6 @@ SMeshData* MMeshResources::CreateMeshDataFromFileName(const char* _filename)
         return nullptr;
     }
     
-    // const bool successImporting = MMeshResources::TryToImportOBJ(OBJFilenameStream.str().c_str(), NewMeshData);
-    // if (successImporting == false)
-    // {
-    //     delete NewMeshData;
-    //     return nullptr;
-    // }
-    
     G_MESH_DATA_MAP.insert({ fileNameAsString, NewMeshData });
     return NewMeshData;
 }
