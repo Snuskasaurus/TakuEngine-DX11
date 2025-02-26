@@ -60,8 +60,8 @@ void MAsset::LoadTextures()
 
 void MAsset::LoadDrawables()
 {
-    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, "", G_ASSET_T_DEBUG, ""});
-    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, "", G_ASSET_T_DEBUG, ""});
+    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE, G_ASSET_T_DEBUG, G_ASSET_T_NONE});
+    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE, G_ASSET_T_DEBUG, G_ASSET_T_NONE});
 
     // Machine
     {

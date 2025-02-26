@@ -2,6 +2,8 @@
 
 #include "../IncludesExternal.h"
 
+inline const char* G_ASSET_T_NONE = "T_None";
+
 inline const char* G_ASSET_ARROW = "Arrow";
 inline const char* G_ASSET_GIZMO = "Gizmo";
 inline const char* G_ASSET_T_DEBUG = "Debugs/T_Debug";
