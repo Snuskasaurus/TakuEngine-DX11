@@ -41,7 +41,7 @@ struct SVSConstantBuffer_Frame
     TMatrix4f CameraViewProjection;
 };
 
-__declspec(align(16)) struct SPixelShaderConstantBuffer
+struct alignas(16) SPixelShaderConstantBuffer
 {
     TVector3f camDir;
     TVector3f lightDir;

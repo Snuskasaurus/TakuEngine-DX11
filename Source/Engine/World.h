@@ -5,7 +5,7 @@
 #include "Inputmanager.h"
 #include "Scene.h"
 
-__declspec(align(16)) struct SWorldLight
+struct alignas(16) SWorldLight
 {
     TVector3f Direction = { 0.37f, 0.93f, 0.0 };
     float Ambient = 0.0f;
