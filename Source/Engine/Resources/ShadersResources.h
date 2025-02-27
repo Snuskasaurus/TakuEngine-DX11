@@ -35,8 +35,8 @@ struct SPixelShaderData
     ~SPixelShaderData()
     {
         Shader->Release();
-        ConstantBuffer->Release();
-        TextureSamplerState->Release();
+        if (ConstantBuffer != nullptr) ConstantBuffer->Release();
+        if (TextureSamplerState != nullptr) TextureSamplerState->Release();
     }
 };
 
@@ -45,6 +45,7 @@ class MShaderResources
 public:
     static ID3DBlob* CreateBlobFromFileName(const char*, EShaderType);
     static ID3DBlob* GetBlobFromFileName(const char*);
+    static ID3DBlob* GetOrCreateBlobFromFileName(const char* _filename, EShaderType _shaderType);
 public:
     static void DeleteAllBlobs();
 private:

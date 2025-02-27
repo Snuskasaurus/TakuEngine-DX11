@@ -69,18 +69,18 @@ public:
     static void CreateRenderTargetView(ID3D11Device*, IDXGISwapChain*, ID3D11Resource**, ID3D11RenderTargetView**);
     static void SetDepthStencilViewToRenderTargetView(ID3D11DeviceContext*, ID3D11RenderTargetView**, ID3D11DepthStencilView*);
     static void CreateAndSetVertexShader(ID3D11Device*, ID3D11DeviceContext*, SVertexShaderData&);
-    static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShaderData&);
+    static void CreateAndSetPixelShader(ID3D11Device*, ID3D11DeviceContext*, SPixelShaderData&, const char* name);
     static void CreatePixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, SPixelShaderData&);
-    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, const SMeshData&);
-    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, const SMeshData&);
+    static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, void* _vertices, UINT _nbVertices, UINT _sizeStruct);
+    static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, TVertexIndex* _indexes, UINT _nbIndex, UINT _sizeStruct);
     static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer, UINT _size);
 public:
     static void SetVSConstantBuffer_Frame(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer);
     static void SetVSConstantBuffer_Instanced(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances);
     
-    static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer);
+    static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer, UINT VertexBufferByteStride);
 public:
-    static void SetPixelShader(ID3D11DeviceContext*, const std::vector<ID3D11ShaderResourceView*>& _textureViews);
+    static void SetPixelShaderTextureViews(ID3D11DeviceContext*, const std::vector<ID3D11ShaderResourceView*>& _textureViews);
     static void SetPixelShaderConstantBuffer(ID3D11Device*, ID3D11DeviceContext*, const SPixelShaderData&);
 public:
     static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
@@ -89,4 +89,6 @@ public:
     static void PresentSwapChain(IDXGISwapChain*);
     static void ClearRenderTarget(ID3D11DeviceContext*, ID3D11RenderTargetView*);
     static void ClearDepthStencil(ID3D11DeviceContext*, ID3D11DepthStencilView*);
+    static void CreateAndSetVertexShader_2d(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext,
+                                     SVertexShaderData& _vertexShader);
 };

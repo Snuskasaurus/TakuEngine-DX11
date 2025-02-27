@@ -12,6 +12,15 @@
 #include "../World.h"
 #include "../Debug/Profiling.h"
 
+// TEMPORARY
+
+
+ID3D11Texture2D* renderTargetTextureMap;
+ID3D11RenderTargetView* renderTargetViewMap;
+ID3D11ShaderResourceView* shaderResourceViewMap;
+SVertexShaderData VSRenderTarget;
+SPixelShaderData PSRenderTarget;
+
 ///---------------------------------------------------------------------------------------------------------------------
 #define RESOLUTION_WIDTH    1920
 #define RESOLUTION_HEIGHT   1080
@@ -44,11 +53,41 @@ void MGraphic::SetupDraw()
     MGraphic::CreateRenderTargetView(G_PIPELINE.Device, G_PIPELINE.SwapChain, &G_PIPELINE.BackBufferResource, &G_PIPELINE.RenderTargetView);
     MGraphic::SetDepthStencilViewToRenderTargetView(G_PIPELINE.DeviceContext, &G_PIPELINE.RenderTargetView, G_PIPELINE.DepthStencilView);
     MGraphic::CreateAndSetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.VertexShaderData);
-    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
+    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData, TAKU_ASSET_PS_BASE);
     MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
     MGraphic::CreateRasterizerState(G_PIPELINE.Device, &G_PIPELINE.rasterizerState);
 
     MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device,G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Frame, sizeof(SVSConstantBuffer_Frame));
+
+    MGraphic::CreateAndSetVertexShader_2d(G_PIPELINE.Device, G_PIPELINE.DeviceContext, VSRenderTarget);
+    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, PSRenderTarget, TAKU_ASSET_PS_2D);
+    
+    MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
+}
+
+void TestInitToGetZBuffer()
+{
+    D3D11_TEXTURE2D_DESC textureDesc;
+    {
+        textureDesc.Width = 1920u / 2u;
+        textureDesc.Height = 1080u / 2u;
+        textureDesc.MipLevels = 1;
+        textureDesc.ArraySize = 1;
+        textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        textureDesc.CPUAccessFlags = 0;
+        textureDesc.MiscFlags = 0;
+    }
+
+    G_PIPELINE.Device->CreateTexture2D(&textureDesc, NULL, &renderTargetTextureMap);
+
+    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+    renderTargetViewDesc.Format = textureDesc.Format;
+    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    renderTargetViewDesc.Texture2D.MipSlice = 0;
+    G_PIPELINE.Device->CreateRenderTargetView(renderTargetTextureMap, &renderTargetViewDesc, &renderTargetViewMap);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Draw()
@@ -57,13 +96,16 @@ void MGraphic::Draw()
 
     SetVSConstantBuffer_Frame(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Frame);
 
+    G_PIPELINE.DeviceContext->PSSetShader(G_PIPELINE.PixelShaderData.Shader, nullptr, 0u);
+    G_PIPELINE.DeviceContext->VSSetShader(G_PIPELINE.VertexShaderData.Shader, nullptr, 0u);
+    G_PIPELINE.DeviceContext->IASetInputLayout(G_PIPELINE.VertexShaderData.Input);
     
     const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
         CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
         
-        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer);
+        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
         
         std::vector<ID3D11ShaderResourceView*> _textureViews;
         _textureViews.push_back(instancedMesh->ColorTexture->textureView);
@@ -73,7 +115,7 @@ void MGraphic::Draw()
             _textureViews.push_back(!instancedMesh->EmissionTexture ? nullptr : instancedMesh->EmissionTexture->textureView);
             _textureViews.push_back(!instancedMesh->MROTexture ? nullptr : instancedMesh->MROTexture->textureView);
         }
-        MGraphic::SetPixelShader(G_PIPELINE.DeviceContext, _textureViews);
+        MGraphic::SetPixelShaderTextureViews(G_PIPELINE.DeviceContext, _textureViews);
 
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
@@ -89,8 +131,22 @@ void MGraphic::Draw()
         }
     }
     
-    MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
     MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
+    
+    {
+        ID3D11Buffer* VertexBuffer = nullptr;
+        ID3D11Buffer* IndexBuffer = nullptr;
+        G_PIPELINE.DeviceContext->PSSetShader(PSRenderTarget.Shader, nullptr, 0u);
+        G_PIPELINE.DeviceContext->VSSetShader(VSRenderTarget.Shader, nullptr, 0u);
+        G_PIPELINE.DeviceContext->IASetInputLayout(VSRenderTarget.Input);
+        TVector3f Vertexes[3] = {{ 0.0f, 0.5f, 0.0f },{ 0.5f, -0.5f, 0.0f },{-0.5f, -0.5f, 0.0f }};
+        TVertexIndex Indexes[3] = { 0, 1, 2 };
+        MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &VertexBuffer, Vertexes, ARRAYSIZE(Vertexes), sizeof(TVector3f));
+        MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &IndexBuffer, Indexes, ARRAYSIZE(Indexes), sizeof(TVertexIndex));
+        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &VertexBuffer, IndexBuffer, sizeof(TVector3f));
+        G_PIPELINE.DeviceContext->DrawIndexed(ARRAYSIZE(Indexes), 0u, 0u);
+    }
+    
     MGraphic::PresentSwapChain(G_PIPELINE.SwapChain);
     MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_PIPELINE.RenderTargetView);
     MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_PIPELINE.DepthStencilView);
@@ -202,14 +258,14 @@ void MGraphic::SetDepthStencilViewToRenderTargetView(ID3D11DeviceContext* _devic
     _deviceContext->OMSetRenderTargets(1u, _renderTargetView, _depthStencilView);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetVertexAndIndexBuffer(ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer)
+void MGraphic::SetVertexAndIndexBuffer(ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer, UINT _vertexBufferByteStride)
 {
     constexpr UINT offset = 0u;
-    _deviceContext->IASetVertexBuffers(0u, 1u, _vertexBuffer, &SMeshData::VertexBuffer_StructureByteStride, &offset);
+    _deviceContext->IASetVertexBuffers(0u, 1u, _vertexBuffer, &_vertexBufferByteStride, &offset);
     _deviceContext->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R16_UINT, offset);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetPixelShader(ID3D11DeviceContext* _deviceContext, const std::vector<ID3D11ShaderResourceView*>& _textureViews)
+void MGraphic::SetPixelShaderTextureViews(ID3D11DeviceContext* _deviceContext, const std::vector<ID3D11ShaderResourceView*>& _textureViews)
 {
     _deviceContext->PSSetShaderResources(0u, (UINT)_textureViews.size(), _textureViews.data());
 }
@@ -236,6 +292,21 @@ void MGraphic::ClearDepthStencil(ID3D11DeviceContext* _deviceContext, ID3D11Dept
     _deviceContext->ClearDepthStencilView(_stencilView, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 ///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateAndSetVertexShader_2d(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShaderData& _vertexShader)
+{
+    _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_2D);
+    CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
+    // VertexShader Input Layout
+    {
+        constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
+        {
+            { "POSITION",  0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u,  0u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+        };
+        UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
+        CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
+    }
+}
+///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShaderData& _vertexShader)
 {
     _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_BASE);
@@ -253,15 +324,13 @@ void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceConte
         UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
         CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
     }
-    _deviceContext->VSSetShader(_vertexShader.Shader, nullptr, 0u);
-    _deviceContext->IASetInputLayout(_vertexShader.Input);
 }
+
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShaderData& _pixelShader)
+void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShaderData& _pixelShader, const char* name)
 {
-    _pixelShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_PS_BASE);
+    _pixelShader.Blob = MShaderResources::GetBlobFromFileName(name);
     CHECK_HRESULT(_device->CreatePixelShader(_pixelShader.Blob->GetBufferPointer(), _pixelShader.Blob->GetBufferSize(), nullptr, &_pixelShader.Shader));
-    _deviceContext->PSSetShader(_pixelShader.Shader, nullptr, 0u);
     
     D3D11_SAMPLER_DESC samplerDesc = {};
     {
@@ -312,7 +381,7 @@ void MGraphic::SetPixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceC
     _deviceContext->PSSetConstantBuffers(0u, 1u, &_pixelShader.ConstantBuffer);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _vertexBuffer, const SMeshData& _meshData)
+void MGraphic::CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _vertexBuffer, void* _vertices, UINT _nbVertices, UINT _sizeStruct)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -320,19 +389,19 @@ void MGraphic::CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _d
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = _meshData.VertexBuffer_ByteWidth;
-        bufferDesc.StructureByteStride = SMeshData::VertexBuffer_StructureByteStride;
+        bufferDesc.ByteWidth = _sizeStruct * _nbVertices;
+        bufferDesc.StructureByteStride = _sizeStruct;
     }
 
     D3D11_SUBRESOURCE_DATA subResourceData = {};
     {
-        subResourceData.pSysMem = _meshData.VertexBuffer.data();
+        subResourceData.pSysMem = _vertices;
     }
 
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, _vertexBuffer));
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _indexBuffer, const SMeshData& _meshData)
+void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _indexBuffer, TVertexIndex* _indexes, UINT _nbIndex, UINT _sizeStruct)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
     {
@@ -340,13 +409,13 @@ void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _de
         bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bufferDesc.CPUAccessFlags = 0u;
         bufferDesc.MiscFlags = 0u;
-        bufferDesc.ByteWidth = _meshData.IndexBuffer_ByteWidth;
-        bufferDesc.StructureByteStride = SMeshData::IndexBuffer_StructureByteStride;
+        bufferDesc.ByteWidth = _sizeStruct * _nbIndex;
+        bufferDesc.StructureByteStride = _sizeStruct;
     }
 
     D3D11_SUBRESOURCE_DATA subResourceData = {};
     {
-        subResourceData.pSysMem = _meshData.IndexBuffer.data();
+        subResourceData.pSysMem = _indexes;
     }
 
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, _indexBuffer));
