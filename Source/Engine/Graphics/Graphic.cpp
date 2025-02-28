@@ -139,8 +139,8 @@ void MGraphic::Draw()
         G_PIPELINE.DeviceContext->PSSetShader(PSRenderTarget.Shader, nullptr, 0u);
         G_PIPELINE.DeviceContext->VSSetShader(VSRenderTarget.Shader, nullptr, 0u);
         G_PIPELINE.DeviceContext->IASetInputLayout(VSRenderTarget.Input);
-        TVector3f Vertexes[3] = {{ 0.0f, 0.5f, 0.0f },{ 0.5f, -0.5f, 0.0f },{-0.5f, -0.5f, 0.0f }};
-        TVertexIndex Indexes[3] = { 0, 1, 2 };
+        TVector3f Vertexes[3] = {{ 0.0f, 0.5f, 0.5f },{ 0.5f, -0.5f, 0.5f },{-0.5f, -0.5f, 0.5f }};
+        TVertexIndex Indexes[3] = { 2, 1, 0 };
         MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &VertexBuffer, Vertexes, ARRAYSIZE(Vertexes), sizeof(TVector3f));
         MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &IndexBuffer, Indexes, ARRAYSIZE(Indexes), sizeof(TVertexIndex));
         MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &VertexBuffer, IndexBuffer, sizeof(TVector3f));
