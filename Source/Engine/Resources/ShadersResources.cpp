@@ -37,6 +37,13 @@ ID3DBlob* MShaderResources::GetBlobFromFileName(const char* _filename)
     return result->second;
 }
 
+ID3DBlob* MShaderResources::GetOrCreateBlobFromFileName(const char* _filename, EShaderType _shaderType)
+{
+    ID3DBlob* blob = GetBlobFromFileName(_filename);
+    if (blob == nullptr) blob = CreateBlobFromFileName(_filename, _shaderType);
+    return blob;
+}
+
 void MShaderResources::DeleteAllBlobs()
 {
     for (auto gBlobMap : G_BLOB_MAP)

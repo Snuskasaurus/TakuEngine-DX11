@@ -20,8 +20,8 @@ struct SMeshData
     static constexpr UINT VertexBuffer_StructureByteStride = sizeof(SVertex);
     static constexpr UINT IndexBuffer_StructureByteStride = sizeof(TVertexIndex);
     
-    UINT VertexBuffer_ByteWidth;
-    UINT IndexBuffer_ByteWidth;
+    UINT VertexBuffer_Size;
+    UINT IndexBuffer_Size;
     
     std::vector<SVertex> VertexBuffer;
     std::vector<TVertexIndex> IndexBuffer;

@@ -87,6 +87,7 @@ float MMath::RandomNumberIntegerInRange(float _min, float _max)
     if (_max - _min <= 1.0f) return 0.0f;
     return (float)(rand() % (int)(_max - _min) + (int)_min);
 }
+const TVector2f TVector2f::Zero = { 0.0f, 0.0f };
 //----------------------------------------------------------------------------------------------------------------------
 TVector3f MMath::RandomVectorIntegerInRange(TVector3f _min, TVector3f _max)
 {

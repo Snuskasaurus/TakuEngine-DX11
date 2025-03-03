@@ -38,6 +38,8 @@ struct TVector2f
 {
     float x, y;
 
+    static const TVector2f Zero;
+    
     FORCE_INLINE static float Dot(const TVector2f& _v1, const TVector2f& _v2)
     {
         return _v1.x * _v2.x + _v1.y * _v2.y;

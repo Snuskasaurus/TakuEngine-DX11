@@ -99,8 +99,8 @@ SMeshData* TryToImportMesh(const std::string& _filename)
         }
     }
     
-    meshData->VertexBuffer_ByteWidth = SMeshData::VertexBuffer_StructureByteStride * static_cast<UINT>(meshData->VertexBuffer.size());
-    meshData->IndexBuffer_ByteWidth = SMeshData::IndexBuffer_StructureByteStride * static_cast<UINT>(meshData->IndexBuffer.size());
+    meshData->VertexBuffer_Size = static_cast<UINT>(meshData->VertexBuffer.size());
+    meshData->IndexBuffer_Size = static_cast<UINT>(meshData->IndexBuffer.size());
     meshData->IndexCount = static_cast<UINT>(meshData->IndexBuffer.size());
     meshData->DebugName = assimpMesh->mName.C_Str();
     
