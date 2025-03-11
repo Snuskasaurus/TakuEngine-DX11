@@ -219,8 +219,8 @@ bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnCreate()
 {
-    SceneLight.SetYaw(40.0f);
-    SceneLight.SetPitch(40.0f);
+    SceneLight.SetYaw(120.0f);
+    SceneLight.SetPitch(130.0f);
     
     // Generate grid terrain
     {
@@ -360,13 +360,13 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
         ToggleDisplayingGrid();
     }
     else if (_key == EKeyCode::KEY_KEYPAD_8)
-        SceneLight.AddPitch(10.0f);
+        SceneLight.AddPitch(5.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_2)
-        SceneLight.AddPitch(-10.0f);
+        SceneLight.AddPitch(-5.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_4)
-        SceneLight.AddYaw(-10.0f);
+        SceneLight.AddYaw(-5.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_6)
-        SceneLight.AddYaw(10.0f);
+        SceneLight.AddYaw(5.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnUpdate(const float& _dt)

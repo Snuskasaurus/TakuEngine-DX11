@@ -20,7 +20,7 @@ class CGameScene
     friend class MInput;
 
 public:
-    const CSceneLight* GetSceneLight() const { return &SceneLight; }
+    const CSceneLight& GetSceneLight() const { return SceneLight; }
     
 public:
     static void ChangeGameScene(const EGameSceneType& _gameSceneType);

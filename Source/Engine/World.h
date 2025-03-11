@@ -24,7 +24,6 @@ public:
     static void InitializeWorld();
     static MWorld* GetWorld() { return Instance; }
     static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
-
 public:
     CGameScene* GetCurrentScene() const { return CurrentGameScene; }
     

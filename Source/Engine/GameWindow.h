@@ -25,6 +25,6 @@ public:
     static UINT GetGameWindowWidth();
     static HWND GetWindowHandle();
     static bool HasFocus();
-    static TMatrix4f GetPerspectiveMatrix();
+    static TMatrix4f GetCameraProjectionMatrix();
 };
 

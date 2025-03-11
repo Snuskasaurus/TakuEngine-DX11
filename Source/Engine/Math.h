@@ -253,6 +253,7 @@ struct alignas(16) TMatrix4f
     static TMatrix4f MatrixRotationPitchRollYaw(const float _pitch, const float _roll, const float _yaw);
     static TMatrix4f MatrixScale(const float _scale);
     static TMatrix4f MatrixPerspectiveFovRH(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ);
+    static TMatrix4f MatrixOrthographicRH(float _viewWidth, float _viewHeight, float _nearZ, float _farZ);
     static TMatrix4f Transpose(const TMatrix4f& _m);
     static TMatrix4f Inverse(const TMatrix4f& _m);
 };

@@ -20,9 +20,15 @@ public:
     void AddPitch(float _pitch) { SetPitch(CurrentPitch + _pitch); }
     void SetYaw(float _yaw);
     void SetPitch(float _pitch);
+public:
+    TVector3f GetWorldLightDir() const { return -Forward; }
+    TMatrix4f GetViewMatrix() const { return TMatrix4f::Inverse(LightMatrix); }
+    TMatrix4f GetProjectionMatrix() const;
+
 private:
     void Initialize();
     void Uninitialize();
+    void OnValueChanged();
 private:
     float CurrentYaw = 0.0f;
     float CurrentPitch = 0.0f;
@@ -30,4 +36,6 @@ private:
     TColorf DiffuseColor = { 0.99215686274f, 0.98431372549f, 0.82745098039f, 1.0f };
     float Ambient = 0.15f;
     float Intensity = 0.5f;
+    TMatrix4f LightMatrix;
+    TVector3f Forward;
 };

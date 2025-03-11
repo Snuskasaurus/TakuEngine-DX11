@@ -18,7 +18,7 @@ struct SVertexShaderData
     ID3D11InputLayout* Input = nullptr;
     ID3D11VertexShader* Shader = nullptr;
 
-    ~SVertexShaderData()
+    void Release()
     {
         Input->Release();
         Shader->Release();
@@ -32,7 +32,7 @@ struct SPixelShaderData
     ID3D11Buffer* ConstantBuffer;
     ID3D11SamplerState* TextureSamplerState;
 
-    ~SPixelShaderData()
+    void Release()
     {
         Shader->Release();
         if (ConstantBuffer != nullptr) ConstantBuffer->Release();

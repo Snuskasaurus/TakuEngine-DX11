@@ -1,18 +1,25 @@
 #define PI 3.14159265
 
+#define SHADOW_BIAS 0.0001f
+
 struct PS_Input
 {
     float4 position : SV_POSITION;
     float3 normal : NORMAL;
     float3 tan : TANGENT;
-    float2 uv : TEXCOORD;
+    float2 uv : TEXCOORD0;
+    float4 positionLight : TEXCOORD1;
 };
 
 Texture2D tex_color : register(t0);
-Texture2D tex_normal : register(t1);
-Texture2D tex_emission : register(t2);
-Texture2D tex_so : register(t3);
-SamplerState samplerState;
+Texture2D<float> tex_buffer_light: register(t1);
+Texture2D tex_normal : register(t2);
+Texture2D tex_emission : register(t3);
+Texture2D tex_so : register(t4);
+
+SamplerState samplerState : register(s0);
+SamplerState SampleStateClamp : register(s1);
+SamplerState SampleStateWrap : register(s2);
 
 cbuffer c_buffer : register(b0)
 {
@@ -59,9 +66,25 @@ float4 Main(PS_Input input) : SV_Target
         normalize(input.normal)
     );
     const float3 normal = normalize(mul((2.0f * sampleNormal) - 1.0f, normalTexSpace).rgb);
+
+    float LightMultiplier = 1.0f;
+    
+    float2 projectTexCoord;
+    projectTexCoord.x = input.positionLight.x / input.positionLight.w / 2.0f + 0.5f;
+    projectTexCoord.y = -input.positionLight.y / input.positionLight.w / 2.0f + 0.5f;
+    if((saturate(projectTexCoord.x) == projectTexCoord.x) && (saturate(projectTexCoord.y) == projectTexCoord.y))
+    {
+        LightMultiplier = 0.8f;
+        float depthValue = tex_buffer_light.Sample(SampleStateClamp, projectTexCoord).r;
+        float lightDepthValue = input.positionLight.z / input.positionLight.w - SHADOW_BIAS;
+        if(lightDepthValue > depthValue)
+        {
+            LightMultiplier = 0.32f;
+        }
+    }
     
     // Output
     const float3 lightingColor = ComputePhongLighting(sampleColor, specFromSample, occlusionFromSample, normal);
     float3 finalColor = sampleEmission + lightingColor;
-    return float4(finalColor, 1.0f);
+    return float4(finalColor * LightMultiplier, 1.0f);
 }

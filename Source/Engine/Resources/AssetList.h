@@ -58,6 +58,9 @@ inline const char* G_ASSET_T_MACHINE_2_MRO = "TestPBR/Machine/T_Machine2_mro";
 #define TAKU_ASSET_VS_2D  "2d_vs"
 #define TAKU_ASSET_PS_2D  "2d_ps"
 
+#define TAKU_ASSET_VS_SHADOW  "Shadow_vs"
+#define TAKU_ASSET_PS_SHADOW  "Shadow_ps"
+
 class MAsset
 {
 public:

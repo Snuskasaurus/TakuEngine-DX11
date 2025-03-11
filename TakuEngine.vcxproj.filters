@@ -84,6 +84,9 @@
     <ClCompile Include="Source\Engine\Resources\TextureResources.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Data\Shaders\Shadow_ps.hlsl">
+      <Filter>Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\CommonEngine.h">
@@ -173,6 +176,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Game\Data\Shaders\2d_vs.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\Shadow_vs.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
