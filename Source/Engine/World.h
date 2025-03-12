@@ -16,6 +16,7 @@ class MWorld
     friend class CGameScene;
     friend class MGraphic;
     friend class MInput;
+    friend struct SShaderBufferHolder;
     
 private:
     static MWorld* Instance;

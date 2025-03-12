@@ -1,19 +1,19 @@
 #define MAX_INSTANCE_COUNT 1024
 
-struct VS_INPUT
-{
-    float3 position : POSITION;
-    uint instanceID : SV_InstanceID;
-};
-
-cbuffer cbuffer_frame : register(b0)
+cbuffer vs_buffer_sceneEachFrame : register(b0)
 {
     matrix cameraViewProjection;
 };
 
-cbuffer cbuffer_object : register(b1)
+cbuffer vs_buffer_object : register(b1)
 {
     matrix world[MAX_INSTANCE_COUNT];
+};
+
+struct VS_INPUT
+{
+    float3 position : POSITION;
+    uint instanceID : SV_InstanceID;
 };
 
 float4 Main(VS_INPUT input) : SV_POSITION

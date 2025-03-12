@@ -20,8 +20,6 @@ struct SDrawableData
     struct STextureData* NormalTextureData = nullptr;
     struct STextureData* EmissionTextureData = nullptr;
     struct STextureData* MROTextureData = nullptr;
-    struct SVertexShaderData* VertexShaderData = nullptr;
-    struct SPixelShaderData* PixelShaderData = nullptr;
 };
 
 class MDrawableResources

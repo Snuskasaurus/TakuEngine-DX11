@@ -1,5 +1,17 @@
 #define MAX_INSTANCE_COUNT 1024
 
+cbuffer vs_buffer_sceneEachFrame : register(b0)
+{
+    matrix cameraViewProjection;
+    matrix lightViewMatrix;
+    matrix lightProjectionMatrix;
+};
+
+cbuffer vs_buffer_object : register(b1)
+{
+    matrix world[MAX_INSTANCE_COUNT];
+};
+
 struct VS_Input
 {
     float3 position : POSITION;
@@ -16,18 +28,6 @@ struct VS_Output
     float3 tan : TANGENT;
     float2 uv : TEXCOORD0;
     float4 positionLight : TEXCOORD1;
-};
-
-cbuffer cbuffer_frame : register(b0)
-{
-    matrix cameraViewProjection;
-    matrix lightViewMatrix;
-    matrix lightProjectionMatrix;
-};
-
-cbuffer cbuffer_object : register(b1)
-{
-    matrix world[MAX_INSTANCE_COUNT];
 };
 
 VS_Output Main(VS_Input input)

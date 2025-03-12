@@ -127,7 +127,6 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshNam
     
     MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, InstancedMesh->MeshData->VertexBuffer.data(), InstancedMesh->MeshData->VertexBuffer_Size, SMeshData::VertexBuffer_StructureByteStride);
     MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, InstancedMesh->MeshData->IndexBuffer.data(), InstancedMesh->MeshData->IndexBuffer_Size, SMeshData::IndexBuffer_StructureByteStride);
-    MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));  
     
     InstancedMeshes.push_back(InstancedMesh);
     return InstancedMesh;
@@ -151,7 +150,6 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDrawFromDrawableData(cons
     
     MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, InstancedMesh->MeshData->VertexBuffer.data(), InstancedMesh->MeshData->VertexBuffer_Size, InstancedMesh->MeshData->VertexBuffer_StructureByteStride);
     MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, InstancedMesh->MeshData->IndexBuffer.data(), InstancedMesh->MeshData->IndexBuffer_Size, InstancedMesh->MeshData->IndexBuffer_StructureByteStride);
-    MGraphic::CreateVertexShaderBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VSConstantBuffer_InstancedObject, sizeof(SVSConstantBuffer_InstanceObject));  
     
     InstancedMeshes.push_back(InstancedMesh);
     return InstancedMesh;

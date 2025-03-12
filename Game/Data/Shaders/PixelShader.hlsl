@@ -1,6 +1,14 @@
 #define PI 3.14159265
-
 #define SHADOW_BIAS 0.0001f
+
+cbuffer ps_buffer_sceneEachFrame : register(b0)
+{
+    float4 b_viewDir;
+    float4 b_lightDir;
+    float4 b_lightColor;
+    float b_lightAmbient;
+    float b_lightBrightness;
+};
 
 struct PS_Input
 {
@@ -20,15 +28,6 @@ Texture2D tex_so : register(t4);
 SamplerState samplerState : register(s0);
 SamplerState SampleStateClamp : register(s1);
 SamplerState SampleStateWrap : register(s2);
-
-cbuffer c_buffer : register(b0)
-{
-    float4 b_viewDir;
-    float4 b_lightDir;
-    float4 b_lightColor;
-    float b_lightAmbient;
-    float b_lightBrightness;
-};
 
 float3 ComputePhongLighting(float3 _objectColor, float _spec, float _occlusion, float3 _normal)
 {
@@ -74,7 +73,7 @@ float4 Main(PS_Input input) : SV_Target
     projectTexCoord.y = -input.positionLight.y / input.positionLight.w / 2.0f + 0.5f;
     if((saturate(projectTexCoord.x) == projectTexCoord.x) && (saturate(projectTexCoord.y) == projectTexCoord.y))
     {
-        LightMultiplier = 0.8f;
+        //LightMultiplier = 0.8f; // Enable to debug | in shadowmap space
         float depthValue = tex_buffer_light.Sample(SampleStateClamp, projectTexCoord).r;
         float lightDepthValue = input.positionLight.z / input.positionLight.w - SHADOW_BIAS;
         if(lightDepthValue > depthValue)

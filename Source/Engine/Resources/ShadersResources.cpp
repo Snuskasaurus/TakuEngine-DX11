@@ -5,9 +5,37 @@
 
 #include "GamePath.h"
 #include "../HResultHandler.h"
+#include "../Graphics/Graphic.h"
 
 // TODO Julien Rogel (20/02/2025): Change this data structure to use an array and avoid allocation for each shader data
 static std::map<std::string, ID3DBlob*> G_BLOB_MAP;
+
+void SVertexShader::CreateVertexShader(ID3D11Device* _device, const char* _filename, const D3D11_INPUT_ELEMENT_DESC* _inputElementDescs, UINT _nbInputElementDescs)
+{
+    this->Blob = MShaderResources::GetBlobFromFileName(_filename);
+    CHECK_HRESULT(_device->CreateVertexShader(this->Blob->GetBufferPointer(), this->Blob->GetBufferSize(), nullptr, &this->Shader));
+    CHECK_HRESULT(_device->CreateInputLayout(_inputElementDescs, _nbInputElementDescs, this->Blob->GetBufferPointer(), this->Blob->GetBufferSize(), &this->Input));
+}
+
+void SVertexShader::Release()
+{
+    Input->Release();
+    Input = nullptr;
+    Shader->Release();
+    Shader = nullptr;
+}
+
+void SPixelShader::CreatePixelShader(ID3D11Device* _device, const char* _filename)
+{
+    this->Blob = MShaderResources::GetBlobFromFileName(_filename);
+    CHECK_HRESULT(_device->CreatePixelShader(this->Blob->GetBufferPointer(), this->Blob->GetBufferSize(), nullptr, &this->Shader));
+}
+
+void SPixelShader::Release()
+{
+    Shader->Release();
+    Shader= nullptr;
+}
 
 ID3DBlob* MShaderResources::CreateBlobFromFileName(const char* _filename, EShaderType _shaderType)
 {
@@ -42,6 +70,12 @@ ID3DBlob* MShaderResources::GetOrCreateBlobFromFileName(const char* _filename, E
     ID3DBlob* blob = GetBlobFromFileName(_filename);
     if (blob == nullptr) blob = CreateBlobFromFileName(_filename, _shaderType);
     return blob;
+}
+
+void MShaderResources::InitializeShaders()
+{
+    ID3D11Device* Device = MGraphic::GetDXDevice();
+    
 }
 
 void MShaderResources::DeleteAllBlobs()

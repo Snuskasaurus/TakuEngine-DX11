@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <d3dcommon.h>
 
+#include "ShaderBuffers.h"
 #include "../Resources/AssetList.h"
 #include "../Resources/MeshResources.h"
 #include "../Resources/ShadersResources.h"
@@ -12,21 +13,14 @@
 #include "../World.h"
 #include "../Debug/Profiling.h"
 
-enum EDebugDrawTarget
+enum class EDebugDrawTarget
 {
-    ZBufferLight,
-    ZBufferScene,
+    NONE,
+    Z_BUFFER_SHADOW,
+    Z_BUFFER_SCENE,
 };
 
-EDebugDrawTarget DebugDrawTarget = EDebugDrawTarget::ZBufferLight;
-
-SVertexShaderData VSRenderTarget;
-SPixelShaderData PSRenderTarget;
-
-SVertexShaderData VertexShaderDataLight;
-SPixelShaderData PixelShaderDataLight;
-
-
+EDebugDrawTarget DebugDrawTarget = EDebugDrawTarget::Z_BUFFER_SCENE;
 ///---------------------------------------------------------------------------------------------------------------------
 #define RESOLUTION_WIDTH    1920
 #define RESOLUTION_HEIGHT   1080
@@ -35,8 +29,19 @@ int GetResolutionWidth() { return RESOLUTION_WIDTH; }
 int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
 ///---------------------------------------------------------------------------------------------------------------------
 static SGraphicResources_Pipeline G_PIPELINE;
-static SVSConstantBuffer_InstanceObject G_VS_CONSTANT_BUFFER;
 static SDepthStencilResources G_DEPTH_STENCIL_RESOURCES;
+static ID3D11SamplerState* G_SAMPLER_STATES[3] = { nullptr, nullptr, nullptr};
+///---------------------------------------------------------------------------------------------------------------------
+static SVertexShader G_VS_SHADOW;
+static SVertexShader G_VS_BASE;
+static SVertexShader G_VS_2D_DEBUG;
+///---------------------------------------------------------------------------------------------------------------------
+static SPixelShader G_PS_SHADOW;
+static SPixelShader G_PS_BASE;
+static SPixelShader G_PS_2D_DEBUG;
+///---------------------------------------------------------------------------------------------------------------------
+static SShaderBufferHolder G_VS_BUFFERS[15];
+static SShaderBufferHolder G_PS_BUFFERS[15];
 ///---------------------------------------------------------------------------------------------------------------------
 ID3D11Device* MGraphic::GetDXDevice()
 {
@@ -56,39 +61,54 @@ void MGraphic::CreateDirectXWindow()
 void MGraphic::SetupDraw()
 {
     MGraphic::CreateRenderTargetView(G_PIPELINE.Device, G_PIPELINE.SwapChain, &G_PIPELINE.BackBufferResource, &G_PIPELINE.RenderTargetView);
-    
     MGraphic::CreateDepthStencil(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES);
-    
-    MGraphic::CreateAndSetVertexShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.VertexShaderData);
-    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData, TAKU_ASSET_PS_BASE);
-    MGraphic::CreatePixelShaderConstantBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.PixelShaderData.ConstantBuffer);
     MGraphic::CreateRasterizerState(G_PIPELINE.Device, &G_PIPELINE.rasterizerState);
-
-    MGraphic::CreateVertexShaderBuffer(G_PIPELINE.Device,G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Scene, sizeof(SVSConstantBuffer_Frame));
-
-    MGraphic::CreateAndSetVertexShader_shadow(G_PIPELINE.Device, G_PIPELINE.DeviceContext, VertexShaderDataLight);
-    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, PixelShaderDataLight, TAKU_ASSET_PS_SHADOW);
-    
-    MGraphic::CreateAndSetVertexShader_2d(G_PIPELINE.Device, G_PIPELINE.DeviceContext, VSRenderTarget);
-    MGraphic::CreateAndSetPixelShader(G_PIPELINE.Device, G_PIPELINE.DeviceContext, PSRenderTarget, TAKU_ASSET_PS_2D);
-    
     MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
-
+    MGraphic::CreateAndSetSampleStates();
+    
+    // Initialize Vertex Shaders
+    {
+        G_VS_2D_DEBUG.CreateVertexShader(G_PIPELINE.Device,     TAKU_ASSET_VS_2D,       VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
+        G_VS_SHADOW.CreateVertexShader(G_PIPELINE.Device,       TAKU_ASSET_VS_SHADOW,   VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
+        G_VS_BASE.CreateVertexShader(G_PIPELINE.Device,         TAKU_ASSET_VS_BASE,     VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
+    }
+    
+    // Initialize Pixel Shaders
+    {
+        G_PS_BASE.CreatePixelShader(G_PIPELINE.Device,      TAKU_ASSET_PS_BASE);
+        G_PS_SHADOW.CreatePixelShader(G_PIPELINE.Device,    TAKU_ASSET_PS_SHADOW);
+        G_PS_2D_DEBUG.CreatePixelShader(G_PIPELINE.Device,  TAKU_ASSET_PS_2D);
+    }
+    
+    // Initialize Vertex Shader Buffers
+    {
+        G_VS_BUFFERS[0].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 0u, sizeof(vs_buffer_sceneEachFrame));
+        G_VS_BUFFERS[1].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 1u, sizeof(vs_buffer_object));
+    }
+    
+    // Initialize Pixel Shader Buffers
+    {
+        G_PS_BUFFERS[0].CreateShaderBuffer(EShaderType::PIXEL_SHADER, 0u, sizeof(ps_buffer_sceneEachFrame));
+    }
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Draw()
 {
-    ID3D11RenderTargetView* NullRenderTarget = nullptr;
+    // Clear pass
+    MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_PIPELINE.RenderTargetView);
+    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.View);
+    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.ViewLight);
     
     const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
     
     // Depth only pass to get SceneLight Z-Buffer
     {
+        ID3D11RenderTargetView* NullRenderTarget = nullptr;
         G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &NullRenderTarget, G_DEPTH_STENCIL_RESOURCES.ViewLight);
-        G_PIPELINE.DeviceContext->PSSetShader(nullptr, nullptr, 0u);
-        G_PIPELINE.DeviceContext->VSSetShader(VertexShaderDataLight.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->IASetInputLayout(VertexShaderDataLight.Input);
-        MGraphic::SetVSBuffer_Light(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Scene);
+        G_PIPELINE.DeviceContext->VSSetShader(G_VS_SHADOW.Shader, nullptr, 0u);
+        G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_SHADOW.Input);
+        G_PIPELINE.DeviceContext->PSSetShader(G_PS_SHADOW.Shader, nullptr, 0u);
+        SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], true);
     
         for (int i = 0; i < instancedMeshes.size(); ++i)
         {
@@ -102,7 +122,7 @@ void MGraphic::Draw()
                 const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
                 const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
                 
-                MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &instancedMesh->VSConstantBuffer_InstancedObject, instancedMesh->Instances, startInstances, nbInstancesToDraw);
+                SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
                 MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
                 
                 nbInstancesRemainingToDraw -= nbInstancesToDraw;
@@ -115,12 +135,11 @@ void MGraphic::Draw()
     {
         G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_PIPELINE.RenderTargetView, G_DEPTH_STENCIL_RESOURCES.View);
         
-        G_PIPELINE.DeviceContext->PSSetShader(G_PIPELINE.PixelShaderData.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->VSSetShader(G_PIPELINE.VertexShaderData.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->IASetInputLayout(G_PIPELINE.VertexShaderData.Input);
-        
-        MGraphic::SetSceneBuffer_PS(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_PIPELINE.PixelShaderData);
-        MGraphic::SetVSBuffer_Scene(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &G_PIPELINE.VSConstantBuffer_Scene);
+        G_PIPELINE.DeviceContext->VSSetShader(G_VS_BASE.Shader, nullptr, 0u);
+        G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_BASE.Input);
+        SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], false);
+        G_PIPELINE.DeviceContext->PSSetShader(G_PS_BASE.Shader, nullptr, 0u);
+        SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(&G_PS_BUFFERS[0]);
         
         for (int i = 0; i < instancedMeshes.size(); ++i)
         {
@@ -146,7 +165,7 @@ void MGraphic::Draw()
                 const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
                 const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
                 
-                MGraphic::SetVSConstantBuffer_Instanced(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &instancedMesh->VSConstantBuffer_InstancedObject, instancedMesh->Instances, startInstances, nbInstancesToDraw);
+                SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
                 MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
                 
                 nbInstancesRemainingToDraw -= nbInstancesToDraw;
@@ -156,19 +175,20 @@ void MGraphic::Draw()
     }
     
     // Draw screen debug
+    if (DebugDrawTarget != EDebugDrawTarget::NONE)
     {
         G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_PIPELINE.RenderTargetView, nullptr);
 
-        G_PIPELINE.DeviceContext->VSSetShader(VSRenderTarget.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->IASetInputLayout(VSRenderTarget.Input);
-        G_PIPELINE.DeviceContext->PSSetShader(PSRenderTarget.Shader, nullptr, 0u);
+        G_PIPELINE.DeviceContext->VSSetShader(G_VS_2D_DEBUG.Shader, nullptr, 0u);
+        G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_2D_DEBUG.Input);
+        G_PIPELINE.DeviceContext->PSSetShader(G_PS_2D_DEBUG.Shader, nullptr, 0u);
 
         switch (DebugDrawTarget) {
-        case ZBufferLight:
+        case EDebugDrawTarget::Z_BUFFER_SHADOW:
             {
                 G_PIPELINE.DeviceContext->PSSetShaderResources(0, 1u, &G_DEPTH_STENCIL_RESOURCES.ResourceViewLight);
             } break;
-        case ZBufferScene:
+        case EDebugDrawTarget::Z_BUFFER_SCENE:
             {
                 G_PIPELINE.DeviceContext->PSSetShaderResources(0, 1u, &G_DEPTH_STENCIL_RESOURCES.ResourceView);
             } break;
@@ -205,20 +225,20 @@ void MGraphic::Draw()
     }
 
     MGraphic::PresentSwapChain(G_PIPELINE.SwapChain);
-
-    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.View);
-    MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_PIPELINE.RenderTargetView);
-        MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.ViewLight);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::UninitializeGraphic()
 {
-    VSRenderTarget.Release();
-    PSRenderTarget.Release();
-    VertexShaderDataLight.Release();
-    PixelShaderDataLight.Release();
     G_DEPTH_STENCIL_RESOURCES.Release();
     G_PIPELINE.Release();
+    
+    G_VS_SHADOW.Release();
+    G_VS_BASE.Release();
+    G_VS_2D_DEBUG.Release();
+    
+    G_PS_SHADOW.Release();
+    G_PS_BASE.Release();
+    G_PS_2D_DEBUG.Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState)
@@ -270,6 +290,49 @@ void MGraphic::CreateRenderTargetView(ID3D11Device* _device, IDXGISwapChain* _sw
 {
     CHECK_HRESULT(_swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(_backBufferResource)));
     CHECK_HRESULT(_device->CreateRenderTargetView(*_backBufferResource, nullptr, _renderTargetView));
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::CreateAndSetSampleStates()
+{
+    D3D11_SAMPLER_DESC samplerDesc = {};
+    
+    {
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[3] = 1.0f;
+        G_PIPELINE.Device->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[0]);
+    }
+
+    {
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[3] = 1.0f;
+        G_PIPELINE.Device->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[1]);
+    }
+
+    {
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+        samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[3] = 1.0f;
+        G_PIPELINE.Device->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[2]);
+    }
+    
+    G_PIPELINE.DeviceContext->PSSetSamplers(0, ARRAYSIZE(G_SAMPLER_STATES), G_SAMPLER_STATES);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SDepthStencilResources& depthStencilResources)
@@ -397,111 +460,6 @@ void MGraphic::ClearDepthStencil(ID3D11DeviceContext* _deviceContext, ID3D11Dept
     _deviceContext->ClearDepthStencilView(_stencilView, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetVertexShader_shadow(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShaderData& _vertexShader)
-{
-    _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_SHADOW);
-    CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), 
-        _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
-    // VertexShader Input Layout
-    {
-        constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
-        {
-            { "POSITION",       0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      0u,     D3D11_INPUT_PER_VERTEX_DATA,      0u },
-            { "SV_InstanceID",  0u,  DXGI_FORMAT_R32_UINT,          1u,      16u,    D3D11_INPUT_PER_INSTANCE_DATA,    0u },
-        };
-        UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
-        CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, 
-            _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
-    }
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetVertexShader_2d(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShaderData& _vertexShader)
-{
-    _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_2D);
-    CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), 
-        _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
-    // VertexShader Input Layout
-    {
-        constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
-        {
-            { "SV_POSITION",    0u,  DXGI_FORMAT_R32G32B32A32_FLOAT,  0u,   0u,      D3D11_INPUT_PER_VERTEX_DATA, 0u },
-            { "TEXCOORD",       0u,  DXGI_FORMAT_R32G32_FLOAT,        0u,   16u,     D3D11_INPUT_PER_VERTEX_DATA, 0u },
-        };
-        UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
-        CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, 
-            _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
-    }
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetVertexShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SVertexShaderData& _vertexShader)
-{
-    _vertexShader.Blob = MShaderResources::GetBlobFromFileName(TAKU_ASSET_VS_BASE);
-    CHECK_HRESULT(_device->CreateVertexShader(_vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), nullptr, &_vertexShader.Shader));
-    // VertexShader Input Layout
-    {
-        constexpr D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
-        {
-            { "POSITION",       0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      0u,     D3D11_INPUT_PER_VERTEX_DATA,      0u },
-            { "NORMAL",         0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      16u,    D3D11_INPUT_PER_VERTEX_DATA,      0u },
-            { "TANGENT",        0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      32u,    D3D11_INPUT_PER_VERTEX_DATA,      0u },
-            { "TEXCOORD",       0u,  DXGI_FORMAT_R32G32_FLOAT,      0u,      48u,    D3D11_INPUT_PER_VERTEX_DATA,      0u },
-            { "SV_InstanceID",  0u,  DXGI_FORMAT_R32_UINT,          1u,      56u,    D3D11_INPUT_PER_INSTANCE_DATA,    0u },
-        };
-        UINT sizeInputElementDesc = ARRAYSIZE(inputElementDesc);
-        CHECK_HRESULT(_device->CreateInputLayout(inputElementDesc, sizeInputElementDesc, _vertexShader.Blob->GetBufferPointer(), _vertexShader.Blob->GetBufferSize(), &_vertexShader.Input));
-    }
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateAndSetPixelShader(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SPixelShaderData& _pixelShader, const char* name)
-{
-    _pixelShader.Blob = MShaderResources::GetBlobFromFileName(name);
-    CHECK_HRESULT(_device->CreatePixelShader(_pixelShader.Blob->GetBufferPointer(), _pixelShader.Blob->GetBufferSize(), nullptr, &_pixelShader.Shader));
-    
-    D3D11_SAMPLER_DESC samplerDesc = {};
-    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-    samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-    samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-    samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
-    samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
-    samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
-    samplerDesc.BorderColor[3] = 1.0f;
-
-    CHECK_HRESULT(_device->CreateSamplerState(&samplerDesc, &_pixelShader.TextureSamplerState));
-    _deviceContext->PSSetSamplers(0, 1, &_pixelShader.TextureSamplerState);
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreatePixelShaderConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _buffer)
-{
-    D3D11_BUFFER_DESC bufferDesc = {};
-    bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    bufferDesc.MiscFlags = 0u;
-    bufferDesc.ByteWidth = sizeof(SPixelShaderConstantBuffer);
-    bufferDesc.StructureByteStride = 0u;
-
-    CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, _buffer));
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetSceneBuffer_PS(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, const SPixelShaderData& _pixelShader)
-{
-    const SLightInfo& lightInfo = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight().GetSceneLightInfo();
-    
-    SPixelShaderConstantBuffer ConstantBufferPixelShader;
-    ConstantBufferPixelShader.camDir = MWorld::GetWorld()->FreeLookCamera.GetCameraWorldViewDir();
-    ConstantBufferPixelShader.lightDir = lightInfo.Direction;
-    ConstantBufferPixelShader.lightColor = { lightInfo.Color.r, lightInfo.Color.g, lightInfo.Color.b };
-    ConstantBufferPixelShader.lightColorIntensity = lightInfo.ColorIntensity;
-    ConstantBufferPixelShader.lightAmbientIntensity = lightInfo.AmbientIntensity;
-
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    CHECK_HRESULT(_deviceContext->Map(_pixelShader.ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-    memcpy(mappedResource.pData, &ConstantBufferPixelShader, sizeof(SPixelShaderConstantBuffer));
-    _deviceContext->Unmap(_pixelShader.ConstantBuffer, 0);
-    _deviceContext->PSSetConstantBuffers(0u, 1u, &_pixelShader.ConstantBuffer);
-}
-///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _vertexBuffer, void* _vertices, UINT _nbVertices, UINT _sizeStruct)
 {
     D3D11_BUFFER_DESC bufferDesc = {};
@@ -548,61 +506,6 @@ void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceConte
     bufferDesc.ByteWidth = _size;
     bufferDesc.StructureByteStride = 0u;
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, VertexConstantBuffer));
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetVSBuffer_Scene(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer)
-{
-    const TMatrix4f cameraViewMatrix = MWorld::GetWorld()->FreeLookCamera.GetViewMatrix();
-    const TMatrix4f cameraProjectionMatrix = MGameWindow::GetCameraProjectionMatrix();
-    
-	const CSceneLight& SceneLight = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight();
-    const TMatrix4f lightViewMatrix = SceneLight.GetViewMatrix();
-    const TMatrix4f lightProjectionMatrix = SceneLight.GetProjectionMatrix();
-
-    SVSConstantBuffer_Frame buffer;
-    buffer.CameraViewProjection = TMatrix4f::Transpose(cameraViewMatrix * TMatrix4f::World * cameraProjectionMatrix);
-    buffer.lightViewMatrix = TMatrix4f::Transpose(lightViewMatrix * TMatrix4f::World);
-    buffer.lightProjectionMatrix = TMatrix4f::Transpose(lightProjectionMatrix);
-    
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    CHECK_HRESULT(_deviceContext->Map(*_objectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-    memcpy(mappedResource.pData, &buffer, sizeof(SVSConstantBuffer_Frame));
-    _deviceContext->Unmap(*_objectBuffer, 0);
-    _deviceContext->VSSetConstantBuffers(0u, 1u, _objectBuffer);
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetVSBuffer_Light(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer)
-{
-    const CSceneLight& SceneLight = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight();
-    const TMatrix4f lightViewMatrix = SceneLight.GetViewMatrix();
-    const TMatrix4f lightProjectionMatrix = SceneLight.GetProjectionMatrix();
-    
-    SVSConstantBuffer_Frame buffer;
-    buffer.CameraViewProjection = TMatrix4f::Transpose(lightViewMatrix * TMatrix4f::World * lightProjectionMatrix);
-    
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    CHECK_HRESULT(_deviceContext->Map(*_objectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-    memcpy(mappedResource.pData, &buffer, sizeof(SVSConstantBuffer_Frame));
-    _deviceContext->Unmap(*_objectBuffer, 0);
-    _deviceContext->VSSetConstantBuffers(0u, 1u, _objectBuffer);
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetVSConstantBuffer_Instanced(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _objectBuffer, const std::vector<TTransform>& _transforms, UINT _start, UINT _nbInstances)
-{
-    int indexGlobal = 0;
-    const UINT End = _start + _nbInstances;
-    for (UINT i = _start; i < End ; ++i)
-    {
-        const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transforms[i]);
-        indexGlobal++;
-        G_VS_CONSTANT_BUFFER.world[indexGlobal] = TMatrix4f::Transpose(objectWorldMatrix);
-    }
-
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    CHECK_HRESULT(_deviceContext->Map(*_objectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-    memcpy(mappedResource.pData, &G_VS_CONSTANT_BUFFER, sizeof(SVSConstantBuffer_InstanceObject));
-    _deviceContext->Unmap(*_objectBuffer, 0);
-    _deviceContext->VSSetConstantBuffers(1u, 1u, _objectBuffer);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState)
