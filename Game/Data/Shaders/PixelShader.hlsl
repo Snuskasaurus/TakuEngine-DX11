@@ -53,8 +53,9 @@ float4 Main(PS_Input input) : SV_Target
     const float3 sampleSO = tex_so.Sample(samplerState, input.uv).rgb; 
     const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
     
-    const float specFromSample = 1.0f - sampleSO.g;
-    const float occlusionFromSample = sampleSO.b;
+    const float specFromSample = sampleSO.r;
+    //return float4(specFromSample.xxx, 1.0f);
+    const float occlusionFromSample = sampleSO.g;
     
     // Normal
     const float3 tangent = normalize(input.tan - dot(input.tan, input.normal) * input.normal);

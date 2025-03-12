@@ -1,0 +1,59 @@
+{
+	"sheets": [
+		{
+			"name": "Drawable",
+			"columns": [
+				{
+					"typeStr": "1",
+					"name": "Name"
+				},
+				{
+					"typeStr": "13",
+					"name": "Mesh"
+				},
+				{
+					"typeStr": "2",
+					"name": "CastShadow"
+				},
+				{
+					"typeStr": "7",
+					"name": "TextureNormal",
+					"display": null
+				},
+				{
+					"typeStr": "7",
+					"name": "TextureEmission",
+					"display": null
+				},
+				{
+					"typeStr": "7",
+					"name": "TextureSO",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"Name": "Tile0000",
+					"Mesh": "Tile0000.obj",
+					"TextureNormal": "a32ce714b9d8450d9245a692ec29921b",
+					"TextureEmission": "",
+					"TextureSO": "",
+					"": "Tile0000.obj",
+					"CastShadow": true
+				},
+				{
+					"Name": "Tile0000",
+					"Mesh": "Tile0000.obj",
+					"CastShadow": true,
+					"TextureNormal": "",
+					"TextureEmission": "",
+					"TextureSO": ""
+				}
+			],
+			"separators": [],
+			"props": {}
+		}
+	],
+	"customTypes": [],
+	"compress": false
+}

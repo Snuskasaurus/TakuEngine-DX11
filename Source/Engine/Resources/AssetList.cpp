@@ -8,17 +8,6 @@
 
 void LoadMeshes()
 {
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1001);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1010);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1101);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1111);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2000);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2002);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2020);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2202);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_2222);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_01);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_02);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_03);
@@ -36,17 +25,6 @@ void LoadShaders()
 
 void LoadTextures()
 {
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1001);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1010);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1101);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1111);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2000);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2002);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2020);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2202);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_2222);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_01);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_02);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_03);
@@ -54,6 +32,18 @@ void LoadTextures()
 
 void LoadDrawables()
 {
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_0000, {G_ASSET_MESH_TILE_0000, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_1000, {G_ASSET_MESH_TILE_1000, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_1001, {G_ASSET_MESH_TILE_1001, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_1010, {G_ASSET_MESH_TILE_1010, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_1101, {G_ASSET_MESH_TILE_1101, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_1111, {G_ASSET_MESH_TILE_1111, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_2000, {G_ASSET_MESH_TILE_2000, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_2002, {G_ASSET_MESH_TILE_2002, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_2020, {G_ASSET_MESH_TILE_2020, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_2202, {G_ASSET_MESH_TILE_2202, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_2222, {G_ASSET_MESH_TILE_2222, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
+
     MDrawableResources::CreateDrawableData(G_ASSET_TILE_BORDER, {G_ASSET_MESH_TILE_BORDER, "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, false});
     MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
     MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});

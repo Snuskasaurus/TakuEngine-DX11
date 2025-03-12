@@ -95,17 +95,17 @@ void InitVisualMeshDataMap()
 {
     CGameScene* GameScene = MWorld::GetWorld()->GetCurrentScene();
     
-    CDrawable_InstancedMesh* Mesh0000 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_0000);
-    CDrawable_InstancedMesh* Mesh1000 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1000);
-    CDrawable_InstancedMesh* Mesh1001 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1001);
-    CDrawable_InstancedMesh* Mesh1010 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1010);
-    CDrawable_InstancedMesh* Mesh1101 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1101);
-    CDrawable_InstancedMesh* Mesh1111 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1111);
-    CDrawable_InstancedMesh* Mesh2000 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2000);
-    CDrawable_InstancedMesh* Mesh2002 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2002);
-    CDrawable_InstancedMesh* Mesh2020 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2020);
-    CDrawable_InstancedMesh* Mesh2202 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2202);
-    CDrawable_InstancedMesh* Mesh2222 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2222);
+    CDrawable_InstancedMesh* Mesh0000 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_0000);
+    CDrawable_InstancedMesh* Mesh1000 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_1000);
+    CDrawable_InstancedMesh* Mesh1001 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_1001);
+    CDrawable_InstancedMesh* Mesh1010 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_1010);
+    CDrawable_InstancedMesh* Mesh1101 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_1101);
+    CDrawable_InstancedMesh* Mesh1111 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_1111);
+    CDrawable_InstancedMesh* Mesh2000 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_2000);
+    CDrawable_InstancedMesh* Mesh2002 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_2002);
+    CDrawable_InstancedMesh* Mesh2020 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_2020);
+    CDrawable_InstancedMesh* Mesh2202 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_2202);
+    CDrawable_InstancedMesh* Mesh2222 = GameScene->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_2222);
     
     VisualMeshDataMap.insert({0, {Mesh0000, 0.0f}});
 
