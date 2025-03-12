@@ -40,7 +40,6 @@ static SVertexShader G_VS_SHADOW;
 static SVertexShader G_VS_BASE;
 static SVertexShader G_VS_2D_DEBUG;
 ///---------------------------------------------------------------------------------------------------------------------
-static SPixelShader G_PS_SHADOW;
 static SPixelShader G_PS_BASE;
 static SPixelShader G_PS_2D_DEBUG;
 static SPixelShader G_PS_POST_PROCESS_1;
@@ -81,7 +80,6 @@ void MGraphic::InitializeGraphic()
     // Initialize Pixel Shaders
     {
         G_PS_BASE.CreatePixelShader(G_PIPELINE.Device,            TAKU_ASSET_PS_BASE);
-        G_PS_SHADOW.CreatePixelShader(G_PIPELINE.Device,          TAKU_ASSET_PS_SHADOW);
         G_PS_2D_DEBUG.CreatePixelShader(G_PIPELINE.Device,        TAKU_ASSET_PS_2D);
         G_PS_POST_PROCESS_1.CreatePixelShader(G_PIPELINE.Device,  TAKU_ASSET_PS_POST_PROCESS_1);
     }
@@ -131,7 +129,7 @@ void MGraphic::RenderFrame_SceneShadowMap()
     G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &NullRenderTarget, G_DEPTH_STENCIL_RESOURCES.ViewLight);
     G_PIPELINE.DeviceContext->VSSetShader(G_VS_SHADOW.Shader, nullptr, 0u);
     G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_SHADOW.Input);
-    G_PIPELINE.DeviceContext->PSSetShader(G_PS_SHADOW.Shader, nullptr, 0u);
+    G_PIPELINE.DeviceContext->PSSetShader(nullptr, nullptr, 0u);
     SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], true);
     
     for (int i = 0; i < instancedMeshes.size(); ++i)
@@ -278,7 +276,6 @@ void MGraphic::UninitializeGraphic()
     G_VS_BASE.Release();
     G_VS_2D_DEBUG.Release();
     
-    G_PS_SHADOW.Release();
     G_PS_BASE.Release();
     G_PS_2D_DEBUG.Release();
 
