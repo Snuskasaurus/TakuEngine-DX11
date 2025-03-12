@@ -64,8 +64,6 @@ inline const char* G_ASSET_T_MACHINE_2_MRO = "TestPBR/Machine/T_Machine2_mro";
 class MAsset
 {
 public:
-    static void LoadMeshes();
-    static void LoadShaders();
-    static void LoadTextures();
-    static void LoadDrawables();
+    static void LoadAssets();
+    static void UnloadAssets();
 };

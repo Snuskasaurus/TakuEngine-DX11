@@ -23,13 +23,15 @@ private:
     
 public:
     static void InitializeWorld();
+    static void UninitializeWorld();
     static MWorld* GetWorld() { return Instance; }
     static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
 public:
     CGameScene* GetCurrentScene() const { return CurrentGameScene; }
     
 private:
-    void OnInit();
+    void OnInitialize();
+    void OnUninitialize();
     void OnUpdate(const float& _dt);
     
 private:

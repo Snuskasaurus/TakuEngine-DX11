@@ -47,12 +47,6 @@ void CGameScene::Update(const float& _dt)
     OnUpdate_Internal(_dt);
     OnUpdate(_dt);
 }
-
-//---------------------------------------------------------------------------------------------------------------------
-void CGameScene::OnCreate_Internal()
-{
-    SceneLight.Initialize();
-}
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Destroy()
 {
@@ -65,12 +59,13 @@ void CGameScene::NotifyKeyPressed(EKeyCode _keyCode)
     OnKeyPressed_Internal(_keyCode);
     OnKeyPressed(_keyCode);
 }
-
+//---------------------------------------------------------------------------------------------------------------------
+void CGameScene::OnCreate_Internal()
+{
+}
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnDestroy_Internal()
 {
-    SceneLight.Uninitialize();
-    
     for (int i = 0; i < InstancedMeshes.size(); ++i)
     {
         delete InstancedMeshes[i];
@@ -96,6 +91,8 @@ void CGameScene::OnKeyPressed_Internal(EKeyCode _key)
     {
         ToggleDebugs();
     }
+    else if (_key == EKeyCode::KEY_NUM_LOCK)
+        MGraphic::ReportLiveObjects(true);
     else if (_key == EKeyCode::KEY_KEYPAD_8)
         SceneLight.AddPitch(10.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_2)

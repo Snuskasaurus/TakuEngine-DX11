@@ -37,4 +37,5 @@ public:
     static SMeshData* CreateMeshDataFromFileName(const char*);
     static SMeshData* GetMeshDataFromFileName(const char*);
     static SMeshData* GetOrCreateMeshDataFromFileName(const char* _filename);
+    static void DestroyMeshesData();
 };

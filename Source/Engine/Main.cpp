@@ -14,13 +14,9 @@ namespace TakuEngine
 void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 {
 	MGameWindow::InitializeGameWindow(hInstance);
-	
-	MAsset::LoadMeshes();
-	MAsset::LoadShaders();
-	MAsset::LoadTextures();
-	MAsset::LoadDrawables();
-	
 	MGraphic::InitializeGraphic();
+	MAsset::LoadAssets();
+	MGraphic::InitializeShaders();
 	MTime::InitializeTime();
 	MInput::InitializeInput(hInstance);
 	MWorld::InitializeWorld();
@@ -43,6 +39,10 @@ void Draw()
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Uninitialization()
 {
+	MGraphic::PrepareUninitializeGraphic();
+	MWorld::UninitializeWorld();
+	MAsset::UnloadAssets();
+	MGraphic::UninitializeGraphic();
 	MGameWindow::UninitializeGameWindow();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -20,6 +20,8 @@ struct SDrawableData
     struct STextureData* NormalTextureData = nullptr;
     struct STextureData* EmissionTextureData = nullptr;
     struct STextureData* MROTextureData = nullptr;
+
+    void Release();
 };
 
 class MDrawableResources
@@ -27,4 +29,5 @@ class MDrawableResources
 public:
     static SDrawableData* CreateDrawableData(const char*, const SDrawableData_CreateInput&);
     static SDrawableData* GetDrawableData(const char*);
+    static void DestroyDrawables();
 };

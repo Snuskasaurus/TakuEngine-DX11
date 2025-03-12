@@ -26,8 +26,6 @@ public:
     TMatrix4f GetProjectionMatrix() const;
 
 private:
-    void Initialize();
-    void Uninitialize();
     void OnValueChanged();
 private:
     float CurrentYaw = 0.0f;

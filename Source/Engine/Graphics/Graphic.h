@@ -7,22 +7,6 @@ class CDrawable_InstancedMesh;
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;
 
-struct SGraphicResources_Pipeline
-{
-    ID3D11Device* Device = nullptr;
-    ID3D11DeviceContext* DeviceContext = nullptr;
-    IDXGISwapChain* SwapChain = nullptr;
-    ID3D11RasterizerState* rasterizerState = nullptr;
-
-    void Release()
-    {
-        Device->Release();
-        DeviceContext->Release();
-        SwapChain->Release();
-        rasterizerState->Release();
-    }
-};
-
 struct SDepthStencilResources
 {
     ID3D11DepthStencilState* State = nullptr;
@@ -40,6 +24,7 @@ struct SDepthStencilResources
         Texture->Release();
         View->Release();
         ResourceView->Release();
+        ViewLight->Release();
         TextureLight->Release();
         ResourceViewLight->Release();
     }
@@ -51,10 +36,12 @@ public:
     static ID3D11Device* GetDXDevice();
     static ID3D11DeviceContext* GetDXDeviceContext();
 public:
-    static void CreateDirectXWindow();
-public:
     static void InitializeGraphic();
+    static void InitializeShaders();
+    static void PrepareUninitializeGraphic();
     static void UninitializeGraphic();
+public:
+    static void ReportLiveObjects(bool _showDetails);
 public:
     static void RenderFrame();
     static void RenderFrame_SceneShadowMap();
@@ -69,7 +56,6 @@ public:
     static void CreateAndSetSampleStates();
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, void* _vertices, UINT _nbVertices, UINT _sizeStruct);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, TVertexIndex* _indexes, UINT _nbIndex, UINT _sizeStruct);
-    static void CreateVertexShaderBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** VertexConstantBuffer, UINT _size);
     static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer, UINT VertexBufferByteStride);
 public:
     static void SetPixelShaderTextureViews(ID3D11DeviceContext* _deviceContext, UINT nbTextures, ID3D11ShaderResourceView** _textureViews);

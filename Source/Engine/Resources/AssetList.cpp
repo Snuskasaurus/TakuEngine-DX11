@@ -6,7 +6,7 @@
 #include "ShadersResources.h"
 #include "TextureResources.h"
 
-void MAsset::LoadMeshes()
+void LoadMeshes()
 {
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SQUARE);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_CUBE);
@@ -32,7 +32,7 @@ void MAsset::LoadMeshes()
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TREE_03);
 }
 
-void MAsset::LoadShaders()
+void LoadShaders()
 {
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_VS_BASE,            VERTEX_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_BASE,            PIXEL_SHADER);
@@ -42,7 +42,7 @@ void MAsset::LoadShaders()
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_POST_PROCESS_1,  PIXEL_SHADER);
 }
 
-void MAsset::LoadTextures()
+void LoadTextures()
 {
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TAKUMI);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_BORDER);
@@ -62,7 +62,7 @@ void MAsset::LoadTextures()
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TREE_03);
 }
 
-void MAsset::LoadDrawables()
+void LoadDrawables()
 {
     MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE});
     MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE});
@@ -81,5 +81,21 @@ void MAsset::LoadDrawables()
             {G_ASSET_MESH_MACHINE_BUTTONS, "", "",
                 G_ASSET_T_MACHINE_2_COLOR, G_ASSET_T_MACHINE_2_NORMAL, G_ASSET_T_MACHINE_2_EMISSION, G_ASSET_T_MACHINE_2_MRO });
     }
+}
+
+void MAsset::LoadAssets()
+{
+    LoadMeshes();
+    LoadShaders();
+    LoadTextures();
+    LoadDrawables();
+}
+
+void MAsset::UnloadAssets()
+{
+    MDrawableResources::DestroyDrawables();
+    MTextureResources::DestroyTexturesData();
+    MShaderResources::DestroyBlobs();
+    MMeshResources::DestroyMeshesData();
 }
 

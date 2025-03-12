@@ -78,6 +78,15 @@ void MShaderResources::InitializeShaders()
     
 }
 
+void MShaderResources::DestroyBlobs()
+{
+    for (const auto& element : G_BLOB_MAP)
+    {
+        element.second->Release();
+    }
+    G_BLOB_MAP.clear();
+}
+
 void MShaderResources::DeleteAllBlobs()
 {
     for (auto gBlobMap : G_BLOB_MAP)

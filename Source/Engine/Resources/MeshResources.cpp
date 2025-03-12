@@ -57,6 +57,15 @@ SMeshData* MMeshResources::GetOrCreateMeshDataFromFileName(const char* _filename
     return textureData;
 }
 //--------------------------------------------------------------------------------------
+void MMeshResources::DestroyMeshesData()
+{
+    for (const auto& element : G_MESH_DATA_MAP)
+    {
+        delete element.second;
+    }
+    G_MESH_DATA_MAP.clear();
+}
+//--------------------------------------------------------------------------------------
 SMeshData* TryToImportMesh(const std::string& _filename)
 {
     static Assimp::Importer importer;

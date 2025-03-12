@@ -6,11 +6,7 @@ struct STextureData
     struct ID3D11Resource* texture = nullptr;
     struct ID3D11ShaderResourceView* textureView = nullptr;
 
-    ~STextureData()
-    {
-        texture->Release();
-        textureView->Release();
-    }
+    void Release();
 };
     
 class MTextureResources
@@ -18,5 +14,6 @@ class MTextureResources
 public:
     static STextureData* CreateTextureDataFromFileName(const char*);
     static STextureData* GetTextureDataFromFileName(const char*); 
-    static STextureData* GetOrCreateTextureDataFromFileName(const char*); 
+    static STextureData* GetOrCreateTextureDataFromFileName(const char*);
+    static void DestroyTexturesData();
 };

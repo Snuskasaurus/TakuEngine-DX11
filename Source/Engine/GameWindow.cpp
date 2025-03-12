@@ -70,14 +70,11 @@ void MGameWindow::InitializeGameWindow(const HINSTANCE hInstance)
         nullptr, nullptr, hInstance, nullptr);
     
     ShowWindow(GameWindowHandle, SW_SHOW);
-    
-    MGraphic::CreateDirectXWindow();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void MGameWindow::UninitializeGameWindow()
 {
     assert(GameWindowHandle != nullptr);
-    MGraphic::UninitializeGraphic();
     DestroyWindow(GameWindowHandle);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------

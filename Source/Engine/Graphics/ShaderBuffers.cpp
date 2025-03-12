@@ -27,9 +27,13 @@ void SShaderBufferHolder::CreateShaderBuffer(EShaderType _shaderType, UINT _slot
     
     ID3D11Device* Device = MGraphic::GetDXDevice();
     CHECK_HRESULT(Device->CreateBuffer(&bufferDesc, nullptr, &this->Buffer));
+#ifdef DEBUG_ENABLE_DIRECT_DEVICE_DEBUG
+    constexpr char name[] = "TAKU_SHADER_BUFFER";
+    CHECK_HRESULT(this->Buffer->SetPrivateData(WKPDID_D3DDebugObjectName, ARRAYSIZE(name), name));
+#endif
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-void SShaderBufferHolder::DestroyShaderBuffer()
+void SShaderBufferHolder::Release()
 {
     if (Buffer != nullptr)
         Buffer->Release();

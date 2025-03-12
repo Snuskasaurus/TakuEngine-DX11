@@ -37,15 +37,6 @@ TMatrix4f CSceneLight::GetProjectionMatrix() const
      const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixOrthographicRH(120, 120, 0.1f, 300.0f);
      return PerspectiveMatrix;
 }
-
-void CSceneLight::Initialize()
-{
-}
-
-void CSceneLight::Uninitialize()
-{
-}
-
 void CSceneLight::OnValueChanged()
 {
       const TMatrix4f LightRotationMatrix = TMatrix4f::MatrixRotationPitch(MMath::Deg2Rad(-CurrentPitch)) * TMatrix4f::MatrixRotationYaw(MMath::Deg2Rad(-CurrentYaw)) * TMatrix4f::MatrixRotationRoll(0.0f);

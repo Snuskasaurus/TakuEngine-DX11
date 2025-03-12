@@ -32,3 +32,12 @@ SDrawableData* MDrawableResources::GetDrawableData(const char* _name)
         return nullptr;
     return result->second;
 }
+
+void MDrawableResources::DestroyDrawables()
+{
+    for (auto element : G_DRAWABLE_DATA_MAP)
+    {
+        delete element.second;
+    }
+    G_DRAWABLE_DATA_MAP.clear();
+}

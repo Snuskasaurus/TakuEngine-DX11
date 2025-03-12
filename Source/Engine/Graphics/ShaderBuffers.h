@@ -38,7 +38,7 @@ struct SShaderBufferHolder
 #endif
 
     void CreateShaderBuffer(EShaderType _shaderType, UINT _slot, UINT _sizeStruct);
-    void DestroyShaderBuffer();
+    void Release();
 
     static void FillBuffer_VS_Object(SShaderBufferHolder*, const TTransform* _transforms, UINT _start, UINT _nbInstances);
     static void FillBuffer_VS_SceneEachFrame(SShaderBufferHolder*, bool _isViewLight);

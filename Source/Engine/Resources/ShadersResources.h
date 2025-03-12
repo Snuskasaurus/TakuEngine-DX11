@@ -60,6 +60,7 @@ public:
     static ID3DBlob* GetBlobFromFileName(const char*);
     static ID3DBlob* GetOrCreateBlobFromFileName(const char* _filename, EShaderType _shaderType);
     static void InitializeShaders();
+    static void DestroyBlobs();
 public:
     static void DeleteAllBlobs();
 private:

@@ -21,8 +21,14 @@ HRESULT CreateWICTextureFromMemory(_In_ ID3D11Device*, _In_opt_ ID3D11DeviceCont
 HRESULT CreateWICTextureFromFile(_In_ ID3D11Device*,_In_opt_ ID3D11DeviceContext*,_In_z_ const wchar_t*,_Out_opt_ ID3D11Resource**,_Out_opt_ ID3D11ShaderResourceView**,_In_ size_t);
 
 //--------------------------------------------------------------------------------------
-// TODO Julien Rogel (11/02/2025): Change this data structure to use an array and avoid allocation for each mesh data
 static std::map<std::string, STextureData*> G_TEXTURE_DATA_MAP;
+
+void STextureData::Release()
+{
+    textureView->Release();
+    texture->Release();
+}
+
 //--------------------------------------------------------------------------------------
 STextureData* MTextureResources::CreateTextureDataFromFileName(const char* _filename)
 {
@@ -52,6 +58,16 @@ STextureData* MTextureResources::GetOrCreateTextureDataFromFileName(const char* 
     STextureData* textureData = GetTextureDataFromFileName(_filename);
     if (textureData == nullptr) textureData = CreateTextureDataFromFileName(_filename);
     return textureData;
+}
+//--------------------------------------------------------------------------------------
+void MTextureResources::DestroyTexturesData()
+{
+    for (const auto& element : G_TEXTURE_DATA_MAP)
+    {
+        element.second->Release();
+        delete element.second;
+    }
+    G_TEXTURE_DATA_MAP.clear();
 }
 //--------------------------------------------------------------------------------------
 // Function for loading a WIC image and creating a Direct3D 11 runtime texture for it

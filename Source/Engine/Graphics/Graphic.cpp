@@ -28,9 +28,13 @@ EDebugDrawTarget DebugDrawTarget = EDebugDrawTarget::NONE;
 int GetResolutionWidth() { return RESOLUTION_WIDTH; }
 int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
 ///---------------------------------------------------------------------------------------------------------------------
-static SGraphicResources_Pipeline G_PIPELINE;
 static SDepthStencilResources G_DEPTH_STENCIL_RESOURCES;
 static ID3D11SamplerState* G_SAMPLER_STATES[3] = { nullptr, nullptr, nullptr};
+///---------------------------------------------------------------------------------------------------------------------
+ID3D11Device* G_DEVICE = nullptr;
+ID3D11DeviceContext* G_DEVICE_CONTEXT = nullptr;
+IDXGISwapChain* G_SWAP_CHAIN = nullptr;
+ID3D11RasterizerState* G_RASTERIZER_STATE = nullptr;
 ///---------------------------------------------------------------------------------------------------------------------
 ID3D11RenderTargetView* G_RENDER_TARGET_VIEW = nullptr;
 ID3D11Resource* G_BACK_BUFFER_RESOURCE = nullptr;
@@ -49,39 +53,50 @@ static SShaderBufferHolder G_PS_BUFFERS[15];
 ///---------------------------------------------------------------------------------------------------------------------
 ID3D11Device* MGraphic::GetDXDevice()
 {
-    return G_PIPELINE.Device;
+    return G_DEVICE;
 }
 ///---------------------------------------------------------------------------------------------------------------------
 ID3D11DeviceContext* MGraphic::GetDXDeviceContext()
 {
-    return G_PIPELINE.DeviceContext;
+    return G_DEVICE_CONTEXT;
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateDirectXWindow()
+void MGraphic::ReportLiveObjects(bool _showDetails)
 {
-    MGraphic::CreateDeviceAndSwapChain(&G_PIPELINE.Device, &G_PIPELINE.DeviceContext, &G_PIPELINE.SwapChain);
+#if DEBUG_ENABLE_DIRECTX_DEVICE_DEBUG
+    OutputDebugStringA("ReportLiveDeviceObjects - Start --------------------------\n");
+    ID3D11Debug* debug = nullptr;
+    CHECK_HRESULT(G_DEVICE->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug));
+    CHECK_HRESULT(debug->ReportLiveDeviceObjects(_showDetails == true ? D3D11_RLDO_DETAIL : D3D11_RLDO_SUMMARY));
+    debug->Release();
+    OutputDebugStringA("ReportLiveDeviceObjects - End --------------------------\n");
+#endif
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::InitializeGraphic()
 {
+    MGraphic::CreateDeviceAndSwapChain(&G_DEVICE, &G_DEVICE_CONTEXT, &G_SWAP_CHAIN);
     MGraphic::CreateRenderTargetView();
-    MGraphic::CreateDepthStencil(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES);
-    MGraphic::CreateRasterizerState(G_PIPELINE.Device, &G_PIPELINE.rasterizerState);
-    MGraphic::ConfigureViewport(G_PIPELINE.DeviceContext);
+    MGraphic::CreateDepthStencil(G_DEVICE, G_DEVICE_CONTEXT, G_DEPTH_STENCIL_RESOURCES);
+    MGraphic::CreateRasterizerState(G_DEVICE, &G_RASTERIZER_STATE);
+    MGraphic::ConfigureViewport(G_DEVICE_CONTEXT);
     MGraphic::CreateAndSetSampleStates();
-    
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::InitializeShaders()
+{ 
     // Initialize Vertex Shaders
     {
-        G_VS_2D_DEBUG.CreateVertexShader(G_PIPELINE.Device,     TAKU_ASSET_VS_2D,       VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
-        G_VS_SHADOW.CreateVertexShader(G_PIPELINE.Device,       TAKU_ASSET_VS_SHADOW,   VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
-        G_VS_BASE.CreateVertexShader(G_PIPELINE.Device,         TAKU_ASSET_VS_BASE,     VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
+        G_VS_2D_DEBUG.CreateVertexShader(G_DEVICE,     TAKU_ASSET_VS_2D,       VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
+        G_VS_SHADOW.CreateVertexShader(G_DEVICE,       TAKU_ASSET_VS_SHADOW,   VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
+        G_VS_BASE.CreateVertexShader(G_DEVICE,         TAKU_ASSET_VS_BASE,     VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
     }
     
     // Initialize Pixel Shaders
     {
-        G_PS_BASE.CreatePixelShader(G_PIPELINE.Device,            TAKU_ASSET_PS_BASE);
-        G_PS_2D_DEBUG.CreatePixelShader(G_PIPELINE.Device,        TAKU_ASSET_PS_2D);
-        G_PS_POST_PROCESS_1.CreatePixelShader(G_PIPELINE.Device,  TAKU_ASSET_PS_POST_PROCESS_1);
+        G_PS_BASE.CreatePixelShader(G_DEVICE,            TAKU_ASSET_PS_BASE);
+        G_PS_2D_DEBUG.CreatePixelShader(G_DEVICE,        TAKU_ASSET_PS_2D);
+        G_PS_POST_PROCESS_1.CreatePixelShader(G_DEVICE,  TAKU_ASSET_PS_POST_PROCESS_1);
     }
     
     // Initialize Vertex Shader Buffers
@@ -98,6 +113,9 @@ void MGraphic::InitializeGraphic()
 ///---------------------------------------------------------------------------------------------------------------------
 void DrawRectToScreenSpace(TVector2f TopLeft, TVector2f BotRight)
 {
+    ID3D11Buffer* VertexBuffer = nullptr;
+    ID3D11Buffer* IndexBuffer = nullptr;
+    
     struct SVertex2D { TVector4f pos; TVector2f uv; } Vertexes[4] =
     {
         {{ TopLeft.x, TopLeft.y, 0.5f, 1.0f }, {0.0f, 0.0f}},
@@ -108,14 +126,12 @@ void DrawRectToScreenSpace(TVector2f TopLeft, TVector2f BotRight)
     UINT sizeVec = sizeof(TVector3f);
     UINT sizeVertex = sizeof(SVertex2D);
     TVertexIndex Indexes[6] = { 2, 1, 0, 2, 0, 3 };
-    ID3D11Buffer* VertexBuffer = nullptr;
-    MGraphic::CreateVertexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &VertexBuffer, Vertexes, ARRAYSIZE(Vertexes), sizeof(SVertex2D));
-    ID3D11Buffer* IndexBuffer = nullptr;
-    MGraphic::CreateIndexBuffer(G_PIPELINE.Device, G_PIPELINE.DeviceContext, &IndexBuffer, Indexes, ARRAYSIZE(Indexes), sizeof(TVertexIndex));
-    MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &VertexBuffer, IndexBuffer, sizeof(SVertex2D));
+    MGraphic::CreateVertexBuffer(G_DEVICE, G_DEVICE_CONTEXT, &VertexBuffer, Vertexes, ARRAYSIZE(Vertexes), sizeof(SVertex2D));
+    MGraphic::CreateIndexBuffer(G_DEVICE, G_DEVICE_CONTEXT, &IndexBuffer, Indexes, ARRAYSIZE(Indexes), sizeof(TVertexIndex));
+    MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &VertexBuffer, IndexBuffer, sizeof(SVertex2D));
 
-    G_PIPELINE.DeviceContext->DrawIndexed(ARRAYSIZE(Indexes), 0u, 0u);
-    MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
+    G_DEVICE_CONTEXT->DrawIndexed(ARRAYSIZE(Indexes), 0u, 0u);
+    MGraphic::Rasterize(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
     
     VertexBuffer->Release();
     IndexBuffer->Release();
@@ -126,16 +142,16 @@ void MGraphic::RenderFrame_SceneShadowMap()
     const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
 
     ID3D11RenderTargetView* NullRenderTarget = nullptr;
-    G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &NullRenderTarget, G_DEPTH_STENCIL_RESOURCES.ViewLight);
-    G_PIPELINE.DeviceContext->VSSetShader(G_VS_SHADOW.Shader, nullptr, 0u);
-    G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_SHADOW.Input);
-    G_PIPELINE.DeviceContext->PSSetShader(nullptr, nullptr, 0u);
+    G_DEVICE_CONTEXT->OMSetRenderTargets(1u, &NullRenderTarget, G_DEPTH_STENCIL_RESOURCES.ViewLight);
+    G_DEVICE_CONTEXT->VSSetShader(G_VS_SHADOW.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->IASetInputLayout(G_VS_SHADOW.Input);
+    G_DEVICE_CONTEXT->PSSetShader(nullptr, nullptr, 0u);
     SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], true);
     
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
         CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
-        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
+        MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
         
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
@@ -145,30 +161,30 @@ void MGraphic::RenderFrame_SceneShadowMap()
             const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
             
             SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
-            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
+            MGraphic::SetPrimitiveAndDraw_Instanced(G_DEVICE_CONTEXT, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
             
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
         }
     }
-    MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
+    MGraphic::Rasterize(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame_Scene()
 {
     const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
     
-    G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, G_DEPTH_STENCIL_RESOURCES.View);
-    G_PIPELINE.DeviceContext->VSSetShader(G_VS_BASE.Shader, nullptr, 0u);
-    G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_BASE.Input);
+    G_DEVICE_CONTEXT->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, G_DEPTH_STENCIL_RESOURCES.View);
+    G_DEVICE_CONTEXT->VSSetShader(G_VS_BASE.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->IASetInputLayout(G_VS_BASE.Input);
     SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], false);
-    G_PIPELINE.DeviceContext->PSSetShader(G_PS_BASE.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->PSSetShader(G_PS_BASE.Shader, nullptr, 0u);
     SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(&G_PS_BUFFERS[0]);
     
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
         CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
         
-        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
+        MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
         
         ID3D11ShaderResourceView* ShaderResourceViews[] =
             {
@@ -179,7 +195,7 @@ void MGraphic::RenderFrame_Scene()
                 (!instancedMesh->MROTexture ? nullptr : instancedMesh->MROTexture->textureView),
             };
         
-        MGraphic::SetPixelShaderTextureViews(G_PIPELINE.DeviceContext, ARRAYSIZE(ShaderResourceViews), ShaderResourceViews);
+        MGraphic::SetPixelShaderTextureViews(G_DEVICE_CONTEXT, ARRAYSIZE(ShaderResourceViews), ShaderResourceViews);
    
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
@@ -189,12 +205,12 @@ void MGraphic::RenderFrame_Scene()
             const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
             
             SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
-            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
+            MGraphic::SetPrimitiveAndDraw_Instanced(G_DEVICE_CONTEXT, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
             
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
         }
     }
-    MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
+    MGraphic::Rasterize(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame_PostProcess()
@@ -208,17 +224,17 @@ void MGraphic::RenderFrame_PostProcess()
     desc.MiscFlags = 0;
     ID3D11Texture2D* renderTexture;
     ID3D11ShaderResourceView* renderShaderResourceView;
-    CHECK_HRESULT(G_PIPELINE.Device->CreateTexture2D(&desc, nullptr, &renderTexture));
-    CHECK_HRESULT(G_PIPELINE.Device->CreateShaderResourceView(renderTexture, nullptr, &renderShaderResourceView));
-    G_PIPELINE.DeviceContext->CopyResource(renderTexture, G_BACK_BUFFER_RESOURCE);
+    CHECK_HRESULT(G_DEVICE->CreateTexture2D(&desc, nullptr, &renderTexture));
+    CHECK_HRESULT(G_DEVICE->CreateShaderResourceView(renderTexture, nullptr, &renderShaderResourceView));
+    G_DEVICE_CONTEXT->CopyResource(renderTexture, G_BACK_BUFFER_RESOURCE);
 
     // setups shaders and resources
-    G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, nullptr);
-    G_PIPELINE.DeviceContext->VSSetShader(G_VS_2D_DEBUG.Shader, nullptr, 0u);
-    G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_2D_DEBUG.Input);
-    G_PIPELINE.DeviceContext->PSSetShader(G_PS_POST_PROCESS_1.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, nullptr);
+    G_DEVICE_CONTEXT->VSSetShader(G_VS_2D_DEBUG.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->IASetInputLayout(G_VS_2D_DEBUG.Input);
+    G_DEVICE_CONTEXT->PSSetShader(G_PS_POST_PROCESS_1.Shader, nullptr, 0u);
     ID3D11ShaderResourceView* ShaderResources[] = { renderShaderResourceView, G_DEPTH_STENCIL_RESOURCES.ResourceView };
-    G_PIPELINE.DeviceContext->PSSetShaderResources(0u, ARRAYSIZE(ShaderResources), ShaderResources);
+    G_DEVICE_CONTEXT->PSSetShaderResources(0u, ARRAYSIZE(ShaderResources), ShaderResources);
         
     DrawRectToScreenSpace({-1.0f, 1.0f}, {1.0f, -1.0f} );
 
@@ -230,20 +246,20 @@ void MGraphic::RenderFrame_DebugScreen()
 {
     if (DebugDrawTarget != EDebugDrawTarget::NONE)
     {
-        G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, nullptr);
+        G_DEVICE_CONTEXT->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, nullptr);
 
-        G_PIPELINE.DeviceContext->VSSetShader(G_VS_2D_DEBUG.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_2D_DEBUG.Input);
-        G_PIPELINE.DeviceContext->PSSetShader(G_PS_2D_DEBUG.Shader, nullptr, 0u);
+        G_DEVICE_CONTEXT->VSSetShader(G_VS_2D_DEBUG.Shader, nullptr, 0u);
+        G_DEVICE_CONTEXT->IASetInputLayout(G_VS_2D_DEBUG.Input);
+        G_DEVICE_CONTEXT->PSSetShader(G_PS_2D_DEBUG.Shader, nullptr, 0u);
 
         switch (DebugDrawTarget) {
         case EDebugDrawTarget::Z_BUFFER_SHADOW:
             {
-                G_PIPELINE.DeviceContext->PSSetShaderResources(0, 1u, &G_DEPTH_STENCIL_RESOURCES.ResourceViewLight);
+                G_DEVICE_CONTEXT->PSSetShaderResources(0, 1u, &G_DEPTH_STENCIL_RESOURCES.ResourceViewLight);
             } break;
         case EDebugDrawTarget::Z_BUFFER_SCENE:
             {
-                G_PIPELINE.DeviceContext->PSSetShaderResources(0, 1u, &G_DEPTH_STENCIL_RESOURCES.ResourceView);
+                G_DEVICE_CONTEXT->PSSetShaderResources(0, 1u, &G_DEPTH_STENCIL_RESOURCES.ResourceView);
             } break;
         }
         DrawRectToScreenSpace({-1.0f, 1.0f}, {-0.25f, 0.25f} );
@@ -252,36 +268,82 @@ void MGraphic::RenderFrame_DebugScreen()
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame()
 {
-    // Clear pass
-    constexpr ID3D11ShaderResourceView* const nullResources[4] = { nullptr, nullptr, nullptr, nullptr };
-    G_PIPELINE.DeviceContext->PSSetShaderResources(0, ARRAYSIZE(nullResources), nullResources);
-    MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_RENDER_TARGET_VIEW);
-    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.View);
-    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.ViewLight);
-
     RenderFrame_SceneShadowMap();
     RenderFrame_Scene();
     RenderFrame_PostProcess();
     RenderFrame_DebugScreen();
     
-    MGraphic::PresentSwapChain(G_PIPELINE.SwapChain);
+    MGraphic::PresentSwapChain(G_SWAP_CHAIN);
+    
+    constexpr ID3D11ShaderResourceView* const nullResources[4] = { nullptr, nullptr, nullptr, nullptr };
+    G_DEVICE_CONTEXT->PSSetShaderResources(0, ARRAYSIZE(nullResources), nullResources);
+    MGraphic::ClearRenderTarget(G_DEVICE_CONTEXT, G_RENDER_TARGET_VIEW);
+    MGraphic::ClearDepthStencil(G_DEVICE_CONTEXT, G_DEPTH_STENCIL_RESOURCES.View);
+    MGraphic::ClearDepthStencil(G_DEVICE_CONTEXT, G_DEPTH_STENCIL_RESOURCES.ViewLight);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::PrepareUninitializeGraphic()
+{
+    ID3D11Buffer* nullBuffer[14] = { nullptr };
+    G_DEVICE_CONTEXT->VSSetConstantBuffers(0, ARRAYSIZE(nullBuffer), nullBuffer);
+    G_DEVICE_CONTEXT->PSSetConstantBuffers(0, ARRAYSIZE(nullBuffer), nullBuffer);
+
+    ID3D11Buffer* nullIndexBuffer = nullptr;
+    UINT zero = 0;
+    G_DEVICE_CONTEXT->IASetVertexBuffers(0, 1, &nullIndexBuffer, &zero, &zero);
+    G_DEVICE_CONTEXT->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    
+    ID3D11RenderTargetView* nullRTV[] = { nullptr };
+    ID3D11ShaderResourceView* nullSRV[6] = { nullptr };
+    G_DEVICE_CONTEXT->OMSetRenderTargets(1, nullRTV, nullptr);
+    G_DEVICE_CONTEXT->PSSetShaderResources(0, ARRAYSIZE(nullSRV), nullSRV);
+    G_DEVICE_CONTEXT->OMSetRenderTargets(0, nullptr, nullptr);
+    
+    CHECK_HRESULT(G_SWAP_CHAIN->SetFullscreenState(FALSE, nullptr));
+
+    G_DEVICE_CONTEXT->ClearState();
+    G_DEVICE_CONTEXT->Flush();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::UninitializeGraphic()
 {
     G_DEPTH_STENCIL_RESOURCES.Release();
-    G_PIPELINE.Release();
+    G_RASTERIZER_STATE->Release();
+    
+    G_BACK_BUFFER_TEXTURE->Release();
+    G_BACK_BUFFER_RESOURCE->Release();
+    G_RENDER_TARGET_VIEW->Release();
+    G_SWAP_CHAIN->Release();
     
     G_VS_SHADOW.Release();
     G_VS_BASE.Release();
     G_VS_2D_DEBUG.Release();
-    
     G_PS_BASE.Release();
     G_PS_2D_DEBUG.Release();
+    G_PS_POST_PROCESS_1.Release();
 
-    G_RENDER_TARGET_VIEW->Release();
-    G_BACK_BUFFER_TEXTURE->Release();
-    G_BACK_BUFFER_RESOURCE->Release();
+    for (auto VertexShaderBuffer : G_VS_BUFFERS)
+    {
+        VertexShaderBuffer.Release();
+    }
+    for (auto PixelShaderBuffer : G_PS_BUFFERS)
+    {
+        PixelShaderBuffer.Release();
+    }
+    for (auto samplerState : G_SAMPLER_STATES)
+    {
+        samplerState->Release();
+    }
+    
+    G_DEVICE_CONTEXT->Release();
+    
+    G_DEVICE_CONTEXT->Flush();
+    
+#if DEBUG_DIRECTX_REPORT_AT_QUIT
+        ReportLiveObjects(true);
+#endif
+    
+    G_DEVICE->Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState)
@@ -320,7 +382,7 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
     SwapChainDesc.Flags = 0;
 
     UINT CreateDeviceAndSwapChainFlags = 0u;
-#ifdef _DEBUG
+#if DEBUG_ENABLE_DIRECTX_DEVICE_DEBUG
     CreateDeviceAndSwapChainFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
     
@@ -331,9 +393,9 @@ void MGraphic::CreateDeviceAndSwapChain(ID3D11Device** _device, ID3D11DeviceCont
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateRenderTargetView()
 {
-    CHECK_HRESULT(G_PIPELINE.SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&G_BACK_BUFFER_TEXTURE));
-    CHECK_HRESULT(G_PIPELINE.SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&G_BACK_BUFFER_RESOURCE)));
-    CHECK_HRESULT(G_PIPELINE.Device->CreateRenderTargetView(G_BACK_BUFFER_RESOURCE, nullptr, &G_RENDER_TARGET_VIEW));
+    CHECK_HRESULT(G_SWAP_CHAIN->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&G_BACK_BUFFER_TEXTURE));
+    CHECK_HRESULT(G_SWAP_CHAIN->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&G_BACK_BUFFER_RESOURCE)));
+    CHECK_HRESULT(G_DEVICE->CreateRenderTargetView(G_BACK_BUFFER_RESOURCE, nullptr, &G_RENDER_TARGET_VIEW));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateAndSetSampleStates()
@@ -349,7 +411,7 @@ void MGraphic::CreateAndSetSampleStates()
         samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
         samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
         samplerDesc.BorderColor[3] = 1.0f;
-        G_PIPELINE.Device->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[0]);
+        G_DEVICE->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[0]);
     }
 
     {
@@ -361,7 +423,7 @@ void MGraphic::CreateAndSetSampleStates()
         samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
         samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
         samplerDesc.BorderColor[3] = 1.0f;
-        G_PIPELINE.Device->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[1]);
+        G_DEVICE->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[1]);
     }
 
     {
@@ -373,10 +435,10 @@ void MGraphic::CreateAndSetSampleStates()
         samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
         samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
         samplerDesc.BorderColor[3] = 1.0f;
-        G_PIPELINE.Device->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[2]);
+        G_DEVICE->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[2]);
     }
     
-    G_PIPELINE.DeviceContext->PSSetSamplers(0, ARRAYSIZE(G_SAMPLER_STATES), G_SAMPLER_STATES);
+    G_DEVICE_CONTEXT->PSSetSamplers(0, ARRAYSIZE(G_SAMPLER_STATES), G_SAMPLER_STATES);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, SDepthStencilResources& depthStencilResources)
@@ -407,7 +469,7 @@ void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _d
             shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
             shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
-            CHECK_HRESULT(G_PIPELINE.Device->CreateShaderResourceView(depthStencilResources.TextureLight, &shaderResourceViewDesc, &G_DEPTH_STENCIL_RESOURCES.ResourceViewLight));
+            CHECK_HRESULT(G_DEVICE->CreateShaderResourceView(depthStencilResources.TextureLight, &shaderResourceViewDesc, &G_DEPTH_STENCIL_RESOURCES.ResourceViewLight));
         }
         // Depth Stencil View
         {
@@ -416,7 +478,7 @@ void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _d
             depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
             depthStencilViewDesc.Texture2D.MipSlice = 0u;
 
-            CHECK_HRESULT(G_PIPELINE.Device->CreateDepthStencilView(depthStencilResources.TextureLight, &depthStencilViewDesc, &depthStencilResources.ViewLight));
+            CHECK_HRESULT(G_DEVICE->CreateDepthStencilView(depthStencilResources.TextureLight, &depthStencilViewDesc, &depthStencilResources.ViewLight));
         }
     }
 
@@ -446,7 +508,7 @@ void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _d
             shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
             shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
-            CHECK_HRESULT(G_PIPELINE.Device->CreateShaderResourceView(depthStencilResources.Texture, &shaderResourceViewDesc, &G_DEPTH_STENCIL_RESOURCES.ResourceView));
+            CHECK_HRESULT(G_DEVICE->CreateShaderResourceView(depthStencilResources.Texture, &shaderResourceViewDesc, &G_DEPTH_STENCIL_RESOURCES.ResourceView));
         }
         // Depth Stencil View
         {
@@ -455,10 +517,9 @@ void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _d
             depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
             depthStencilViewDesc.Texture2D.MipSlice = 0u;
 
-            CHECK_HRESULT(G_PIPELINE.Device->CreateDepthStencilView(depthStencilResources.Texture, &depthStencilViewDesc, &depthStencilResources.View));
+            CHECK_HRESULT(G_DEVICE->CreateDepthStencilView(depthStencilResources.Texture, &depthStencilViewDesc, &depthStencilResources.View));
         }
     }
-   
     
     // Depth Stencil State
     {
@@ -466,7 +527,7 @@ void MGraphic::CreateDepthStencil(ID3D11Device* _device, ID3D11DeviceContext* _d
         depthStencilDesc.DepthEnable = true;
         depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
         depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        G_PIPELINE.Device->CreateDepthStencilState(&depthStencilDesc, &depthStencilResources.State);
+        G_DEVICE->CreateDepthStencilState(&depthStencilDesc, &depthStencilResources.State);
     }
 }
 ///---------------------------------------------------------------------------------------------------------------------
@@ -522,6 +583,10 @@ void MGraphic::CreateVertexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _d
     }
 
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, _vertexBuffer));
+#if DEBUG_ENABLE_DIRECTX_DEVICE_DEBUG
+    constexpr char name[] = "TAKU_VERTEX_BUFFER";
+    CHECK_HRESULT((*_vertexBuffer)->SetPrivateData(WKPDID_D3DDebugObjectName, ARRAYSIZE(name), name));
+#endif
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** _indexBuffer, TVertexIndex* _indexes, UINT _nbIndex, UINT _sizeStruct)
@@ -538,18 +603,10 @@ void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _de
     subResourceData.pSysMem = _indexes;
 
     CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, &subResourceData, _indexBuffer));
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::CreateVertexShaderBuffer(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, ID3D11Buffer** VertexConstantBuffer, UINT _size)
-{
-    D3D11_BUFFER_DESC bufferDesc = {};
-    bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    bufferDesc.MiscFlags = 0u;
-    bufferDesc.ByteWidth = _size;
-    bufferDesc.StructureByteStride = 0u;
-    CHECK_HRESULT(_device->CreateBuffer(&bufferDesc, nullptr, VertexConstantBuffer));
+#if DEBUG_ENABLE_DIRECTX_DEVICE_DEBUG
+    constexpr char name[] = "TAKU_INDEX_BUFFER";
+    CHECK_HRESULT((*_indexBuffer)->SetPrivateData(WKPDID_D3DDebugObjectName, ARRAYSIZE(name), name));
+#endif
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState)
