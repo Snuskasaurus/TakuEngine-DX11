@@ -151,6 +151,8 @@ void MGraphic::RenderFrame_SceneShadowMap()
     for (int i = 0; i < instancedMeshes.size(); ++i)
     {
         CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
+        if (instancedMesh->CastShadow == false) continue;
+        
         MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
         
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();

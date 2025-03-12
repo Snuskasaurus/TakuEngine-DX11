@@ -103,7 +103,7 @@ void CGameScene::OnKeyPressed_Internal(EKeyCode _key)
         SceneLight.AddYaw(10.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
-CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw(const char* _meshName)
+CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw_DEPRECATED(const char* _meshName)
 {
     CDrawable_InstancedMesh* InstancedMesh = new CDrawable_InstancedMesh;
     
@@ -142,6 +142,7 @@ CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDrawFromDrawableData(cons
     InstancedMesh->NormalTexture = DrawableData->NormalTextureData;
     InstancedMesh->EmissionTexture = DrawableData->EmissionTextureData;
     InstancedMesh->MROTexture = DrawableData->MROTextureData;
+    InstancedMesh->CastShadow = DrawableData->CastShadow;
     
     MGraphic::CreateVertexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->VertexBuffer, InstancedMesh->MeshData->VertexBuffer.data(), InstancedMesh->MeshData->VertexBuffer_Size, InstancedMesh->MeshData->VertexBuffer_StructureByteStride);
     MGraphic::CreateIndexBuffer(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), &InstancedMesh->IndexBuffer, InstancedMesh->MeshData->IndexBuffer.data(), InstancedMesh->MeshData->IndexBuffer_Size, InstancedMesh->MeshData->IndexBuffer_StructureByteStride);

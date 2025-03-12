@@ -11,6 +11,7 @@ struct SDrawableData_CreateInput
     std::string Filename_NormalTexture;
     std::string Filename_EmissionTexture;
     std::string Filename_MROTexture;
+    bool CastShadow = true;
 };
 
 struct SDrawableData
@@ -20,7 +21,8 @@ struct SDrawableData
     struct STextureData* NormalTextureData = nullptr;
     struct STextureData* EmissionTextureData = nullptr;
     struct STextureData* MROTextureData = nullptr;
-
+    bool CastShadow = true;
+    
     void Release();
 };
 

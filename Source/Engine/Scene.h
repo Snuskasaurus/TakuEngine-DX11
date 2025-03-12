@@ -45,7 +45,7 @@ private:
     void NotifyKeyPressed(EKeyCode _keyCode);
 
 public:
-    CDrawable_InstancedMesh* AddInstancedMeshToDraw(const char* _meshName);
+    CDrawable_InstancedMesh* AddInstancedMeshToDraw_DEPRECATED(const char* _meshName);
     CDrawable_InstancedMesh* AddInstancedMeshToDrawFromDrawableData(const char* _meshName);
 
 protected:

@@ -18,6 +18,8 @@ SDrawableData* MDrawableResources::CreateDrawableData(const char* _name, const S
     if (!_input.Filename_EmissionTexture.empty()) newDrawableData->EmissionTextureData = MTextureResources::GetOrCreateTextureDataFromFileName(_input.Filename_EmissionTexture.c_str());
     if (!_input.Filename_VertexShader.empty()) {} // TODO
     if (!_input.Filename_PixelShader.empty()) {} // TODO;
+
+    newDrawableData->CastShadow = _input.CastShadow;
     
     G_DRAWABLE_DATA_MAP.insert({ _name, newDrawableData });
     

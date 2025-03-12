@@ -29,4 +29,5 @@ private:
     STextureData* NormalTexture = nullptr;
     STextureData* EmissionTexture = nullptr;
     STextureData* MROTexture = nullptr;
+    bool CastShadow = true;
 };

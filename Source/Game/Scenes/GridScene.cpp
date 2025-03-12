@@ -95,17 +95,17 @@ void InitVisualMeshDataMap()
 {
     CGameScene* GameScene = MWorld::GetWorld()->GetCurrentScene();
     
-    CDrawable_InstancedMesh* Mesh0000 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_0000);
-    CDrawable_InstancedMesh* Mesh1000 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1000);
-    CDrawable_InstancedMesh* Mesh1001 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1001);
-    CDrawable_InstancedMesh* Mesh1010 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1010);
-    CDrawable_InstancedMesh* Mesh1101 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1101);
-    CDrawable_InstancedMesh* Mesh1111 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_1111);
-    CDrawable_InstancedMesh* Mesh2000 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2000);
-    CDrawable_InstancedMesh* Mesh2002 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2002);
-    CDrawable_InstancedMesh* Mesh2020 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2020);
-    CDrawable_InstancedMesh* Mesh2202 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2202);
-    CDrawable_InstancedMesh* Mesh2222 = GameScene->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_2222);
+    CDrawable_InstancedMesh* Mesh0000 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_0000);
+    CDrawable_InstancedMesh* Mesh1000 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1000);
+    CDrawable_InstancedMesh* Mesh1001 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1001);
+    CDrawable_InstancedMesh* Mesh1010 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1010);
+    CDrawable_InstancedMesh* Mesh1101 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1101);
+    CDrawable_InstancedMesh* Mesh1111 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_1111);
+    CDrawable_InstancedMesh* Mesh2000 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2000);
+    CDrawable_InstancedMesh* Mesh2002 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2002);
+    CDrawable_InstancedMesh* Mesh2020 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2020);
+    CDrawable_InstancedMesh* Mesh2202 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2202);
+    CDrawable_InstancedMesh* Mesh2222 = GameScene->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TILE_2222);
     
     VisualMeshDataMap.insert({0, {Mesh0000, 0.0f}});
 
@@ -268,9 +268,9 @@ void CGridScene::OnCreate()
         }
     }
     
-    CDrawable_InstancedMesh* TreeMesh1 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_01);
-    CDrawable_InstancedMesh* TreeMesh2 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_02);
-    CDrawable_InstancedMesh* TreeMesh3 = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TREE_03);
+    CDrawable_InstancedMesh* TreeMesh1 = this->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TREE_01);
+    CDrawable_InstancedMesh* TreeMesh2 = this->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TREE_02);
+    CDrawable_InstancedMesh* TreeMesh3 = this->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TREE_03);
     
     for (int i = 0; i < G_NB_TILES; ++i)
     {
@@ -326,7 +326,7 @@ void CGridScene::ToggleDisplayingGrid()
         G_DRAW_TILE_BORDER = true;
         
         if (TileBorderMesh == nullptr)
-            TileBorderMesh = this->AddInstancedMeshToDraw(TAKU_ASSET_MESH_TILE_BORDER);
+            TileBorderMesh = this->AddInstancedMeshToDrawFromDrawableData(G_ASSET_TILE_BORDER);
 
         for (int i = 0; i < G_NB_TILES; ++i)
         {

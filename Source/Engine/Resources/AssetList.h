@@ -1,39 +1,19 @@
 ﻿#pragma once
 
-#include "../IncludesExternal.h"
+
+inline const char* G_ASSET_TILE_BORDER = "TileBorder";
+inline const char* G_ASSET_ARROW = "Arrow";
+inline const char* G_ASSET_GIZMO = "Gizmo";
 
 inline const char* G_ASSET_T_NONE_NORMAL = "T_NoneNormal";
 inline const char* G_ASSET_T_NONE_WHITE = "T_NoneWhite";
 inline const char* G_ASSET_T_NONE_DARK = "T_NoneDark";
 
-inline const char* G_ASSET_ARROW = "Arrow";
-inline const char* G_ASSET_GIZMO = "Gizmo";
 inline const char* G_ASSET_T_DEBUG = "Debugs/T_Debug";
 inline const char* G_ASSET_MESH_ARROW = "Debugs/Arrow";
 inline const char* G_ASSET_MESH_GIZMO = "Debugs/Gizmo";
 
-inline const char* G_DRAWABLE_MACHINE = "Machine";
-inline const char* G_DRAWABLE_MACHINE_BUTTONS = "Machine_Buttons";
-inline const char* G_DRAWABLE_MACHINE_PANELS = "Machine_Panels";
-inline const char* G_ASSET_MESH_MACHINE = "TestPBR/Machine/Machine";
-inline const char* G_ASSET_MESH_MACHINE_BUTTONS = "TestPBR/Machine/Machine_Buttons";
-inline const char* G_ASSET_MESH_MACHINE_PANELS = "TestPBR/Machine/Machine_Panels";
-inline const char* G_ASSET_T_MACHINE_1_COLOR = "TestPBR/Machine/T_Machine1_c";
-inline const char* G_ASSET_T_MACHINE_2_COLOR = "TestPBR/Machine/T_Machine2_c";
-inline const char* G_ASSET_T_MACHINE_1_NORMAL = "TestPBR/Machine/T_Machine1_n";
-inline const char* G_ASSET_T_MACHINE_2_NORMAL = "TestPBR/Machine/T_Machine2_n";
-inline const char* G_ASSET_T_MACHINE_1_EMISSION = "TestPBR/Machine/T_Machine1_e";
-inline const char* G_ASSET_T_MACHINE_2_EMISSION = "TestPBR/Machine/T_Machine2_e";
-inline const char* G_ASSET_T_MACHINE_1_MRO = "TestPBR/Machine/T_Machine1_mro";
-inline const char* G_ASSET_T_MACHINE_2_MRO = "TestPBR/Machine/T_Machine2_mro";
-
-#define TAKU_ASSET_MESH_SQUARE    "Square"
-#define TAKU_ASSET_MESH_CUBE      "Cube"
-#define TAKU_ASSET_MESH_SPHERE    "Sphere"
-#define TAKU_ASSET_MESH_SUZANNE   "Suzanne"
-#define TAKU_ASSET_MESH_CRATE     "Crate"
-#define TAKU_ASSET_MESH_MONSTER   "Monster"
-#define TAKU_ASSET_MESH_TAKUMI    "Takumi"
+inline const char* G_ASSET_MESH_TILE_BORDER = "Tiles/TileBorder";
 
 #define TAKU_ASSET_MESH_TILE_BORDER  "Tiles/TileBorder"
 #define TAKU_ASSET_MESH_TILE_0000  "Tiles/Tile0000"

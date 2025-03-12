@@ -8,14 +8,6 @@
 
 void LoadMeshes()
 {
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SQUARE);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_CUBE);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SPHERE);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_SUZANNE);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_CRATE);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_MONSTER);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TAKUMI);
-    MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_BORDER);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
     MMeshResources::CreateMeshDataFromFileName(TAKU_ASSET_MESH_TILE_1001);
@@ -44,8 +36,6 @@ void LoadShaders()
 
 void LoadTextures()
 {
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TAKUMI);
-    MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_BORDER);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_0000);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1000);
     MTextureResources::CreateTextureDataFromFileName(TAKU_ASSET_MESH_TILE_1001);
@@ -64,23 +54,9 @@ void LoadTextures()
 
 void LoadDrawables()
 {
-    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE});
-    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE});
-
-    // Machine
-    {
-        MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE,
-       {G_ASSET_MESH_MACHINE, "", "",
-           G_ASSET_T_MACHINE_1_COLOR, G_ASSET_T_MACHINE_1_NORMAL, "", G_ASSET_T_MACHINE_1_MRO });
-
-        MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_PANELS,
-            {G_ASSET_MESH_MACHINE_PANELS, "", "",
-                G_ASSET_T_MACHINE_2_COLOR, G_ASSET_T_MACHINE_2_NORMAL, G_ASSET_T_MACHINE_2_EMISSION, G_ASSET_T_MACHINE_2_MRO });
-
-        MDrawableResources::CreateDrawableData(G_DRAWABLE_MACHINE_BUTTONS,
-            {G_ASSET_MESH_MACHINE_BUTTONS, "", "",
-                G_ASSET_T_MACHINE_2_COLOR, G_ASSET_T_MACHINE_2_NORMAL, G_ASSET_T_MACHINE_2_EMISSION, G_ASSET_T_MACHINE_2_MRO });
-    }
+    MDrawableResources::CreateDrawableData(G_ASSET_TILE_BORDER, {G_ASSET_MESH_TILE_BORDER, "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
+    MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
 }
 
 void MAsset::LoadAssets()
