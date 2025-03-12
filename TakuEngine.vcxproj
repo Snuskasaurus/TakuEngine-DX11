@@ -186,6 +186,11 @@
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\ps_post_process.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <ClCompile Include="Source\Engine\Defines.cpp" />
     <ClCompile Include="Source\Engine\Graphics\ShaderBuffers.cpp" />
     <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp" />

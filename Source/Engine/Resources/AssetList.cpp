@@ -42,6 +42,7 @@ void MAsset::LoadShaders()
     
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_VS_SHADOW,  VERTEX_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_SHADOW,  PIXEL_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_POST_PROCESS_1,  PIXEL_SHADER);
 }
 
 void MAsset::LoadTextures()

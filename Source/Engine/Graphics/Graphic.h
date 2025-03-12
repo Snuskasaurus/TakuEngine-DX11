@@ -12,8 +12,6 @@ struct SGraphicResources_Pipeline
     ID3D11Device* Device = nullptr;
     ID3D11DeviceContext* DeviceContext = nullptr;
     IDXGISwapChain* SwapChain = nullptr;
-    ID3D11RenderTargetView* RenderTargetView = nullptr;
-    ID3D11Resource* BackBufferResource = nullptr;
     ID3D11RasterizerState* rasterizerState = nullptr;
 
     void Release()
@@ -21,8 +19,6 @@ struct SGraphicResources_Pipeline
         Device->Release();
         DeviceContext->Release();
         SwapChain->Release();
-        RenderTargetView->Release();
-        BackBufferResource->Release();
         rasterizerState->Release();
     }
 };
@@ -63,7 +59,7 @@ public:
     static void CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState);
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
     static void CreateDepthStencil(ID3D11Device*, ID3D11DeviceContext*, SDepthStencilResources&);
-    static void CreateRenderTargetView(ID3D11Device*, IDXGISwapChain*, ID3D11Resource**, ID3D11RenderTargetView**);
+    static void CreateRenderTargetView();
     static void CreateAndSetSampleStates();
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, void* _vertices, UINT _nbVertices, UINT _sizeStruct);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, TVertexIndex* _indexes, UINT _nbIndex, UINT _sizeStruct);
