@@ -63,7 +63,7 @@ void MGraphic::CreateDirectXWindow()
     MGraphic::CreateDeviceAndSwapChain(&G_PIPELINE.Device, &G_PIPELINE.DeviceContext, &G_PIPELINE.SwapChain);
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::SetupDraw()
+void MGraphic::InitializeGraphic()
 {
     MGraphic::CreateRenderTargetView();
     MGraphic::CreateDepthStencil(G_PIPELINE.Device, G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES);
@@ -123,7 +123,83 @@ void DrawRectToScreenSpace(TVector2f TopLeft, TVector2f BotRight)
     IndexBuffer->Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void DrawPostProcess()
+void MGraphic::RenderFrame_SceneShadowMap()
+{
+    const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
+
+    ID3D11RenderTargetView* NullRenderTarget = nullptr;
+    G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &NullRenderTarget, G_DEPTH_STENCIL_RESOURCES.ViewLight);
+    G_PIPELINE.DeviceContext->VSSetShader(G_VS_SHADOW.Shader, nullptr, 0u);
+    G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_SHADOW.Input);
+    G_PIPELINE.DeviceContext->PSSetShader(G_PS_SHADOW.Shader, nullptr, 0u);
+    SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], true);
+    
+    for (int i = 0; i < instancedMeshes.size(); ++i)
+    {
+        CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
+        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
+        
+        const UINT nbInstances = (UINT)instancedMesh->Instances.size();
+        UINT nbInstancesRemainingToDraw = nbInstances;
+        while (nbInstancesRemainingToDraw > 0)
+        {
+            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
+            const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
+            
+            SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
+            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
+            
+            nbInstancesRemainingToDraw -= nbInstancesToDraw;
+        }
+    }
+    MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::RenderFrame_Scene()
+{
+    const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
+    
+    G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, G_DEPTH_STENCIL_RESOURCES.View);
+    G_PIPELINE.DeviceContext->VSSetShader(G_VS_BASE.Shader, nullptr, 0u);
+    G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_BASE.Input);
+    SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], false);
+    G_PIPELINE.DeviceContext->PSSetShader(G_PS_BASE.Shader, nullptr, 0u);
+    SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(&G_PS_BUFFERS[0]);
+    
+    for (int i = 0; i < instancedMeshes.size(); ++i)
+    {
+        CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
+        
+        MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
+        
+        ID3D11ShaderResourceView* ShaderResourceViews[] =
+            {
+                (instancedMesh->ColorTexture->textureView),
+                (G_DEPTH_STENCIL_RESOURCES.ResourceViewLight),
+                (instancedMesh->NormalTexture == nullptr ? nullptr : instancedMesh->NormalTexture->textureView),
+                (!instancedMesh->EmissionTexture ? nullptr : instancedMesh->EmissionTexture->textureView),
+                (!instancedMesh->MROTexture ? nullptr : instancedMesh->MROTexture->textureView),
+            };
+        
+        MGraphic::SetPixelShaderTextureViews(G_PIPELINE.DeviceContext, ARRAYSIZE(ShaderResourceViews), ShaderResourceViews);
+   
+        const UINT nbInstances = (UINT)instancedMesh->Instances.size();
+        UINT nbInstancesRemainingToDraw = nbInstances;
+        while (nbInstancesRemainingToDraw > 0)
+        {
+            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
+            const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
+            
+            SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
+            MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
+            
+            nbInstancesRemainingToDraw -= nbInstancesToDraw;
+        }
+    }
+    MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::RenderFrame_PostProcess()
 {
     // Copy the render target to a new texture
     D3D11_TEXTURE2D_DESC desc;
@@ -152,93 +228,8 @@ void DrawPostProcess()
     renderTexture->Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::Draw()
+void MGraphic::RenderFrame_DebugScreen()
 {
-    // Clear pass
-    constexpr ID3D11ShaderResourceView* const nullResources[4] = { nullptr, nullptr, nullptr, nullptr };
-    G_PIPELINE.DeviceContext->PSSetShaderResources(0, ARRAYSIZE(nullResources), nullResources);
-    MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_RENDER_TARGET_VIEW);
-    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.View);
-    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.ViewLight);
-    
-    const std::vector<CDrawable_InstancedMesh*>& instancedMeshes = MWorld::GetWorld()->CurrentGameScene->InstancedMeshes;
-    
-    // Depth only pass to get SceneLight Z-Buffer
-    {
-        ID3D11RenderTargetView* NullRenderTarget = nullptr;
-        G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &NullRenderTarget, G_DEPTH_STENCIL_RESOURCES.ViewLight);
-        G_PIPELINE.DeviceContext->VSSetShader(G_VS_SHADOW.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_SHADOW.Input);
-        G_PIPELINE.DeviceContext->PSSetShader(G_PS_SHADOW.Shader, nullptr, 0u);
-        SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], true);
-    
-        for (int i = 0; i < instancedMeshes.size(); ++i)
-        {
-            CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
-            MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
-            
-            const UINT nbInstances = (UINT)instancedMesh->Instances.size();
-            UINT nbInstancesRemainingToDraw = nbInstances;
-            while (nbInstancesRemainingToDraw > 0)
-            {
-                const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
-                const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
-                
-                SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
-                MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
-                
-                nbInstancesRemainingToDraw -= nbInstancesToDraw;
-            }
-        }
-        MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
-    }
-
-    // Draw the scene
-    {
-        G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, G_DEPTH_STENCIL_RESOURCES.View);
-        
-        G_PIPELINE.DeviceContext->VSSetShader(G_VS_BASE.Shader, nullptr, 0u);
-        G_PIPELINE.DeviceContext->IASetInputLayout(G_VS_BASE.Input);
-        SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(&G_VS_BUFFERS[0], false);
-        G_PIPELINE.DeviceContext->PSSetShader(G_PS_BASE.Shader, nullptr, 0u);
-        SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(&G_PS_BUFFERS[0]);
-        
-        for (int i = 0; i < instancedMeshes.size(); ++i)
-        {
-            CDrawable_InstancedMesh* instancedMesh = instancedMeshes[i];
-            
-            MGraphic::SetVertexAndIndexBuffer(G_PIPELINE.DeviceContext, &instancedMesh->VertexBuffer, instancedMesh->IndexBuffer, SMeshData::VertexBuffer_StructureByteStride);
-            
-            ID3D11ShaderResourceView* ShaderResourceViews[] =
-                {
-                    (instancedMesh->ColorTexture->textureView),
-                    (G_DEPTH_STENCIL_RESOURCES.ResourceViewLight),
-                    (instancedMesh->NormalTexture == nullptr ? nullptr : instancedMesh->NormalTexture->textureView),
-                    (!instancedMesh->EmissionTexture ? nullptr : instancedMesh->EmissionTexture->textureView),
-                    (!instancedMesh->MROTexture ? nullptr : instancedMesh->MROTexture->textureView),
-                };
-            
-            MGraphic::SetPixelShaderTextureViews(G_PIPELINE.DeviceContext, ARRAYSIZE(ShaderResourceViews), ShaderResourceViews);
-    
-            const UINT nbInstances = (UINT)instancedMesh->Instances.size();
-            UINT nbInstancesRemainingToDraw = nbInstances;
-            while (nbInstancesRemainingToDraw > 0)
-            {
-                const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
-                const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
-                
-                SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
-                MGraphic::SetPrimitiveAndDraw_Instanced(G_PIPELINE.DeviceContext, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
-                
-                nbInstancesRemainingToDraw -= nbInstancesToDraw;
-            }
-        }
-        MGraphic::Rasterize(G_PIPELINE.DeviceContext, G_PIPELINE.rasterizerState);
-    }
-
-    DrawPostProcess();
-    
-    // Draw screen debug
     if (DebugDrawTarget != EDebugDrawTarget::NONE)
     {
         G_PIPELINE.DeviceContext->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, nullptr);
@@ -259,7 +250,22 @@ void MGraphic::Draw()
         }
         DrawRectToScreenSpace({-1.0f, 1.0f}, {-0.25f, 0.25f} );
     }
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::RenderFrame()
+{
+    // Clear pass
+    constexpr ID3D11ShaderResourceView* const nullResources[4] = { nullptr, nullptr, nullptr, nullptr };
+    G_PIPELINE.DeviceContext->PSSetShaderResources(0, ARRAYSIZE(nullResources), nullResources);
+    MGraphic::ClearRenderTarget(G_PIPELINE.DeviceContext, G_RENDER_TARGET_VIEW);
+    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.View);
+    MGraphic::ClearDepthStencil(G_PIPELINE.DeviceContext, G_DEPTH_STENCIL_RESOURCES.ViewLight);
 
+    RenderFrame_SceneShadowMap();
+    RenderFrame_Scene();
+    RenderFrame_PostProcess();
+    RenderFrame_DebugScreen();
+    
     MGraphic::PresentSwapChain(G_PIPELINE.SwapChain);
 }
 ///---------------------------------------------------------------------------------------------------------------------

@@ -351,10 +351,6 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
     {
         PostQuitMessage(1);
     }
-    else if (_key == EKeyCode::KEY_F1)
-    {
-        ChangeGameScene(EGameSceneType::TakumiScene);
-    }
     else if (_key == EKeyCode::KEY_G)
     {
         ToggleDisplayingGrid();

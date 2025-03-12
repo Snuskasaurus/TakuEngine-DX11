@@ -10,8 +10,6 @@
 #include "Resources/GamePath.h"
 
 #include "../Game/Scenes/GridScene.h"
-#include "../Game/Scenes/TakumiScene.h"
-#include "../Game/Scenes/TestPBRScene.h"
 
 bool G_DEBUG_ENABLED = false;
 CDrawable_InstancedMesh* G_DEBUG_GIZMO_MESH = nullptr;
@@ -169,9 +167,7 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
     switch (_gameSceneType)
     {
     case None: break;
-    case TakumiScene: NewWorldGameScene = new CTakumiScene; break;
     case GridScene: NewWorldGameScene = new CGridScene; break;
-    case TestPBRScene: NewWorldGameScene = new CTestPBRScene; break;
     }
     
     MWorld::GetWorld()->CurrentGameScene = NewWorldGameScene;

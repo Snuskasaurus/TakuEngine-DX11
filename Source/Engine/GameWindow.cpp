@@ -86,7 +86,7 @@ void MGameWindow::DrawGameWindow()
     if (MGameWindow::HasFocus() == false)
         return;
 
-    MGraphic::Draw();
+    MGraphic::RenderFrame();
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 SExitResult MGameWindow::HandleGameWindowMessage()

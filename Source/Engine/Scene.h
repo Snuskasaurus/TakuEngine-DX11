@@ -8,9 +8,7 @@
 enum EGameSceneType
 {
     None,
-    TakumiScene,
     GridScene,
-    TestPBRScene,
 };
 
 class CGameScene

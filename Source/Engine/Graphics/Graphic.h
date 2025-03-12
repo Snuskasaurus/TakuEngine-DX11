@@ -52,9 +52,15 @@ public:
     static ID3D11DeviceContext* GetDXDeviceContext();
 public:
     static void CreateDirectXWindow();
-    static void SetupDraw();
-    static void Draw();
+public:
+    static void InitializeGraphic();
     static void UninitializeGraphic();
+public:
+    static void RenderFrame();
+    static void RenderFrame_SceneShadowMap();
+    static void RenderFrame_Scene();
+    static void RenderFrame_DebugScreen();
+    static void RenderFrame_PostProcess();
 public:
     static void CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState);
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);

@@ -20,7 +20,7 @@ void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 	MAsset::LoadTextures();
 	MAsset::LoadDrawables();
 	
-	MGraphic::SetupDraw();
+	MGraphic::InitializeGraphic();
 	MTime::InitializeTime();
 	MInput::InitializeInput(hInstance);
 	MWorld::InitializeWorld();
