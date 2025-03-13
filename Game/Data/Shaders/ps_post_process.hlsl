@@ -19,7 +19,7 @@ float4 Main(VS_OUTPUT input) : SV_Target
     float1 zFar = 300.0f;
     float linearDepth = (2.0f * zNear) / (zFar + zNear - sampleDepth * (zFar - zNear));
 
-    float3 finalColor = saturate(sampleColor * 0.5f + linearDepth.xxx);
+    float3 finalColor = lerp(linearDepth.x, sampleColor, float3(0.5f, 0.5f, 0.5f));
     
     return float4(finalColor , 1.0f);
 }
