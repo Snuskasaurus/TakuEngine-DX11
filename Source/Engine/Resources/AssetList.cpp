@@ -15,12 +15,12 @@ void LoadMeshes()
 
 void LoadShaders()
 {
-    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_VS_BASE,            VERTEX_SHADER);
-    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_BASE,            PIXEL_SHADER);
-    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_VS_2D,              VERTEX_SHADER);
-    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_2D,              PIXEL_SHADER);
-    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_VS_SHADOW,          VERTEX_SHADER);
-    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_PS_POST_PROCESS_1,  PIXEL_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_BASE,            VERTEX_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_BASE,            PIXEL_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_2D,              VERTEX_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_DEBUG_SCREEN,              PIXEL_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_SHADOW,          VERTEX_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_POST_PROCESS_1,  PIXEL_SHADER);
 }
 
 void LoadTextures()

@@ -87,16 +87,16 @@ void MGraphic::InitializeShaders()
 { 
     // Initialize Vertex Shaders
     {
-        G_VS_2D_DEBUG.CreateVertexShader(G_DEVICE,     TAKU_ASSET_VS_2D,       VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
-        G_VS_SHADOW.CreateVertexShader(G_DEVICE,       TAKU_ASSET_VS_SHADOW,   VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
-        G_VS_BASE.CreateVertexShader(G_DEVICE,         TAKU_ASSET_VS_BASE,     VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
+        G_VS_2D_DEBUG.CreateVertexShader(G_DEVICE,     TAKU_ASSET_SHADER_VS_2D,       VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
+        G_VS_SHADOW.CreateVertexShader(G_DEVICE,       TAKU_ASSET_SHADER_VS_SHADOW,   VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
+        G_VS_BASE.CreateVertexShader(G_DEVICE,         TAKU_ASSET_SHADER_VS_BASE,     VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
     }
     
     // Initialize Pixel Shaders
     {
-        G_PS_BASE.CreatePixelShader(G_DEVICE,            TAKU_ASSET_PS_BASE);
-        G_PS_2D_DEBUG.CreatePixelShader(G_DEVICE,        TAKU_ASSET_PS_2D);
-        G_PS_POST_PROCESS_1.CreatePixelShader(G_DEVICE,  TAKU_ASSET_PS_POST_PROCESS_1);
+        G_PS_BASE.CreatePixelShader(G_DEVICE,            TAKU_ASSET_SHADER_PS_BASE);
+        G_PS_2D_DEBUG.CreatePixelShader(G_DEVICE,        TAKU_ASSET_SHADER_PS_DEBUG_SCREEN);
+        G_PS_POST_PROCESS_1.CreatePixelShader(G_DEVICE,  TAKU_ASSET_SHADER_PS_POST_PROCESS_1);
     }
     
     // Initialize Vertex Shader Buffers
