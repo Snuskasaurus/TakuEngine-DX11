@@ -75,17 +75,12 @@
     <ClCompile Include="Source\Engine\Sun.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game\Scenes\TakumiScene.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Game\Scenes\TestPBRScene.cpp">
-      <Filter>Source\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Engine\Resources\TextureResources.cpp">
       <Filter>Source\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Defines.cpp" />
     <ClCompile Include="Source\Engine\Graphics\ShaderBuffers.cpp" />
+    <ClCompile Include="Source\Game\MGridSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\CommonEngine.h">
@@ -151,41 +146,30 @@
     <ClInclude Include="Source\Engine\Sun.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game\Scenes\TakumiScene.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Game\Scenes\TestPBRScene.h">
-      <Filter>Source\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine\Resources\TextureResources.h">
       <Filter>Source\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Defines.h" />
     <ClInclude Include="Source\Engine\Graphics\ShaderBuffers.h" />
+    <ClInclude Include="Source\Game\MGridSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Game\Data\Shaders\VertexShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Game\Data\Shaders\PixelShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Game\Data\Shaders\PixelShader_PBR.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Game\Data\Shaders\2d_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Game\Data\Shaders\2d_vs.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Game\Data\Shaders\Shadow_vs.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Game\Data\Shaders\Shadow_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Game\Data\Shaders\ps_post_process.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\ps_debug_screen.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\ps_instanced_mesh.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\vs_2d.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\vs_instanced_mesh.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\vs_shadow_map.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
