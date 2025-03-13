@@ -283,6 +283,7 @@
     <ClCompile Include="Source\Engine\Resources\DrawableResources.cpp" />
     <ClCompile Include="Source\Engine\Resources\TextureResources.cpp" />
     <ClCompile Include="Source\Engine\Sun.cpp" />
+    <ClCompile Include="Source\Game\MGridSystem.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp" />
     <ClCompile Include="Source\Engine\CommonEngine.cpp" />
     <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
@@ -323,6 +324,7 @@
     <ClInclude Include="Source\Engine\Sun.h" />
     <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\World.h" />
+    <ClInclude Include="Source\Game\MGridSystem.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
