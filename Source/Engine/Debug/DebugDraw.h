@@ -15,6 +15,7 @@ class MDebugDraw
 {
     friend class MGraphic;
 public:
+    static void Prepare();
     static void Line(TVector3f _positionStart, TVector3f _positionEnd, TColor _color);
 private:
     static std::vector<SDebugLine>& GetDebugLines();

@@ -3,6 +3,7 @@
 #include "../Engine/World.h"
 #include "../Engine/Math.h"
 #include "../Engine/Resources/AssetList.h"
+#include "../Engine/Debug/DebugDraw.h"
 
 typedef int TTerrainIndex;
 typedef int TGridIndex;
@@ -21,10 +22,9 @@ enum ETerrainType
     MOUNTAIN,
 };
 
-
 constexpr int G_GRID_WIDTH = 20; // X
 constexpr int G_GRID_HEIGHT = 20; // Y
-constexpr float G_TILE_SIZE = 10.0f;
+constexpr float G_TILE_SIZE = 15.0f;
 constexpr float G_TILE_SIZE_HALF = G_TILE_SIZE * 0.5f;
 constexpr int G_NB_TILES = G_GRID_WIDTH * G_GRID_HEIGHT;
 constexpr int G_NB_TILES_VISUAL = (G_GRID_WIDTH + 1) * (G_GRID_HEIGHT + 1);
@@ -182,7 +182,6 @@ void InitVisualMeshDataMap()
     
     Mesh1111->Instances.push_back({{(G_TILE_SIZE + 1.0f) * 5, 0.0f, -200.0f }, 0.0f, 0.0f, 0.0f});
 #endif
-    
 }
 //---------------------------------------------------------------------------------------------------------------------
 bool ReadMapAndFillTerrains(std::vector<ETerrainType>& _terrains)
@@ -228,6 +227,27 @@ void MGridSystem::CreateGrid()
         bool Success = ReadMapAndFillTerrains(GridTerrains);
         assert(Success);
     }
+
+    // for (int i = 0; i < G_NB_TILES; ++i)
+    // {
+    //     const int XTile = i % G_GRID_WIDTH;
+    //     const int YTile = i / G_GRID_WIDTH;
+    //
+    //     TVector3f tilePosition = { (float)(XTile) * G_TILE_SIZE - G_GRID_WIDTH_HALF, (float)(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF, 0.0f };
+    //     
+    //     
+    //     for (int xOffset = -1; xOffset < 2; ++xOffset)
+    //     {
+    //         for (int yOffset = -1; yOffset < 2; ++yOffset)
+    //         {
+    //             float sizeTile = 5.0f;
+    //             float startOffsetX = xOffset * sizeTile;
+    //             float startOffsetY = yOffset * sizeTile;
+    //             TVector3f position = tilePosition + TVector3f(startOffsetX, startOffsetY, 0.0f);
+    //             MDebugDraw::Line({position}, {position + TVector3f::Up * 5.0f}, TColor::Green);
+    //         }
+    //     }
+    // }
     
     // Generate grid meshes
     {

@@ -278,25 +278,23 @@ void MGraphic::RenderFrame_DebugLines()
     G_DEVICE_CONTEXT->IASetInputLayout(G_VS_DEBUG_DRAW.Input);
     
     const std::vector<SDebugLine>& debugLines = MDebugDraw::GetDebugLines();
-    for (int i = 0; i < debugLines.size(); ++i)
-    {
-        MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &VertexBuffer, IndexBuffer, sizeof(SInputVertexBuffer));
-        
-        // TODO Julien Rogel (12/03/2025): Try Structured Buffers to avoid filling multiples times the buffers
-        const UINT nbInstances = (UINT)debugLines.size();
-        UINT nbInstancesRemainingToDraw = nbInstances;
-        while (nbInstancesRemainingToDraw > 0)
-        {
-            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
-            const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
+    MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &VertexBuffer, IndexBuffer, sizeof(SInputVertexBuffer));
     
-            SShaderBufferHolder::FillBuffer_VS_DebugLine(&G_VS_BUFFERS[13], debugLines.data(), startInstances, nbInstancesToDraw);
-            G_DEVICE_CONTEXT->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-            G_DEVICE_CONTEXT->DrawIndexedInstanced(2u, nbInstancesToDraw + 1u, 0u, 0, 0u);
-            
-            nbInstancesRemainingToDraw -= nbInstancesToDraw;
-        }
+    // TODO Julien Rogel (12/03/2025): Try Structured Buffers to avoid filling multiples times the buffers
+    const UINT nbInstances = (UINT)debugLines.size();
+    UINT nbInstancesRemainingToDraw = nbInstances;
+    while (nbInstancesRemainingToDraw > 0)
+    {
+        const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, 467u);
+        const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
+    
+        SShaderBufferHolder::FillBuffer_VS_DebugLine(&G_VS_BUFFERS[13], debugLines.data(), startInstances, nbInstancesToDraw);
+        G_DEVICE_CONTEXT->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+        G_DEVICE_CONTEXT->DrawIndexedInstanced(2u, nbInstancesToDraw + 1u, 0u, 0, 0u);
+        
+        nbInstancesRemainingToDraw -= nbInstancesToDraw;
     }
+    
     G_DEVICE_CONTEXT->RSSetState(G_RASTERIZER_STATE);
     
     VertexBuffer->Release();

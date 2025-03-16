@@ -7,12 +7,14 @@
 #include "Inputmanager.h"
 #include "Graphics/Graphic.h"
 #include "Resources/AssetList.h"
+#include "Debug/DebugDraw.h"
 
 namespace TakuEngine
 {
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 {
+	MDebugDraw::Prepare();
 	MGameWindow::InitializeGameWindow(hInstance);
 	MGraphic::InitializeGraphic();
 	MAsset::LoadAssets();

@@ -10,8 +10,6 @@ void CGridScene::OnCreate()
     SceneLight.SetYaw(120.0f);
     SceneLight.SetPitch(130.0f);
     MGridSystem::CreateGrid();
-
-    MDebugDraw::Line({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 500.0f}, TColor::Green);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGridScene::OnKeyPressed(EKeyCode _key)
