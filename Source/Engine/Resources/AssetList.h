@@ -43,11 +43,13 @@ inline const char* G_ASSET_T_TILES_SO= "Tiles/T_TileSO";
 #define TAKU_ASSET_MESH_TREE_02  "Tree02"
 #define TAKU_ASSET_MESH_TREE_03  "Tree03"
 
+#define TAKU_ASSET_SHADER_VS_DEBUG_DRAW  "vs_debug_draw"
 #define TAKU_ASSET_SHADER_VS_BASE  "vs_instanced_mesh"
 #define TAKU_ASSET_SHADER_PS_BASE  "ps_instanced_mesh"
 #define TAKU_ASSET_SHADER_VS_2D  "vs_2d"
 #define TAKU_ASSET_SHADER_PS_DEBUG_SCREEN  "ps_debug_screen"
 #define TAKU_ASSET_SHADER_PS_POST_PROCESS_1  "ps_post_process"
+#define TAKU_ASSET_SHADER_PS_SIMPLE_COLOR  "ps_simple_color"
 #define TAKU_ASSET_SHADER_VS_SHADOW  "vs_shadow_map"
 
 class MAsset

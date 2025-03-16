@@ -81,6 +81,7 @@
     <ClCompile Include="Source\Engine\Defines.cpp" />
     <ClCompile Include="Source\Engine\Graphics\ShaderBuffers.cpp" />
     <ClCompile Include="Source\Game\MGridSystem.cpp" />
+    <ClCompile Include="Source\Engine\Debug\DebugDraw.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Engine\CommonEngine.h">
@@ -152,6 +153,7 @@
     <ClInclude Include="Source\Engine\Defines.h" />
     <ClInclude Include="Source\Engine\Graphics\ShaderBuffers.h" />
     <ClInclude Include="Source\Game\MGridSystem.h" />
+    <ClInclude Include="Source\Engine\Debug\DebugDraw.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Game\Data\Shaders\ps_post_process.hlsl">
@@ -170,6 +172,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Game\Data\Shaders\vs_shadow_map.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Game\Data\Shaders\vs_debug_draw.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

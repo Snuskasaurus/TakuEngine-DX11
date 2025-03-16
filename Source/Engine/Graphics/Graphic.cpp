@@ -11,6 +11,7 @@
 #include "../GameWindow.h"
 #include "../HResultHandler.h"
 #include "../World.h"
+#include "../Debug/DebugDraw.h"
 #include "../Debug/Profiling.h"
 
 enum class EDebugDrawTarget
@@ -43,13 +44,15 @@ ID3D11Texture2D* G_BACK_BUFFER_TEXTURE = nullptr;
 static SVertexShader G_VS_SHADOW;
 static SVertexShader G_VS_BASE;
 static SVertexShader G_VS_2D_DEBUG;
+static SVertexShader G_VS_DEBUG_DRAW;
 ///---------------------------------------------------------------------------------------------------------------------
 static SPixelShader G_PS_BASE;
 static SPixelShader G_PS_2D_DEBUG;
 static SPixelShader G_PS_POST_PROCESS_1;
+static SPixelShader G_PS_SIMPLE_COLOR;
 ///---------------------------------------------------------------------------------------------------------------------
-static SShaderBufferHolder G_VS_BUFFERS[15];
-static SShaderBufferHolder G_PS_BUFFERS[15];
+static SShaderBufferHolder G_VS_BUFFERS[14];
+static SShaderBufferHolder G_PS_BUFFERS[14];
 ///---------------------------------------------------------------------------------------------------------------------
 ID3D11Device* MGraphic::GetDXDevice()
 {
@@ -87,9 +90,10 @@ void MGraphic::InitializeShaders()
 { 
     // Initialize Vertex Shaders
     {
-        G_VS_2D_DEBUG.CreateVertexShader(G_DEVICE,     TAKU_ASSET_SHADER_VS_2D,       VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
-        G_VS_SHADOW.CreateVertexShader(G_DEVICE,       TAKU_ASSET_SHADER_VS_SHADOW,   VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
-        G_VS_BASE.CreateVertexShader(G_DEVICE,         TAKU_ASSET_SHADER_VS_BASE,     VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
+        G_VS_2D_DEBUG.CreateVertexShader(G_DEVICE,     TAKU_ASSET_SHADER_VS_2D,         VS_INPUT_DESC::POS_UV,                  ARRAYSIZE(VS_INPUT_DESC::POS_UV));
+        G_VS_SHADOW.CreateVertexShader(G_DEVICE,       TAKU_ASSET_SHADER_VS_SHADOW,     VS_INPUT_DESC::POS_INST,                ARRAYSIZE(VS_INPUT_DESC::POS_INST));
+        G_VS_BASE.CreateVertexShader(G_DEVICE,         TAKU_ASSET_SHADER_VS_BASE,       VS_INPUT_DESC::POS_NORM_TAN_UV_INST,    ARRAYSIZE(VS_INPUT_DESC::POS_NORM_TAN_UV_INST));
+        G_VS_DEBUG_DRAW.CreateVertexShader(G_DEVICE,   TAKU_ASSET_SHADER_VS_DEBUG_DRAW, VS_INPUT_DESC::ID_INST,                 ARRAYSIZE(VS_INPUT_DESC::ID_INST));
     }
     
     // Initialize Pixel Shaders
@@ -97,17 +101,19 @@ void MGraphic::InitializeShaders()
         G_PS_BASE.CreatePixelShader(G_DEVICE,            TAKU_ASSET_SHADER_PS_BASE);
         G_PS_2D_DEBUG.CreatePixelShader(G_DEVICE,        TAKU_ASSET_SHADER_PS_DEBUG_SCREEN);
         G_PS_POST_PROCESS_1.CreatePixelShader(G_DEVICE,  TAKU_ASSET_SHADER_PS_POST_PROCESS_1);
+        G_PS_SIMPLE_COLOR.CreatePixelShader(G_DEVICE,    TAKU_ASSET_SHADER_PS_SIMPLE_COLOR);
     }
     
     // Initialize Vertex Shader Buffers
     {
-        G_VS_BUFFERS[0].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 0u, sizeof(vs_buffer_sceneEachFrame));
-        G_VS_BUFFERS[1].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 1u, sizeof(vs_buffer_object));
+        G_VS_BUFFERS[0].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 0u, sizeof(b00_vs_buffer_sceneEachFrame));
+        G_VS_BUFFERS[1].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 1u, sizeof(b01_vs_buffer_object));
+        G_VS_BUFFERS[13].CreateShaderBuffer(EShaderType::VERTEX_SHADER, 13u, sizeof(b13_vs_buffer_debug_draw_line));
     }
     
     // Initialize Pixel Shader Buffers
     {
-        G_PS_BUFFERS[0].CreateShaderBuffer(EShaderType::PIXEL_SHADER, 0u, sizeof(ps_buffer_sceneEachFrame));
+        G_PS_BUFFERS[0].CreateShaderBuffer(EShaderType::PIXEL_SHADER, 0u, sizeof(b00_ps_buffer_sceneEachFrame));
     }
 }
 ///---------------------------------------------------------------------------------------------------------------------
@@ -131,7 +137,6 @@ void DrawRectToScreenSpace(TVector2f TopLeft, TVector2f BotRight)
     MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &VertexBuffer, IndexBuffer, sizeof(SVertex2D));
 
     G_DEVICE_CONTEXT->DrawIndexed(ARRAYSIZE(Indexes), 0u, 0u);
-    MGraphic::Rasterize(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
     
     VertexBuffer->Release();
     IndexBuffer->Release();
@@ -168,7 +173,6 @@ void MGraphic::RenderFrame_SceneShadowMap()
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
         }
     }
-    MGraphic::Rasterize(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame_Scene()
@@ -199,20 +203,20 @@ void MGraphic::RenderFrame_Scene()
         
         MGraphic::SetPixelShaderTextureViews(G_DEVICE_CONTEXT, ARRAYSIZE(ShaderResourceViews), ShaderResourceViews);
    
+        // TODO Julien Rogel (12/03/2025): Try Structured Buffers to avoid filling multiples times the buffers
         const UINT nbInstances = (UINT)instancedMesh->Instances.size();
         UINT nbInstancesRemainingToDraw = nbInstances;
         while (nbInstancesRemainingToDraw > 0)
         {
             const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
             const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
-            
+
             SShaderBufferHolder::FillBuffer_VS_Object(&G_VS_BUFFERS[1], instancedMesh->Instances.data(), startInstances, nbInstancesToDraw);
             MGraphic::SetPrimitiveAndDraw_Instanced(G_DEVICE_CONTEXT, instancedMesh->MeshData->IndexCount, nbInstancesToDraw + 1);
             
             nbInstancesRemainingToDraw -= nbInstancesToDraw;
         }
     }
-    MGraphic::Rasterize(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame_PostProcess()
@@ -244,6 +248,62 @@ void MGraphic::RenderFrame_PostProcess()
     renderTexture->Release();
 }
 ///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::RenderFrame_DebugLines()
+{
+    ID3D11Buffer* VertexBuffer = nullptr;
+    ID3D11Buffer* IndexBuffer = nullptr;
+    
+    TVertexIndex indexBufferData[] = { 0, 1 };
+    struct SInputVertexBuffer
+    {
+        uint32_t index;
+    };
+    SInputVertexBuffer vertexBufferData[] = { 0, 1 };
+    
+    
+    D3D11_RASTERIZER_DESC rasterizerDesc;
+    G_RASTERIZER_STATE->GetDesc(&rasterizerDesc);
+    rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+    rasterizerDesc.CullMode = D3D11_CULL_NONE;
+    ID3D11RasterizerState* newRasterizerState;
+    G_DEVICE->CreateRasterizerState(&rasterizerDesc, &newRasterizerState);
+    G_DEVICE_CONTEXT->RSSetState(newRasterizerState);
+    
+    MGraphic::CreateIndexBuffer(G_DEVICE, G_DEVICE_CONTEXT, &IndexBuffer, indexBufferData, ARRAYSIZE(indexBufferData), sizeof(TVertexIndex));
+    MGraphic::CreateVertexBuffer(G_DEVICE, G_DEVICE_CONTEXT, &VertexBuffer, vertexBufferData, ARRAYSIZE(vertexBufferData), sizeof(SInputVertexBuffer));
+    
+    G_DEVICE_CONTEXT->OMSetRenderTargets(1u, &G_RENDER_TARGET_VIEW, nullptr);
+    G_DEVICE_CONTEXT->VSSetShader(G_VS_DEBUG_DRAW.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->PSSetShader(G_PS_SIMPLE_COLOR.Shader, nullptr, 0u);
+    G_DEVICE_CONTEXT->IASetInputLayout(G_VS_DEBUG_DRAW.Input);
+    
+    const std::vector<SDebugLine>& debugLines = MDebugDraw::GetDebugLines();
+    for (int i = 0; i < debugLines.size(); ++i)
+    {
+        MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &VertexBuffer, IndexBuffer, sizeof(SInputVertexBuffer));
+        
+        // TODO Julien Rogel (12/03/2025): Try Structured Buffers to avoid filling multiples times the buffers
+        const UINT nbInstances = (UINT)debugLines.size();
+        UINT nbInstancesRemainingToDraw = nbInstances;
+        while (nbInstancesRemainingToDraw > 0)
+        {
+            const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, MAX_INSTANCE_COUNT - 1);
+            const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
+    
+            SShaderBufferHolder::FillBuffer_VS_DebugLine(&G_VS_BUFFERS[13], debugLines.data(), startInstances, nbInstancesToDraw);
+            G_DEVICE_CONTEXT->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+            G_DEVICE_CONTEXT->DrawIndexedInstanced(2u, nbInstancesToDraw + 1u, 0u, 0, 0u);
+            
+            nbInstancesRemainingToDraw -= nbInstancesToDraw;
+        }
+    }
+    G_DEVICE_CONTEXT->RSSetState(G_RASTERIZER_STATE);
+    
+    VertexBuffer->Release();
+    IndexBuffer->Release();
+    newRasterizerState->Release();
+}
+///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame_DebugScreen()
 {
     if (DebugDrawTarget != EDebugDrawTarget::NONE)
@@ -270,9 +330,12 @@ void MGraphic::RenderFrame_DebugScreen()
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::RenderFrame()
 {
+    MGraphic::SetRasterizerState(G_DEVICE_CONTEXT, G_RASTERIZER_STATE);
+    
     RenderFrame_SceneShadowMap();
     RenderFrame_Scene();
     RenderFrame_PostProcess();
+    RenderFrame_DebugLines();
     RenderFrame_DebugScreen();
     
     MGraphic::PresentSwapChain(G_SWAP_CHAIN);
@@ -409,9 +472,9 @@ void MGraphic::CreateAndSetSampleStates()
         samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
-        samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
-        samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[0] = TColor::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = TColor::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = TColor::Magenta.ToFloat().b;
         samplerDesc.BorderColor[3] = 1.0f;
         G_DEVICE->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[0]);
     }
@@ -421,9 +484,9 @@ void MGraphic::CreateAndSetSampleStates()
         samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
-        samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
-        samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[0] = TColor::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = TColor::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = TColor::Magenta.ToFloat().b;
         samplerDesc.BorderColor[3] = 1.0f;
         G_DEVICE->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[1]);
     }
@@ -433,9 +496,9 @@ void MGraphic::CreateAndSetSampleStates()
         samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
         samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-        samplerDesc.BorderColor[0] = TColorI::Magenta.ToFloat().r;
-        samplerDesc.BorderColor[1] = TColorI::Magenta.ToFloat().g;
-        samplerDesc.BorderColor[2] = TColorI::Magenta.ToFloat().b;
+        samplerDesc.BorderColor[0] = TColor::Magenta.ToFloat().r;
+        samplerDesc.BorderColor[1] = TColor::Magenta.ToFloat().g;
+        samplerDesc.BorderColor[2] = TColor::Magenta.ToFloat().b;
         samplerDesc.BorderColor[3] = 1.0f;
         G_DEVICE->CreateSamplerState(&samplerDesc, &G_SAMPLER_STATES[2]);
     }
@@ -611,7 +674,7 @@ void MGraphic::CreateIndexBuffer(ID3D11Device* _device, ID3D11DeviceContext* _de
 #endif
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MGraphic::Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState)
+void MGraphic::SetRasterizerState(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState)
 {
     _deviceContext->RSSetState(_rasterizerState);
 }

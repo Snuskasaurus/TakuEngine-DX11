@@ -6,6 +6,7 @@
 #include "../World.h"
 #include "../GameWindow.h"
 #include "../FreeLookCamera.h"
+#include "../Debug/DebugDraw.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void SShaderBufferHolder::CreateShaderBuffer(EShaderType _shaderType, UINT _slot, UINT _sizeStruct)
@@ -68,7 +69,7 @@ void CopyBufferDataToDeviceContext(UINT _slot, ID3D11Buffer** _buffer, const voi
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void SShaderBufferHolder::FillBuffer_VS_Object(SShaderBufferHolder* _shaderBufferHolder, const TTransform* _transforms, UINT _start, UINT _nbInstances)
 {
-    vs_buffer_object BufferData = {};
+    b01_vs_buffer_object BufferData = {};
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(_shaderBufferHolder != nullptr);
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
@@ -88,7 +89,7 @@ void SShaderBufferHolder::FillBuffer_VS_Object(SShaderBufferHolder* _shaderBuffe
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 void SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(SShaderBufferHolder* _shaderBufferHolder, bool _isViewLight)
 {
-    vs_buffer_sceneEachFrame BufferData = {};
+    b00_vs_buffer_sceneEachFrame BufferData = {};
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(_shaderBufferHolder != nullptr);
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
@@ -117,9 +118,36 @@ void SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(SShaderBufferHolder* _sha
     CopyBufferDataToDeviceContext(_shaderBufferHolder->Slot, &_shaderBufferHolder->Buffer, &BufferData, sizeof(BufferData), _shaderBufferHolder->ShaderType);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+void SShaderBufferHolder::FillBuffer_VS_DebugLine(SShaderBufferHolder* _shaderBufferHolder, const SDebugLine* _debugLines, UINT _start, UINT _nbInstances)
+{
+    b13_vs_buffer_debug_draw_line BufferData = {};
+#if DEBUG_DO_CHECK_IN_SHADER_BUFFER
+    assert(_shaderBufferHolder != nullptr);
+    assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
+#endif
+    
+    const TMatrix4f cameraViewMatrix = MWorld::GetWorld()->FreeLookCamera.GetViewMatrix();
+    const TMatrix4f cameraProjectionMatrix = MGameWindow::GetCameraProjectionMatrix();
+    
+    int iBufferStruct = 0;
+    const UINT End = _start + _nbInstances;
+
+    for (UINT iTransform = _start; iTransform < End ; ++iTransform)
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            const TMatrix4f wvp = TTransform::ToMatrix(_debugLines[iTransform].Transforms[i]);
+            BufferData.debugLines[iBufferStruct].wvp[i] = TMatrix4f::Transpose(wvp);
+        }
+        iBufferStruct++;
+    }
+
+    CopyBufferDataToDeviceContext(_shaderBufferHolder->Slot, &_shaderBufferHolder->Buffer, &BufferData, sizeof(BufferData), _shaderBufferHolder->ShaderType);
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
 void SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(SShaderBufferHolder* _shaderBufferHolder)
 {
-    ps_buffer_sceneEachFrame BufferData = {};
+    b00_ps_buffer_sceneEachFrame BufferData = {};
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(_shaderBufferHolder != nullptr);
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);

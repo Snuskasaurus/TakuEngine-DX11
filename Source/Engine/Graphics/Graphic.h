@@ -48,6 +48,8 @@ public:
     static void RenderFrame_Scene();
     static void RenderFrame_DebugScreen();
     static void RenderFrame_PostProcess();
+    static void RenderFrame_DebugLines();
+
 public:
     static void CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState);
     static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
@@ -61,7 +63,7 @@ public:
     static void SetPixelShaderTextureViews(ID3D11DeviceContext* _deviceContext, UINT nbTextures, ID3D11ShaderResourceView** _textureViews);
 public:
     static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
-    static void Rasterize(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState);
+    static void SetRasterizerState(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState);
     static void ConfigureViewport(ID3D11DeviceContext*);
     static void PresentSwapChain(IDXGISwapChain*);
     static void ClearRenderTarget(ID3D11DeviceContext*, ID3D11RenderTargetView*);

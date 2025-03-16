@@ -11,13 +11,13 @@ TColorf TColorf::Magenta = TColorf{1.0f, 0.0f, 1.0f, 1.0f};
 TColorf TColorf::Yellow = TColorf{1.0f, 1.0f, 0.0f, 1.0f};
 TColorf TColorf::Cyan = TColorf{0.0f, 1.0f, 1.0f, 1.0f};
 
-TColorI TColorI::White = TColorI{255u, 255u, 255u, 255u};
-TColorI TColorI::Black = TColorI{0u, 0u, 0u, 255u};
+TColor TColor::White = TColor{255u, 255u, 255u, 255u};
+TColor TColor::Black = TColor{0u, 0u, 0u, 255u};
 
-TColorI TColorI::Red = TColorI{255u, 0u, 0u, 255u};
-TColorI TColorI::Green = TColorI{0u, 255u, 0u, 255u};
-TColorI TColorI::Blue = TColorI{0u, 0u, 255u, 255u};
+TColor TColor::Red = TColor{255u, 0u, 0u, 255u};
+TColor TColor::Green = TColor{0u, 255u, 0u, 255u};
+TColor TColor::Blue = TColor{0u, 0u, 255u, 255u};
 
-TColorI TColorI::Magenta = TColorI{255u, 0u, 255u, 255u};
-TColorI TColorI::Yellow = TColorI{255u, 255u, 0u, 255u};
-TColorI TColorI::Cyan = TColorI{0u, 255u, 255u, 255u};
+TColor TColor::Magenta = TColor{255u, 0u, 255u, 255u};
+TColor TColor::Yellow = TColor{255u, 255u, 0u, 255u};
+TColor TColor::Cyan = TColor{0u, 255u, 255u, 255u};
