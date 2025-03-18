@@ -13,6 +13,7 @@ void MDebugDraw::Line(TVector3f _positionStart, TVector3f _positionEnd, TColor _
     SDebugLine newLine;
     newLine.Transforms[0] = {_positionStart };
     newLine.Transforms[1] = {_positionEnd };
+    newLine.Color = _color.ToFloat();
     G_DEBUG_LINES.push_back(newLine);
 }
 

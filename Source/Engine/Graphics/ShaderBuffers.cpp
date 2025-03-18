@@ -139,6 +139,10 @@ void SShaderBufferHolder::FillBuffer_VS_DebugLine(SShaderBufferHolder* _shaderBu
             const TMatrix4f wvp = TTransform::ToMatrix(_debugLines[iTransform].Transforms[i]);
             BufferData.debugLines[iBufferStruct].wvp[i] = TMatrix4f::Transpose(wvp);
         }
+        BufferData.debugLines[iBufferStruct].r = _debugLines[iBufferStruct].Color.r;
+        BufferData.debugLines[iBufferStruct].g = _debugLines[iBufferStruct].Color.g;
+        BufferData.debugLines[iBufferStruct].b = _debugLines[iBufferStruct].Color.b;
+        
         iBufferStruct++;
     }
 

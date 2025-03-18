@@ -5,6 +5,7 @@
 #include "../Resources/ShadersResources.h"
 #include "../Defines.h"
 
+
 #define MAX_INSTANCE_COUNT 1024u
 
 struct alignas(16) b00_vs_buffer_sceneEachFrame
@@ -24,8 +25,9 @@ struct alignas(16) b13_vs_buffer_debug_draw_line
     struct debug_line
     {
         TMatrix4f wvp[2];
+        float r, g, b;
     };
-    debug_line debugLines[468];
+    debug_line debugLines[416];
 };
 
 struct alignas(16) b00_ps_buffer_sceneEachFrame
@@ -51,6 +53,6 @@ struct SShaderBufferHolder
 
     static void FillBuffer_VS_Object(SShaderBufferHolder*, const TTransform* _transforms, UINT _start, UINT _nbInstances);
     static void FillBuffer_VS_SceneEachFrame(SShaderBufferHolder*, bool _isViewLight);
-    static void FillBuffer_VS_DebugLine(SShaderBufferHolder*, const struct SDebugLine* _debugLines, UINT _start, UINT _nbInstances);
+    static void FillBuffer_VS_DebugLine(SShaderBufferHolder* _shaderBufferHolder, const struct SDebugLine* _debugLines, UINT _start, UINT _nbInstances);
     static void FillBuffer_PS_SceneEachFrame(SShaderBufferHolder*);
 };

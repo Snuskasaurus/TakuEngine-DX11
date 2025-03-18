@@ -285,7 +285,7 @@ void MGraphic::RenderFrame_DebugLines()
     UINT nbInstancesRemainingToDraw = nbInstances;
     while (nbInstancesRemainingToDraw > 0)
     {
-        const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, 467u);
+        const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, 416u);
         const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
     
         SShaderBufferHolder::FillBuffer_VS_DebugLine(&G_VS_BUFFERS[13], debugLines.data(), startInstances, nbInstancesToDraw);
