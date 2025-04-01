@@ -162,6 +162,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Game\Scenes\PlanetScene.cpp" />
     <FxCompile Include="Game\Data\Shaders\ps_debug_screen.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
@@ -312,6 +313,7 @@
     <ClInclude Include="Source\Engine\World.h" />
     <ClInclude Include="Source\Game\MGridSystem.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />
+    <ClInclude Include="Source\Game\Scenes\PlanetScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Game\Data\Shaders\ps_post_process.hlsl">
