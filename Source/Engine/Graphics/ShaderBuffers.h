@@ -20,7 +20,7 @@ struct alignas(16) b01_vs_buffer_object
     TMatrix4f world[MAX_INSTANCE_COUNT];
 };
 
-struct alignas(16) b13_vs_buffer_debug_draw_line
+struct b13_vs_buffer_debug_draw_line
 {
     struct debug_line
     {

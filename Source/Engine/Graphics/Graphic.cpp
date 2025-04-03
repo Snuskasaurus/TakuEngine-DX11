@@ -282,10 +282,10 @@ void MGraphic::RenderFrame_DebugLines()
     
     // TODO Julien Rogel (12/03/2025): Try Structured Buffers to avoid filling multiples times the buffers
     const UINT nbInstances = (UINT)debugLines.size();
-    UINT nbInstancesRemainingToDraw = nbInstances;
+    UINT nbInstancesRemainingToDraw = nbInstances - 1;
     while (nbInstancesRemainingToDraw > 0)
     {
-        const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, 416u);
+        const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, 415u);
         const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
     
         SShaderBufferHolder::FillBuffer_VS_DebugLine(&G_VS_BUFFERS[13], debugLines.data(), startInstances, nbInstancesToDraw);

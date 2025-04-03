@@ -5,7 +5,9 @@
 #include "../Engine/Resources/AssetList.h"
 #include "../Engine/Debug/DebugDraw.h"
 
-#define ENABLE_DEBUG_TERRAIN_TYPE 0
+#define DEBUG_DISPLAY_GRID_TERRAINS 1 
+#define DEBUG_DISPLAY_GRID_PATH_TERRAINS_COST 1
+#define ENABLE_GENERATE_FORESTS 0
 
 typedef int TTerrainIndex;
 typedef int TGridIndex;
@@ -24,26 +26,32 @@ enum ETerrainType
     WATER,
     GROUND,
     MOUNTAIN,
-    //FOREST,
+    FOREST,
 };
 
 constexpr int G_GRID_WIDTH = 20; // X
 constexpr int G_GRID_HEIGHT = 20; // Y
 constexpr float G_TILE_SIZE = 15.0f;
 constexpr float G_TILE_SIZE_HALF = G_TILE_SIZE * 0.5f;
+constexpr float G_TILE_SIZE_THIRD = G_TILE_SIZE * 0.33f;
 constexpr int G_NB_TILES = G_GRID_WIDTH * G_GRID_HEIGHT;
 
 constexpr int G_GRID_WIDTH_VISUAL = G_GRID_WIDTH + 1;
 constexpr int G_GRID_HEIGHT_VISUAL = G_GRID_HEIGHT + 1;
 constexpr int G_NB_TILES_VISUAL = G_GRID_WIDTH_VISUAL * G_GRID_HEIGHT_VISUAL;
 
-constexpr int G_NB_TILES_MINI = G_NB_TILES * 9;
+constexpr int G_NB_TILES_PATH = G_NB_TILES * 9;
 
 constexpr float G_GRID_WIDTH_HALF = G_TILE_SIZE_HALF * (G_GRID_WIDTH - 1);
 constexpr float G_GRID_HEIGHT_HALF = G_TILE_SIZE_HALF * (G_GRID_HEIGHT - 1);
 
+// constexpr float G_GRID_GLOBAL_OFFSET_X = G_GRID_WIDTH_HALF;
+// constexpr float G_GRID_GLOBAL_OFFSET_Y = G_GRID_HEIGHT_HALF;
+constexpr float G_GRID_GLOBAL_OFFSET_X = 0;
+constexpr float G_GRID_GLOBAL_OFFSET_Y = 0;
+
 static std::vector<ETerrainType> G_GRID_TERRAINS;
-static std::vector<TTerrainCost> G_GRID_MINI_TERRAINS_COST;
+static std::vector<TTerrainCost> G_GRID_PATH_TERRAINS_COST;
 std::map<TTerrainIndex, TVisualMeshData> G_VISUAL_MESH_DATA_MAP;
 bool G_DRAW_TILE_BORDER = false;
 CDrawable_InstancedMesh* G_TILE_BORDER_MESH;
@@ -91,12 +99,12 @@ TVisualMeshData* GetVisualMeshDataFromVisualGridIndex(const TVisualGridIndex& _v
         TTerrainIndex TerrainType = TileIndexes[i] >= 0 ? (TTerrainIndex)G_GRID_TERRAINS[TileIndexes[i]] : 0;
         if (IsMountain)
         {
-            if (TerrainType == ETerrainType::GROUND)
+            if (TerrainType != ETerrainType::WATER && TerrainType != ETerrainType::MOUNTAIN)
                 TerrainType = (TTerrainIndex) ETerrainType::WATER;
         }
         else
         {
-            if (TerrainType == ETerrainType::MOUNTAIN)
+            if (TerrainType != ETerrainType::WATER && TerrainType != ETerrainType::GROUND)
                 TerrainType = (TTerrainIndex) ETerrainType::GROUND;
         }
         
@@ -206,9 +214,7 @@ TTerrainCost ConvertTerrainTypeToTerrainCost(ETerrainType _terrainType)
     switch (_terrainType)
     {
         case GROUND: return 2u;
-        
-        case WATER: return 0u;
-        case MOUNTAIN: return 0u;
+        case FOREST: return 4u;
     }
     return 0u;
 }
@@ -252,66 +258,46 @@ void MGridSystem::CreateGrid()
     // Generate grid terrain
     {
         G_GRID_TERRAINS.reserve(G_NB_TILES);
-        G_GRID_TERRAINS.insert(G_GRID_TERRAINS.end(), G_NB_TILES, ETerrainType::WATER);
+        G_GRID_TERRAINS.insert(std::begin(G_GRID_TERRAINS), G_NB_TILES, ETerrainType::WATER);
         const bool success = ReadMapAndFillTerrains(G_GRID_TERRAINS);
         assert(success);
     }
 
-    // Initialize mini grid
-    G_GRID_MINI_TERRAINS_COST.reserve(G_NB_TILES_MINI);
-    for (int i = 0; i < G_NB_TILES_MINI; ++i)
-    {
-        const int xTile = i % (G_GRID_WIDTH * 3) - 1;
-        const int yTile = i / (G_GRID_HEIGHT * 3) - 1;
-        
-        // int indexTerrainTile = i / 9;
-        // TTerrainCost cost = 
-        // G_GRID_MINI_TERRAINS_COST.push_back();
+    // Initialize path cost grid
+    G_GRID_PATH_TERRAINS_COST.reserve(G_NB_TILES_PATH);
+    G_GRID_PATH_TERRAINS_COST.insert(G_GRID_PATH_TERRAINS_COST.end(), G_NB_TILES_PATH, 1);
 
-        TVector3f tilePosition =
-        {
-            static_cast<float>(xTile) * G_TILE_SIZE / 3.0f - G_GRID_WIDTH_HALF,
-            static_cast<float>(yTile) * G_TILE_SIZE / 3.0f - G_GRID_HEIGHT_HALF,
-            0.0f
+    InitVisualMeshDataMap();
+    
+    // Create the terrain meshes from visual grid
+    for (int i = 0; i < G_NB_TILES_VISUAL; ++i)
+    {
+        const int xTile = i % G_GRID_WIDTH_VISUAL;
+        const int yTile = (G_GRID_WIDTH_VISUAL -1 ) - i / G_GRID_WIDTH_VISUAL;
+
+        const TVector3f position =
+        { 
+            (static_cast<float>(xTile) * G_TILE_SIZE) - G_GRID_GLOBAL_OFFSET_X - G_TILE_SIZE_HALF, 
+            (static_cast<float>(yTile) * G_TILE_SIZE) - G_GRID_GLOBAL_OFFSET_Y - G_TILE_SIZE_HALF, 
+            0.0f 
         };
-        
-        //MDebugDraw::Line({tilePosition}, {tilePosition + TVector3f::Up * 5.0f}, TColor::Green);
-    }
 
-    // Generate grid meshes
-    {
-        InitVisualMeshDataMap();
-        
-        for (int i = 0; i < G_NB_TILES_VISUAL; ++i)
-        {
-            const int xTile = i % G_GRID_WIDTH_VISUAL;
-            const int yTile = i / G_GRID_WIDTH_VISUAL;
-
-            const TVector3f position =
-            { 
-                (static_cast<float>(xTile) * G_TILE_SIZE) - G_GRID_WIDTH_HALF - G_TILE_SIZE_HALF, 
-                (static_cast<float>(yTile) * -G_TILE_SIZE) + G_GRID_HEIGHT_HALF + G_TILE_SIZE_HALF, 
-                0.0f 
-            };
-
-            // Add ground/water tiles
-            { 
-                const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i, false);
-                if (visualMeshData != nullptr)
-                {
-                    TTransform transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
-                    visualMeshData->InstancedMesh->Instances.push_back(transform);
-                }
-            }
-
-            // Add Mountain tiles
+        // Add ground/water tiles
+        { 
+            const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i, false);
+            if (visualMeshData != nullptr)
             {
-                const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i, true);
-                if (visualMeshData != nullptr)
-                {
-                    TTransform transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
-                    visualMeshData->InstancedMesh->Instances.push_back(transform);
-                }
+                TTransform transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
+                visualMeshData->InstancedMesh->Instances.push_back(transform);
+            }
+        }
+        // Add Mountain tiles
+        {
+            const TVisualMeshData* visualMeshData = GetVisualMeshDataFromVisualGridIndex(i, true);
+            if (visualMeshData != nullptr)
+            {
+                TTransform transform = { position, visualMeshData->Rotation, 0.0f, 0.0f };
+                visualMeshData->InstancedMesh->Instances.push_back(transform);
             }
         }
     }
@@ -320,63 +306,106 @@ void MGridSystem::CreateGrid()
     CDrawable_InstancedMesh* TreeMesh2 = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TREE_02);
     CDrawable_InstancedMesh* TreeMesh3 = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDraw_DEPRECATED(TAKU_ASSET_MESH_TREE_03);
     
-    for (int i = 0; i < G_NB_TILES; ++i)
+    for (int iTile = 0; iTile < G_NB_TILES; ++iTile)
     {
-        const int XTile = i % G_GRID_WIDTH;
-        const int YTile = i / G_GRID_WIDTH;
-
+        const int xTile = iTile % G_GRID_WIDTH;
+        const int yTile = (G_GRID_HEIGHT - 1) - (iTile / G_GRID_WIDTH);
+        
+        if (xTile > 10) continue;
+        if (yTile > 10) continue;
+        
         TVector3f tilePosition =
             {
-            static_cast<float>(XTile) * G_TILE_SIZE - G_GRID_WIDTH_HALF,
-            static_cast<float>(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF,
+            static_cast<float>(xTile) * G_TILE_SIZE - G_GRID_GLOBAL_OFFSET_X,
+            static_cast<float>(yTile) * G_TILE_SIZE - G_GRID_GLOBAL_OFFSET_Y,
             0.0f
         };
         TTransform tileTransform = { tilePosition, { 0.0f, 0.0f, 0.0f }};
-
-#if ENABLE_DEBUG_TERRAIN_TYPE
+        
+#if DEBUG_DISPLAY_GRID_TERRAINS
         TColor colorLine = TColor::Blue;
-        if (G_GRID_TERRAINS[i] == ETerrainType::GROUND)
+        if (G_GRID_TERRAINS[iTile] == ETerrainType::GROUND)
         {
             colorLine = TColor::Green;
         }
-        MDebugDraw::Line({tilePosition}, {tilePosition + TVector3f::Up * 5.0f}, colorLine);
+        MDebugDraw::Line({tilePosition}, {tilePosition + TVector3f::Up * 20.0f}, colorLine);
 #endif
-        
-        if (G_GRID_TERRAINS[i] != ETerrainType::GROUND)
-            continue;
-         
-        if (MMath::RandomNumberIntegerInRange(0, 8) >= 1)
+
+        // Create forests
+#if ENABLE_GENERATE_FORESTS
+        if (G_GRID_TERRAINS[i] == ETerrainType::GROUND)
         {
-            constexpr float sizeChange = G_TILE_SIZE / 9 * 3.0f;
-            constexpr float startOffsetX = -G_TILE_SIZE_HALF + sizeChange * 0.5f;
-            constexpr float startOffsetY = -G_TILE_SIZE_HALF + sizeChange * 0.5f;
-
-            constexpr float MaxRandOffset = sizeChange * 0.35f;
-            
-            for (int xOffset = 0; xOffset < 3; ++xOffset)
+            if (MMath::RandomNumberIntegerInRange(0, 100) <= 25)
             {
-                for (int yOffset = 0; yOffset < 3; ++yOffset)
+                G_GRID_TERRAINS[i] = ETerrainType::FOREST;
+            
+                constexpr float sizeChange = G_TILE_SIZE / 9 * 3.0f;
+                constexpr float startOffsetX = -G_TILE_SIZE_HALF + sizeChange * 0.5f;
+                constexpr float startOffsetY = -G_TILE_SIZE_HALF + sizeChange * 0.5f;
+
+                constexpr float MaxRandOffset = sizeChange * 0.35f;
+            
+                for (int xOffset = 0; xOffset < 3; ++xOffset)
                 {
-                    if (MMath::RandomNumberIntegerInRange(0, 8) == 0)
-                        continue;
-
-                    const float randOffsetX = MMath::RandomNumberIntegerInRange(-MaxRandOffset * 100.0f, MaxRandOffset * 100.0f) / 100.0f;
-                    const float randOffsetY = MMath::RandomNumberIntegerInRange(-MaxRandOffset * 100.0f, MaxRandOffset * 100.0f) / 100.0f;
-                    
-                    const float offsetX = startOffsetX + sizeChange * (float)xOffset + randOffsetX;
-                    const float offsetY = startOffsetY + sizeChange * (float)yOffset + randOffsetY;
-                    const TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.0f);
-                    const TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(-5.0f, 5.0f)), 0.0f };
-
-                    const int varTree = MMath::RandomNumberIntegerInRange(1, 4);
-                    switch (varTree)
+                    for (int yOffset = 0; yOffset < 3; ++yOffset)
                     {
+                        if (MMath::RandomNumberIntegerInRange(0, 8) == 0)
+                            continue;
+
+                        const float randOffsetX = MMath::RandomNumberIntegerInRange(-MaxRandOffset * 100.0f, MaxRandOffset * 100.0f) / 100.0f;
+                        const float randOffsetY = MMath::RandomNumberIntegerInRange(-MaxRandOffset * 100.0f, MaxRandOffset * 100.0f) / 100.0f;
+                    
+                        const float offsetX = startOffsetX + sizeChange * (float)xOffset + randOffsetX;
+                        const float offsetY = startOffsetY + sizeChange * (float)yOffset + randOffsetY;
+                        const TVector3f positionTree = tilePosition + TVector3f(offsetX, offsetY, 0.0f);
+                        const TRotator rotationTree = { MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(0.0f, 360.0f)), MMath::Deg2Rad(MMath::RandomNumberIntegerInRange(-5.0f, 5.0f)), 0.0f };
+
+                        const int varTree = MMath::RandomNumberIntegerInRange(1, 4);
+                        switch (varTree)
+                        {
                         case 1: TreeMesh1->Instances.push_back({positionTree, rotationTree }); break;
                         case 2: TreeMesh2->Instances.push_back({positionTree, rotationTree }); break;
                         case 3: TreeMesh3->Instances.push_back({positionTree, rotationTree }); break;
+                        }
                     }
                 }
             }
+        }
+#endif
+
+        // Create paths costs
+        for (int iPath = 0; iPath < 5; ++iPath)
+        {
+            const int xTilePath = iPath % 3;
+            const int yTilePath = 2 - (iPath / 3);
+            
+            const int indexPathGrid = iTile * 9 + iPath;
+            
+            TVector3f tilePositionOffset =
+            {
+                static_cast<float>(xTilePath) * G_TILE_SIZE_THIRD - G_TILE_SIZE_THIRD,
+                static_cast<float>(yTilePath) * G_TILE_SIZE_THIRD - G_TILE_SIZE_THIRD,
+                0.0f
+            };
+
+            G_GRID_PATH_TERRAINS_COST[indexPathGrid] = ConvertTerrainTypeToTerrainCost(G_GRID_TERRAINS[iTile]);
+        
+#if DEBUG_DISPLAY_GRID_PATH_TERRAINS_COST
+            //if (G_GRID_PATH_TERRAINS_COST[indexPathGrid] > 0)
+            {
+                TColor color = TColor::Black;
+                if (yTilePath == 0)    color = TColor::Red;
+                if (yTilePath == 1)    color = TColor::Green;
+                if (yTilePath == 2)    color = TColor::Blue;
+                // switch (G_GRID_PATH_TERRAINS_COST[indexPathGrid])
+                // {
+                //     case 2: color = TColor::Green; break;
+                //     case 3: color = TColor(255/2, 255/2, 0); break;
+                //     case 4: color = TColor::Red; break;
+                // }
+                MDebugDraw::Line({tilePosition + tilePositionOffset}, {tilePosition + tilePositionOffset + TVector3f::Up * 2.0f}, color);
+            }
+#endif
         }
     }
 }
@@ -396,8 +425,8 @@ void MGridSystem::ToggleDisplayingGrid()
             const int YTile = i / G_GRID_WIDTH;
             TVector3f tilePosition =
                 {
-                static_cast<float>(XTile) * G_TILE_SIZE - G_GRID_WIDTH_HALF,
-                static_cast<float>(YTile) * -G_TILE_SIZE + G_GRID_HEIGHT_HALF,
+                static_cast<float>(XTile) * G_TILE_SIZE - G_GRID_GLOBAL_OFFSET_X,
+                static_cast<float>(YTile) * -G_TILE_SIZE + G_GRID_GLOBAL_OFFSET_Y,
                 0.0f
                 };
             TTransform tileBorderTransform = { tilePosition, { 0.0f, 0.0f, 0.0f }};
