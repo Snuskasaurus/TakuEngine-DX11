@@ -34,7 +34,7 @@ TMatrix4f CSceneLight::GetProjectionMatrix() const
 {
      //return MGameWindow::GetPerspectiveMatrix();
       
-     const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixOrthographicRH(120, 120, 0.1f, 300.0f);
+     const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixOrthographic(120, 120, 0.1f, 300.0f);
      return PerspectiveMatrix;
 }
 void CSceneLight::OnValueChanged()

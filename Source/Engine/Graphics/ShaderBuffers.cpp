@@ -75,7 +75,7 @@ void SShaderBufferHolder::FillBuffer_VS_Object(SShaderBufferHolder* _shaderBuffe
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
 #endif
     
-    int iBufferStruct = _start;
+    int iBufferStruct = 0;
     const UINT End = _start + _nbInstances;
     for (UINT iTransform = _start; iTransform < End ; ++iTransform)
     {
@@ -124,13 +124,12 @@ void SShaderBufferHolder::FillBuffer_VS_DebugLine(SShaderBufferHolder* _shaderBu
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(_shaderBufferHolder != nullptr);
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
-    assert(_nbInstances <= 416);
 #endif
     
     const TMatrix4f cameraViewMatrix = MWorld::GetWorld()->FreeLookCamera.GetViewMatrix();
     const TMatrix4f cameraProjectionMatrix = MGameWindow::GetCameraProjectionMatrix();
     
-    int iBufferStruct = _start;
+    int iBufferStruct = 0;
     const UINT End = _start + _nbInstances;
 
     for (UINT iTransform = _start; iTransform < End ; ++iTransform)

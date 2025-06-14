@@ -68,6 +68,11 @@ struct alignas(16) TVector3f
     {
         return { -x, -y, -z };
     }
+
+    FORCE_INLINE TVector3f operator-(const TVector3f& _v2) const
+    {
+        return TVector3f(x - _v2.x, y - _v2.y, z - _v2.z);
+    }
     
     FORCE_INLINE TVector3f& operator*=(const float& _f)
     {
@@ -106,6 +111,16 @@ struct alignas(16) TVector3f
     FORCE_INLINE friend TVector3f operator*(float _f, const TVector3f& _v)
     {
         return { _v.x *_f, _v.y * _f, _v.z *_f };
+    }
+
+    TVector3f operator/(float _f) const
+    {
+        return { this->x / _f, this->y / _f, this->z / _f };
+    }
+    
+    FORCE_INLINE friend TVector3f operator/(float _f, const TVector3f& _v)
+    {
+        return { _v.x / _f, _v.y / _f, _v.z / _f };
     }
 
 #pragma endregion // operator_region
@@ -252,8 +267,9 @@ struct alignas(16) TMatrix4f
     static TMatrix4f MatrixRotationYaw(const float _yaw);
     static TMatrix4f MatrixRotationPitchRollYaw(const float _pitch, const float _roll, const float _yaw);
     static TMatrix4f MatrixScale(const float _scale);
-    static TMatrix4f MatrixPerspectiveFovRH(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ);
-    static TMatrix4f MatrixOrthographicRH(float _viewWidth, float _viewHeight, float _nearZ, float _farZ);
+    static TMatrix4f MatrixPerspectiveFov(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ);
+    static TMatrix4f MatrixOrthographic(float _viewWidth, float _viewHeight, float _nearZ, float _farZ);
+    static TMatrix4f MatrixLookTo(TVector3f _position, TVector3f _forward, TVector3f _up);
     static TMatrix4f Transpose(const TMatrix4f& _m);
     static TMatrix4f Inverse(const TMatrix4f& _m);
 };

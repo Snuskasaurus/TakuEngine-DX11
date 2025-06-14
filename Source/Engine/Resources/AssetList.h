@@ -2,6 +2,7 @@
 
 inline const char* G_ASSET_ARROW = "Arrow";
 inline const char* G_ASSET_GIZMO = "Gizmo";
+inline const char* G_ASSET_2D_CIRCLE = "2D_Circle";
 
 inline const char* G_ASSET_T_NONE_NORMAL = "T_NoneNormal";
 inline const char* G_ASSET_T_NONE_WHITE = "T_NoneWhite";
