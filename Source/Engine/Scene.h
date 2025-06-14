@@ -9,6 +9,7 @@ enum EGameSceneType
 {
     None,
     GridScene,
+    PlanetScene,
 };
 
 class CGameScene
