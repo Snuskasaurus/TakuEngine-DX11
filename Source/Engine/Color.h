@@ -3,7 +3,7 @@
 #include <array>
 #include <Windows.h>
 
-struct alignas(16) TColorf
+struct TColorf
 {
     float r, g, b, a;
     
@@ -17,18 +17,18 @@ struct alignas(16) TColorf
     static TColorf Cyan;
 };
 
-struct TColorI
+struct TColor
 {
     UINT8 r, g, b, a;
     
-    static TColorI White;
-    static TColorI Black;
-    static TColorI Red;
-    static TColorI Green;
-    static TColorI Blue;
-    static TColorI Magenta;
-    static TColorI Yellow;
-    static TColorI Cyan;
+    static TColor White;
+    static TColor Black;
+    static TColor Red;
+    static TColor Green;
+    static TColor Blue;
+    static TColor Magenta;
+    static TColor Yellow;
+    static TColor Cyan;
 
     TColorf ToFloat() const { return {(float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f}; }
 };

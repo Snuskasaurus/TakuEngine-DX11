@@ -161,15 +161,22 @@ TMatrix4f TMatrix4f::MatrixScale(const float _scale)
     return FromDirectXMatrix(DirectX::XMMatrixScaling(_scale, _scale, _scale));
 }
 //----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::MatrixPerspectiveFovRH(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ)
+TMatrix4f TMatrix4f::MatrixPerspectiveFov(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ)
 {
     return FromDirectXMatrix(DirectX::XMMatrixPerspectiveFovRH(_fovAngleY, _aspectRatio, _nearZ, _farZ));
 }
 //----------------------------------------------------------------------------------------------------------------------
-TMatrix4f TMatrix4f::MatrixOrthographicRH(float _viewWidth, float _viewHeight, float _nearZ, float _farZ)
+TMatrix4f TMatrix4f::MatrixOrthographic(float _viewWidth, float _viewHeight, float _nearZ, float _farZ)
 {
-     //return FromDirectXMatrix(DirectX::XMMatrixOrthographicRH(_viewWidth, _viewHeight, _nearZ, _farZ));
      return FromDirectXMatrix(DirectX::XMMatrixOrthographicRH(_viewWidth, _viewHeight, _nearZ, _farZ));
+}
+//----------------------------------------------------------------------------------------------------------------------
+TMatrix4f TMatrix4f::MatrixLookTo(TVector3f _position, TVector3f _forward, TVector3f _up)
+{
+    return FromDirectXMatrix(DirectX::XMMatrixLookToRH(
+        {_position.x, _position.y, _position.z},
+        {_forward.x, _forward.y, _forward.z},
+        {_up.x, _up.y, _up.z}));
 }
 //----------------------------------------------------------------------------------------------------------------------
 TMatrix4f TMatrix4f::Transpose(const TMatrix4f& _m)

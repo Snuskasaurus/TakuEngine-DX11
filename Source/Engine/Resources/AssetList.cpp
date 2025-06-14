@@ -15,12 +15,14 @@ void LoadMeshes()
 
 void LoadShaders()
 {
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_DEBUG_DRAW,      VERTEX_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_BASE,            VERTEX_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_BASE,            PIXEL_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_2D,              VERTEX_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_DEBUG_SCREEN,              PIXEL_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_VS_SHADOW,          VERTEX_SHADER);
     MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_POST_PROCESS_1,  PIXEL_SHADER);
+    MShaderResources::CreateBlobFromFileName(TAKU_ASSET_SHADER_PS_SIMPLE_COLOR,  PIXEL_SHADER);
 }
 
 void LoadTextures()
@@ -47,6 +49,8 @@ void LoadDrawables()
     MDrawableResources::CreateDrawableData(G_ASSET_TILE_BORDER, {G_ASSET_MESH_TILE_BORDER, "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, false});
     MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
     MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
+
+    MDrawableResources::CreateDrawableData(G_ASSET_2D_CIRCLE, {"Debugs/2D_Circle", "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
 }
 
 void MAsset::LoadAssets()

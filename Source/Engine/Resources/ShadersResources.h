@@ -15,6 +15,12 @@ enum EShaderType
 
 namespace VS_INPUT_DESC
 {
+    constexpr D3D11_INPUT_ELEMENT_DESC ID_INST[] = {
+        { "INDEX",0u,  DXGI_FORMAT_R32_UINT,           0u,0u, D3D11_INPUT_PER_VERTEX_DATA,0u },
+        // { "COLOR",0u,  DXGI_FORMAT_R32G32B32_FLOAT,  0u, 4u,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "SV_InstanceID",  0u,  DXGI_FORMAT_R32_UINT,          1u,      4u,    D3D11_INPUT_PER_INSTANCE_DATA,    0u },
+    };
+    
     constexpr D3D11_INPUT_ELEMENT_DESC POS_INST[] = {
         { "POSITION",       0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      0u,     D3D11_INPUT_PER_VERTEX_DATA,      0u },
         { "SV_InstanceID",  0u,  DXGI_FORMAT_R32_UINT,          1u,      16u,    D3D11_INPUT_PER_INSTANCE_DATA,    0u },
