@@ -24,6 +24,13 @@ inline const char* G_ASSET_MESH_TILE_2020 = "Tiles/Tile2020";
 inline const char* G_ASSET_MESH_TILE_2202 = "Tiles/Tile2202";
 inline const char* G_ASSET_MESH_TILE_2222 = "Tiles/Tile2222";
 
+
+inline const char* G_ASSET_NAME_TERRAIN = "Terrain";
+inline const char* G_ASSET_MESH_TERRAIN = "Terrain/SM_Terrain";
+inline const char* G_ASSET_T_COLOR_TERRAIN = "Terrain/TC_Terrain";
+inline const char* G_ASSET_T_NORMAL_TERRAIN = "Terrain/TN_Terrain";
+inline const char* G_ASSET_T_MRO_TERRAIN = "Terrain/TMRO_Terrain";
+
 inline const char* G_ASSET_TILE_0000 = "Tile0000";
 inline const char* G_ASSET_TILE_1000 = "Tile1000";
 inline const char* G_ASSET_TILE_1001 = "Tile1001";

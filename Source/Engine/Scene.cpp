@@ -10,6 +10,7 @@
 #include "Resources/GamePath.h"
 
 #include "../Game/Scenes/GridScene.h"
+#include "../Game/Scenes/GameTerrainScene.h"
 
 bool G_DEBUG_ENABLED = false;
 CDrawable_InstancedMesh* G_DEBUG_GIZMO_MESH = nullptr;
@@ -164,8 +165,9 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
     CGameScene* NewWorldGameScene = nullptr;
     switch (_gameSceneType)
     {
-    case None: break;
-    case GridScene:     NewWorldGameScene = new CGridScene; break;
+        case None: break;
+        case GridScene:            NewWorldGameScene = new CGridScene; break;
+        case GameTerrainScene:     NewWorldGameScene = new CGameTerrainScene; break;
     }
     
     MWorld::GetWorld()->CurrentGameScene = NewWorldGameScene;

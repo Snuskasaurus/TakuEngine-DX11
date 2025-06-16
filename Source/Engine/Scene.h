@@ -9,7 +9,10 @@ enum EGameSceneType
 {
     None,
     GridScene,
+    GameTerrainScene,
 };
+
+constexpr EGameSceneType GC_DEFAULT_SCENE = EGameSceneType::GameTerrainScene;
 
 class CGameScene
 {
