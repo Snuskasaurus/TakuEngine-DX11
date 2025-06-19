@@ -22,6 +22,18 @@ void MWorld::UninitializeWorld()
     Instance = nullptr;
 }
 //---------------------------------------------------------------------------------------------------------------------
+void MWorld::NotifyKeyPressedToGameScene(EKeyCode _keyCode)
+{
+    Instance->CurrentGameScene->OnKeyPressed_Internal(_keyCode);
+    Instance->CurrentGameScene->OnEvent_KeyPressed(_keyCode);
+}
+//---------------------------------------------------------------------------------------------------------------------
+void MWorld::NotifyKeyReleasedToGameScene(EKeyCode _keyCode)
+{
+    Instance->CurrentGameScene->OnKeyPressed_Internal(_keyCode);
+    Instance->CurrentGameScene->OnEvent_KeyReleased(_keyCode);
+}
+//---------------------------------------------------------------------------------------------------------------------
 void MWorld::OnInitialize()
 {
     FreeLookCamera.SetPosition(TVector3f(0.0f, -80.0f, 30.0f));

@@ -5,6 +5,7 @@
 #include <wincodec.h>
 #include <DirectXMath.h>
 
+#include "Inputmanager.h"
 #include "Math.h"
 #include "Graphics/Graphic.h"
 
@@ -25,6 +26,19 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 {
     switch (msg)
     {
+    case WM_KEYDOWN:
+        {
+            MInput::HandleKeyDown(wParam);
+        } break;
+    case WM_KEYUP:
+        {
+            MInput::HandleKeyUp(wParam);
+        } break;
+    case WM_MOUSEMOVE:
+        {
+            //xPos = GET_X_LPARAM(lParam); 
+            //yPos = GET_Y_LPARAM(lParam); 
+        } break;
     case WM_SIZE:
         {
             WindowSizeX = HIWORD(lParam);
@@ -63,6 +77,7 @@ void MGameWindow::InitializeGameWindow(const HINSTANCE hInstance)
         windowInfos.hIconSm = nullptr;
         windowInfos.lpszClassName = GameClassName;
     }
+    
     RegisterClassEx(&windowInfos);
 	
     GameWindowHandle = CreateWindowEx(0, GameClassName, WindowName, DefaultDword,

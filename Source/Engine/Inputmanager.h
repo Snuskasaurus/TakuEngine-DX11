@@ -1,12 +1,9 @@
 ﻿#pragma once
 
-// Created with the help of https://www.braynzarsoft.net/viewtutorial/q16390-18-direct-input
-//                          https://raptor.developpez.com/tutorial/direct_input/base/
+#include "Math.h"
+#include <Windows.h>
 
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-
-enum EKeyCode
+enum EKeyCode : UINT8
 {
     KEY_ESCAPE,
     KEY_1,
@@ -120,14 +117,19 @@ private:
     static MInput* Instance;
 
 public:
-    static void InitializeInput(HINSTANCE);
+    static void InitializeInput();
     static void DetectInputs();
     static void ClearInputs();
     static TInputHolder* GetInputHolder();
+    static TVector2f GetMousePosition();
 
-private:
-    static void FillInputHolder_Keyboard(const BYTE*);
-    static void FillInputHolder_Mouse(DIMOUSESTATE);
+    static void DispatchKeyEventsToScenes();
+    
+    static bool IsKeyUp(EKeyCode KeyCode);
+    static bool IsKeyDown(EKeyCode KeyCode);
+    
+    static void HandleKeyUp(WPARAM wParam);
+    static void HandleKeyDown(WPARAM wParam);
     
 private:
     TInputHolder InputHolder;

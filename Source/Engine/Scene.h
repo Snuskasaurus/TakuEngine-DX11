@@ -34,18 +34,19 @@ private:
     void OnUpdate_Internal(const float& _dt);
     void OnDestroy_Internal();
     void OnKeyPressed_Internal(EKeyCode _key);
+    void OnKeyReleased_Internal(EKeyCode _key);
     
 protected:
-    virtual void OnCreate() = 0;
-    virtual void OnUpdate(const float& _dt) = 0;
-    virtual void OnDestroy() = 0;
-    virtual void OnKeyPressed(EKeyCode _key) = 0;
+    virtual void OnEvent_Create() {}
+    virtual void OnEvent_Update(const float& _dt) {}
+    virtual void OnEvent_Destroy() {}
+    virtual void OnEvent_KeyPressed(EKeyCode _key) {}
+    virtual void OnEvent_KeyReleased(EKeyCode _key) {}
 
 private:
     void Create();
     void Update(const float& _dt);
     void Destroy();
-    void NotifyKeyPressed(EKeyCode _keyCode);
 
 public:
     CDrawable_InstancedMesh* AddInstancedMeshToDraw_DEPRECATED(const char* _meshName);

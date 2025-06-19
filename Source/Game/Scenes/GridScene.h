@@ -5,8 +5,8 @@
 class CGridScene final : public CGameScene
 {
 protected:
-    virtual void OnCreate() override;
-    void OnKeyPressed(EKeyCode _key) override;
-    virtual void OnUpdate(const float& _dt) override;
-    virtual void OnDestroy() override;
+    virtual void OnEvent_Create() override;
+    void OnEvent_KeyPressed(EKeyCode _key) override;
+    virtual void OnEvent_Update(const float& _dt) override;
+    virtual void OnEvent_Destroy() override;
 };

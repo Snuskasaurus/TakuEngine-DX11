@@ -4,80 +4,53 @@
 
 #include "IncludesExternal.h"
 
-#include "HResultHandler.h"
 #include "GameWindow.h"
 #include "World.h"
 
-///---------------------------------------------------------------------------------------------------------------------
-LPDIRECTINPUT8 G_DIRECT_INPUT;
-IDirectInputDevice8* G_INPUT_DEVICE_KEYBOARD;
-IDirectInputDevice8* G_INPUT_DEVICE_MOUSE;
-BYTE G_LAST_KEYBOARD_STATE[256];
+bool G_KEY_THIS_FRAME[EKeyCode::KEY_INVALID];
+
+struct FKeyEvent
+{
+    bool IsDown;
+    EKeyCode Code;
+};
+
+std::vector<FKeyEvent> KeyEventsFromLastFrame;
+bool AreKeyDown[EKeyCode::KEY_INVALID] = { false };
+std::vector<FKeyEvent> KeyEventsThisFrame;
+
 ///---------------------------------------------------------------------------------------------------------------------
 MInput* MInput::Instance = nullptr;
 ///---------------------------------------------------------------------------------------------------------------------
-void MInput::InitializeInput(HINSTANCE _hInstance)
+void MInput::InitializeInput()
 {
     assert(Instance == nullptr);
     Instance = new MInput;
 
-    CHECK_HRESULT(DirectInput8Create(_hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&G_DIRECT_INPUT, nullptr));
-    CHECK_HRESULT(G_DIRECT_INPUT->CreateDevice(GUID_SysKeyboard, &G_INPUT_DEVICE_KEYBOARD, nullptr));
-    CHECK_HRESULT(G_DIRECT_INPUT->CreateDevice(GUID_SysMouse, &G_INPUT_DEVICE_MOUSE, nullptr));
-
-    const HWND hwnd = MGameWindow::GetWindowHandle();
-    
-    CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetDataFormat(&c_dfDIKeyboard));
-    CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
-
-    DIPROPDWORD dipdw = {};
-    {
-        dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
-        dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-        dipdw.diph.dwObj        = 0;
-        dipdw.diph.dwHow        = DIPH_DEVICE;
-        dipdw.dwData            = 16;
-    }
-    CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph));
-    
-    CHECK_HRESULT(G_INPUT_DEVICE_MOUSE->SetDataFormat(&c_dfDIMouse));
-    CHECK_HRESULT(G_INPUT_DEVICE_MOUSE->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND));
+    KeyEventsFromLastFrame.reserve(64);
+    KeyEventsThisFrame.reserve(64);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::DetectInputs()
 {
-    if (MGameWindow::HasFocus() == false)
+    if (KeyEventsFromLastFrame.empty())
         return;
     
-    BYTE newKeyboardState[256];
-    G_INPUT_DEVICE_KEYBOARD->Acquire();
-    G_INPUT_DEVICE_KEYBOARD->GetDeviceState(sizeof(newKeyboardState),(LPVOID)&newKeyboardState);
-    FillInputHolder_Keyboard(newKeyboardState);
-    
-    DIDEVICEOBJECTDATA rgdod[16];
-    DWORD dwItems = 16;
-    CHECK_HRESULT(G_INPUT_DEVICE_KEYBOARD->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), rgdod, &dwItems, 0));
-
-    // Process each event
-    for (DWORD i = 0; i < dwItems; i++)
+    for (const auto& KeyEvent : KeyEventsFromLastFrame)
     {
-        if (rgdod[i].dwData & 0x80) // Key pressed
-        {
-            const DWORD KeyValue = rgdod[i].dwOfs;
-            const EKeyCode KeyCode = (KeyValue > 0 && KeyValue < EKeyCode::KEY_INVALID) ? (EKeyCode)(KeyValue - 1) : EKeyCode::KEY_INVALID;
-            MWorld::GetWorld()->CurrentGameScene->NotifyKeyPressed(KeyCode);
-        }
+        if (KeyEvent.Code == EKeyCode::KEY_INVALID)
+            return;
+        AreKeyDown[KeyEvent.Code] = KeyEvent.IsDown;
     }
-
-    DIMOUSESTATE mouseCurrState;
-    G_INPUT_DEVICE_MOUSE->Acquire();
-    G_INPUT_DEVICE_MOUSE->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
-    FillInputHolder_Mouse(mouseCurrState);
+    
+    KeyEventsThisFrame.resize(KeyEventsFromLastFrame.size());
+    std::memcpy(KeyEventsThisFrame.data(), KeyEventsFromLastFrame.data(), KeyEventsFromLastFrame.size() * sizeof(FKeyEvent));
+    KeyEventsFromLastFrame.clear();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::ClearInputs()
 {
-    Instance->InputHolder = {};
+    KeyEventsThisFrame.clear();
 }
 ///---------------------------------------------------------------------------------------------------------------------
 TInputHolder* MInput::GetInputHolder()
@@ -85,32 +58,159 @@ TInputHolder* MInput::GetInputHolder()
     return &Instance->InputHolder;
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MInput::FillInputHolder_Keyboard(const BYTE* _keyboardState)
+TVector2f MInput::GetMousePosition()
 {
-#define KEYBOARD_CHANGE_INPUT_HOLDER(Key, Input, Value) if(_keyboardState[Key] & 0x80) { Instance->InputHolder.Input = Value; }
+    POINT cursorPos;
+    if (GetCursorPos(&cursorPos))
+    {
+        ScreenToClient(MGameWindow::GetWindowHandle(), &cursorPos);
+    }
     
-    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_D, CameraRight, 1.0f)
-    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_A, CameraRight, -1.0f)
-    
-    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_W, CameraForward, 1.0f)
-    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_S, CameraForward, -1.0f)
-    
-    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_LSHIFT, CameraUp, 1.0f)
-    KEYBOARD_CHANGE_INPUT_HOLDER(DIK_LCONTROL, CameraUp, -1.0f)
-
-#undef KEYBOARD_CHANGE_INPUT_HOLDER
+    return { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MInput::FillInputHolder_Mouse(DIMOUSESTATE _mouseState)
+void MInput::DispatchKeyEventsToScenes()
 {
-#define MOUSE_AXE_CHANGE_INPUT_HOLDER_POSITIVE(Axis, Input) if(_mouseState.Axis != 0) { Instance->InputHolder.Input = (float)_mouseState.Axis; }
-#define MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE(Axis, Input) if(_mouseState.Axis != 0) { Instance->InputHolder.Input = (float)-_mouseState.Axis; }
+    for (const auto& KeyEvent : KeyEventsThisFrame)
+    {
+        if (KeyEvent.IsDown)
+        {
+            // TODO Julien Rogel (18/06/2025): Prevent double KeyPressEvent
+            MWorld::NotifyKeyPressedToGameScene(KeyEvent.Code);
+        }
+        else
+        {
+            MWorld::NotifyKeyReleasedToGameScene(KeyEvent.Code);
+        }
+    }
+}
+///---------------------------------------------------------------------------------------------------------------------
+bool MInput::IsKeyUp(EKeyCode KeyCode)
+{
+    return !AreKeyDown[KeyCode];
+}
+///---------------------------------------------------------------------------------------------------------------------
+bool MInput::IsKeyDown(EKeyCode KeyCode)
+{
+    return AreKeyDown[KeyCode];
+}
+///---------------------------------------------------------------------------------------------------------------------
+EKeyCode TranslateWin32KeyToKeyCode(const WPARAM wParam)
+{
+    switch (wParam)
+    {
+        case VK_ESCAPE:     return KEY_ESCAPE;
+        case '1':           return KEY_1;
+        case '2':           return KEY_2;
+        case '3':           return KEY_3;
+        case '4':           return KEY_4;
+        case '5':           return KEY_5;
+        case '6':           return KEY_6;
+        case '7':           return KEY_7;
+        case '8':           return KEY_8;
+        case '9':           return KEY_9;
+        case '0':           return KEY_0;
+        case VK_OEM_MINUS:  return KEY_MINUS;
+        case VK_OEM_PLUS:   return KEY_EQUALS;
+        case VK_BACK:       return KEY_BACKSPACE;
+
+        case VK_TAB:        return KEY_TAB;
+        case 'Q':           return KEY_Q;
+        case 'W':           return KEY_W;
+        case 'E':           return KEY_E;
+        case 'R':           return KEY_R;
+        case 'T':           return KEY_T;
+        case 'Y':           return KEY_Y;
+        case 'U':           return KEY_U;
+        case 'I':           return KEY_I;
+        case 'O':           return KEY_O;
+        case 'P':           return KEY_P;
+        case VK_OEM_4:      return KEY_LBRACKET;
+        case VK_OEM_6:      return KEY_RBRACKET;
+        case VK_RETURN:     return KEY_ENTER;
+        case VK_CONTROL:    return KEY_LEFT_CTRL;
+        case VK_LCONTROL:   return KEY_LEFT_CTRL;
+
+        case 'A':           return KEY_A;
+        case 'S':           return KEY_S;
+        case 'D':           return KEY_D;
+        case 'F':           return KEY_F;
+        case 'G':           return KEY_G;
+        case 'H':           return KEY_H;
+        case 'J':           return KEY_J;
+        case 'K':           return KEY_K;
+        case 'L':           return KEY_L;
+        case VK_OEM_1:      return KEY_SEMICOLON;
+        case VK_OEM_7:      return KEY_APOSTROPHE;
+        case VK_OEM_3:      return KEY_GRAVE;
+        case VK_SHIFT:      return KEY_LEFT_SHIFT;
+        case VK_LSHIFT:     return KEY_LEFT_SHIFT;
+        case VK_OEM_5:      return KEY_BACKSLASH;
+
+        case 'Z':           return KEY_Z;
+        case 'X':           return KEY_X;
+        case 'C':           return KEY_C;
+        case 'V':           return KEY_V;
+        case 'B':           return KEY_B;
+        case 'N':           return KEY_N;
+        case 'M':           return KEY_M;
+        case VK_OEM_COMMA:  return KEY_COMMA;
+        case VK_OEM_PERIOD: return KEY_PERIOD;
+        case VK_OEM_2:      return KEY_SLASH;
+        case VK_RSHIFT:     return KEY_RIGHT_SHIFT;
+        case VK_MULTIPLY:   return KEY_KEYPAD_MULTIPLY;
+        case VK_LMENU:      return KEY_LEFT_ALT;
+        case VK_SPACE:      return KEY_SPACE;
+
+        case VK_CAPITAL:    return KEY_CAPS_LOCK;
+        case VK_F1:         return KEY_F1;
+        case VK_F2:         return KEY_F2;
+        case VK_F3:         return KEY_F3;
+        case VK_F4:         return KEY_F4;
+        case VK_F5:         return KEY_F5;
+        case VK_F6:         return KEY_F6;
+        case VK_F7:         return KEY_F7;
+        case VK_F8:         return KEY_F8;
+        case VK_F9:         return KEY_F9;
+        case VK_F10:        return KEY_F10;
+
+        case VK_NUMLOCK:    return KEY_NUM_LOCK;
+        case VK_SCROLL:     return KEY_SCROLL_LOCK;
+        case VK_NUMPAD7:    return KEY_KEYPAD_7;
+        case VK_NUMPAD8:    return KEY_KEYPAD_8;
+        case VK_NUMPAD9:    return KEY_KEYPAD_9;
+        case VK_SUBTRACT:   return KEY_KEYPAD_MINUS;
+        case VK_NUMPAD4:    return KEY_KEYPAD_4;
+        case VK_NUMPAD5:    return KEY_KEYPAD_5;
+        case VK_NUMPAD6:    return KEY_KEYPAD_6;
+        case VK_ADD:        return KEY_KEYPAD_PLUS;
+        case VK_NUMPAD1:    return KEY_KEYPAD_1;
+        case VK_NUMPAD2:    return KEY_KEYPAD_2;
+        case VK_NUMPAD3:    return KEY_KEYPAD_3;
+        case VK_NUMPAD0:    return KEY_KEYPAD_0;
+        case VK_DECIMAL:    return KEY_KEYPAD_PERIOD;
+
+        case VK_OEM_102:    return KEY_OEM_102; // Usually "<" on ISO keyboards
+        case VK_F11:        return KEY_F11;
+        case VK_F12:        return KEY_F12;
+
+        default:            return KEY_INVALID;
+    }
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::HandleKeyUp(WPARAM wParam)
+{
+    EKeyCode KeyCode = TranslateWin32KeyToKeyCode(wParam);
+    if (KeyCode == EKeyCode::KEY_INVALID) return;
     
-    MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE(lX, CameraYaw)
-    MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE(lY, CameraPitch)
-    MOUSE_AXE_CHANGE_INPUT_HOLDER_POSITIVE(lZ, CameraSpeedModifier)
+    KeyEventsFromLastFrame.push_back({false, KeyCode});
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::HandleKeyDown(WPARAM wParam)
+{
+    EKeyCode KeyCode = TranslateWin32KeyToKeyCode(wParam);
+    if (KeyCode == EKeyCode::KEY_INVALID) return;
     
-#undef MOUSE_AXE_CHANGE_INPUT_HOLDER_POSITIVE
-#undef MOUSE_AXE_CHANGE_INPUT_HOLDER_NEGATIVE
+    KeyEventsFromLastFrame.push_back({true, KeyCode});
 }
 ///---------------------------------------------------------------------------------------------------------------------

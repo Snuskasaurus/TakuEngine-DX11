@@ -24,6 +24,8 @@ private:
 public:
     static void InitializeWorld();
     static void UninitializeWorld();
+    static void NotifyKeyPressedToGameScene(EKeyCode _keyCode);
+    static void NotifyKeyReleasedToGameScene(EKeyCode _keyCode);
     static MWorld* GetWorld() { return Instance; }
     static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
 public:

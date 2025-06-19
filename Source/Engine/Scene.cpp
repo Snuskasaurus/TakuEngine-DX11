@@ -40,25 +40,19 @@ void ToggleDebugs()
 void CGameScene::Create()
 {
     OnCreate_Internal();
-    OnCreate();
+    OnEvent_Create();
 }
 
 void CGameScene::Update(const float& _dt)
 {
     OnUpdate_Internal(_dt);
-    OnUpdate(_dt);
+    OnEvent_Update(_dt);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Destroy()
 {
-    OnDestroy();
+    OnEvent_Destroy();
     OnDestroy_Internal();
-}
-
-void CGameScene::NotifyKeyPressed(EKeyCode _keyCode)
-{
-    OnKeyPressed_Internal(_keyCode);
-    OnKeyPressed(_keyCode);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnCreate_Internal()
@@ -102,6 +96,11 @@ void CGameScene::OnKeyPressed_Internal(EKeyCode _key)
         SceneLight.AddYaw(-10.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_6)
         SceneLight.AddYaw(10.0f);
+}
+//---------------------------------------------------------------------------------------------------------------------
+void CGameScene::OnKeyReleased_Internal(EKeyCode _key)
+{
+    
 }
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw_DEPRECATED(const char* _meshName)

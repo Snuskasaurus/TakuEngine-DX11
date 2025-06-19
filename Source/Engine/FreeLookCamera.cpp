@@ -5,17 +5,51 @@
 #include "IncludesExternal.h"
 #include "Inputmanager.h"
 
+float GetCameraInputForward()
+{
+    if (MInput::IsKeyDown(EKeyCode::KEY_W))
+       return 1.0f;
+
+    if (MInput::IsKeyDown(EKeyCode::KEY_S))
+        return -1.0f;
+
+    return 0.0f;
+}
+
+float GetCameraInputRight()
+{
+    if (MInput::IsKeyDown(EKeyCode::KEY_D))
+        return 1.0f;
+
+    if (MInput::IsKeyDown(EKeyCode::KEY_A))
+        return -1.0f;
+
+    return 0.0f;
+}
+
+float GetCameraInputUp()
+{
+    if (MInput::IsKeyDown(EKeyCode::KEY_LEFT_SHIFT))
+        return 1.0f;
+
+    if (MInput::IsKeyDown(EKeyCode::KEY_LEFT_CTRL))
+        return -1.0f;
+
+    return 0.0f;
+}
+
 void TFreeLookCamera::UpdateCamera(const float dt)
 {
     // Inputs ----------------------------------------------------------------------------------------------------------
 
-    SpeedMovement += GET_INPUT(CameraSpeedModifier) * AddedSpeedMovementByCameraSpeedModifier * dt;
+    SpeedMovement += 1.0f * AddedSpeedMovementByCameraSpeedModifier * dt;
+    //SpeedMovement += GET_INPUT(CameraSpeedModifier) * AddedSpeedMovementByCameraSpeedModifier * dt;
     if (SpeedMovement <= 0.0f)
         SpeedMovement = 0.0f;
-    
-    const float InputForward = GET_INPUT(CameraForward) * SpeedMovement * dt;
-    const float InputRight = GET_INPUT(CameraRight) * SpeedMovement * dt;
-    const float InputUp = GET_INPUT(CameraUp) * SpeedMovement * dt;
+
+    const float SpeedForward = GetCameraInputForward() * SpeedMovement * dt;
+    const float SpeedRight = GetCameraInputRight() * SpeedMovement * dt;
+    const float SpeedUp = GetCameraInputUp() * SpeedMovement * dt;
     
     const float InputYaw = GET_INPUT(CameraYaw) * SpeedRotation * dt;
     const float InputPitch = GET_INPUT(CameraPitch) * SpeedRotation * dt;
@@ -38,9 +72,9 @@ void TFreeLookCamera::UpdateCamera(const float dt)
     CamUp = TVector3f::Cross(CamForward, CamRight);
     CamUp = TVector3f::Normalize(CamUp);
 
-    Position += CamRight * InputRight;
-    Position += CamForward * InputForward;
-    Position += TVector3f::Up * InputUp;
+    Position += CamRight * SpeedRight;
+    Position += CamForward * SpeedForward;
+    Position += TVector3f::Up * SpeedUp;
     
     const TMatrix4f CamPositionMatrix = TMatrix4f::MatrixTranslation(Position);
     CamMatrix = CamRotationMatrix * CamPositionMatrix;

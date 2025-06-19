@@ -5,14 +5,14 @@
 #include "../../Engine/Debug/DebugDraw.h"
 
 //---------------------------------------------------------------------------------------------------------------------
-void CGridScene::OnCreate()
+void CGridScene::OnEvent_Create()
 {
     SceneLight.SetYaw(120.0f);
     SceneLight.SetPitch(130.0f);
     MGridSystem::CreateGrid();
 }
 //---------------------------------------------------------------------------------------------------------------------
-void CGridScene::OnKeyPressed(EKeyCode _key)
+void CGridScene::OnEvent_KeyPressed(EKeyCode _key)
 {
     if (_key == EKeyCode::KEY_ESCAPE)
     {
@@ -32,11 +32,11 @@ void CGridScene::OnKeyPressed(EKeyCode _key)
         SceneLight.AddYaw(5.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
-void CGridScene::OnUpdate(const float& _dt)
+void CGridScene::OnEvent_Update(const float& _dt)
 {
 }
 //---------------------------------------------------------------------------------------------------------------------
-void CGridScene::OnDestroy()
+void CGridScene::OnEvent_Destroy()
 {
     
 }

@@ -20,13 +20,14 @@ void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 	MAsset::LoadAssets();
 	MGraphic::InitializeShaders();
 	MTime::InitializeTime();
-	MInput::InitializeInput(hInstance);
+	MInput::InitializeInput();
 	MWorld::InitializeWorld();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Update()
 {
 	MInput::DetectInputs();
+	MInput::DispatchKeyEventsToScenes();
 	
 	const float dt = MTime::GetDeltaTime();
 	MWorld::UpdateWorld(dt);
