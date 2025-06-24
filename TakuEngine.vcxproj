@@ -162,6 +162,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Engine\Debug\DebugGUIManager.cpp" />
     <ClCompile Include="Source\Game\Scenes\GameTerrainScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -239,6 +240,13 @@
       <AdditionalIncludeDirectories>E:\Perso\TakuEngine\\Includes</AdditionalIncludeDirectories>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Source\imgui\imgui.cpp" />
+    <ClCompile Include="Source\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Source\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Source\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Source\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Source\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Source\imgui\imgui_widgets.cpp" />
     <FxCompile Include="Game\Data\Shaders\ps_debug_screen.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
@@ -370,6 +378,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Engine\CommonEngine.h" />
     <ClInclude Include="Source\Engine\Debug\DebugDraw.h" />
+    <ClInclude Include="Source\Engine\Debug\DebugGUIManager.h" />
     <ClInclude Include="Source\Engine\Defines.h" />
     <ClInclude Include="Source\Engine\Graphics\Drawable.h" />
     <ClInclude Include="Source\Engine\Graphics\Graphic.h" />
@@ -395,12 +404,23 @@
     <ClInclude Include="Source\Game\MGridSystem.h" />
     <ClInclude Include="Source\Game\Scenes\GameTerrainScene.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />
+    <ClInclude Include="Source\imgui\imconfig.h" />
+    <ClInclude Include="Source\imgui\imgui.h" />
+    <ClInclude Include="Source\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="Source\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="Source\imgui\imgui_internal.h" />
+    <ClInclude Include="Source\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Source\imgui\imstb_textedit.h" />
+    <ClInclude Include="Source\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Game\Data\Shaders\ps_post_process.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Source\imgui\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,12 +1,13 @@
 ﻿#include "GameWindow.h"
 
-#include <Windows.h>
+#include <windows.h>
 #include <Windowsx.h>
 #include <wincodec.h>
 #include <DirectXMath.h>
 
 #include "Inputmanager.h"
 #include "Math.h"
+#include "Debug/DebugGUIManager.h"
 #include "Graphics/Graphic.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -14,8 +15,8 @@ HWND GameWindowHandle;
 const CHAR* GameClassName = "TakuEngine";
 const CHAR* WindowName = "TakuEngine";
 constexpr DWORD DefaultDword = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
-constexpr UINT DefaultWindowSizeX = (UINT)(1920 * 0.65);
-constexpr UINT DefaultWindowSizeY = (UINT)(1080 * 0.65);
+constexpr UINT DefaultWindowSizeX = (UINT)(1440);
+constexpr UINT DefaultWindowSizeY = (UINT)(810);
 constexpr UINT DefaultWindowPositionX = (UINT)(DefaultWindowSizeX * 0.1);
 constexpr UINT DefaultWindowPositionY = (UINT)(DefaultWindowSizeY * 0.1);
 UINT WindowSizeX = DefaultWindowSizeX;
@@ -24,6 +25,8 @@ bool HasWindowFocus = false;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    MDebugGUI::DispatchWinProcDebugGUI(hWnd, msg, wParam, lParam);
+    
     switch (msg)
     {
     case WM_KEYDOWN:
@@ -41,8 +44,8 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         } break;
     case WM_SIZE:
         {
-            WindowSizeX = HIWORD(lParam);
-            WindowSizeY = LOWORD(lParam);
+            WindowSizeX = LOWORD(lParam);
+            WindowSizeY = HIWORD(lParam);
         } break;
     case WM_DESTROY:
         {

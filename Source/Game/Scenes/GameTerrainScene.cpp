@@ -4,6 +4,7 @@
 #include "../../Engine/Resources/AssetList.h"
 #include "../../Engine/World.h"
 #include "../../Engine/Debug/DebugDraw.h"
+#include "../../imgui/imgui.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Create()

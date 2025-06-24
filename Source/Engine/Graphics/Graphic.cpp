@@ -12,6 +12,7 @@
 #include "../HResultHandler.h"
 #include "../World.h"
 #include "../Debug/DebugDraw.h"
+#include "../Debug/DebugGUIManager.h"
 #include "../Debug/Profiling.h"
 
 enum class EDebugDrawTarget
@@ -23,11 +24,8 @@ enum class EDebugDrawTarget
 
 EDebugDrawTarget DebugDrawTarget = EDebugDrawTarget::NONE;
 ///---------------------------------------------------------------------------------------------------------------------
-#define RESOLUTION_WIDTH    1920
-#define RESOLUTION_HEIGHT   1080
-///---------------------------------------------------------------------------------------------------------------------
-int GetResolutionWidth() { return RESOLUTION_WIDTH; }
-int GetResolutionHeight() { return RESOLUTION_HEIGHT; }
+int GetResolutionWidth() { return MGameWindow::GetGameWindowWidth(); }
+int GetResolutionHeight() { return MGameWindow::GetGameWindowHeight(); }
 ///---------------------------------------------------------------------------------------------------------------------
 static SDepthStencilResources G_DEPTH_STENCIL_RESOURCES;
 static ID3D11SamplerState* G_SAMPLER_STATES[3] = { nullptr, nullptr, nullptr};
@@ -335,6 +333,9 @@ void MGraphic::RenderFrame()
     RenderFrame_PostProcess();
     RenderFrame_DebugLines();
     RenderFrame_DebugScreen();
+
+    MDebugGUI::StartFrameDebugGUI();
+    MDebugGUI::EndFrameDebugGUI();
     
     MGraphic::PresentSwapChain(G_SWAP_CHAIN);
     

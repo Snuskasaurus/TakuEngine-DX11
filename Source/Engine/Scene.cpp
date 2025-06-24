@@ -11,6 +11,7 @@
 
 #include "../Game/Scenes/GridScene.h"
 #include "../Game/Scenes/GameTerrainScene.h"
+#include "../imgui/imgui.h"
 
 bool G_DEBUG_ENABLED = false;
 CDrawable_InstancedMesh* G_DEBUG_GIZMO_MESH = nullptr;

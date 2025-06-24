@@ -1,6 +1,5 @@
 #include <ctime>
 
-#include "Resources/MeshResources.h"
 #include "TimeManager.h"
 #include "World.h"
 #include "GameWindow.h"
@@ -8,6 +7,7 @@
 #include "Graphics/Graphic.h"
 #include "Resources/AssetList.h"
 #include "Debug/DebugDraw.h"
+#include "Debug/DebugGUIManager.h"
 
 namespace TakuEngine
 {
@@ -22,6 +22,7 @@ void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 	MTime::InitializeTime();
 	MInput::InitializeInput();
 	MWorld::InitializeWorld();
+	MDebugGUI::InitializeDebugGUI();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Update()
