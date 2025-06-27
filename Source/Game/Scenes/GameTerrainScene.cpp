@@ -67,7 +67,7 @@ void CGameTerrainScene::HandleCursorTerrainCollision()
     SelectorMesh->Instances[0].Position = TVector3f::Zero;
     if (collisionResult.Success == true)
     {
-        SelectorMesh->Instances[0].Position = collisionResult.Intersection;
+        SelectorMesh->Instances[0].Position = collisionResult.Intersection + collisionResult.Normal;
         SelectorMesh->Instances[0].Rotator = TRotator::CreateFromUp(collisionResult.Normal);
         
         //MDebugDraw::Line(collisionResult.Intersection, collisionResult.Intersection + collisionResult.Normal * 5.0f, TColor::Red);   
