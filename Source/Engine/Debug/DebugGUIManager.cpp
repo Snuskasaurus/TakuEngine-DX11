@@ -3,7 +3,6 @@
 #include "../GameWindow.h"
 #include "../Graphics/Graphic.h"
 
-#include "../../imgui/imgui.h"
 #include "../../imgui/imgui_impl_win32.h"
 #include "../../imgui/imgui_impl_dx11.h"
 
@@ -21,7 +20,7 @@ void MDebugGUI::InitializeDebugGUI()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(MGameWindow::GetWindowHandle());
@@ -34,6 +33,13 @@ void MDebugGUI::StartFrameDebugGUI()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     ImGui::ShowDemoWindow();
+
+    for (int i = 0; i < Instance->WindowDrawFunctions.size(); ++i)
+    {
+        ImGui::Begin(Instance->WindowDrawFunctions[i].Name.c_str());
+        Instance->WindowDrawFunctions[i].Function();
+        ImGui::End();
+    }
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MDebugGUI::EndFrameDebugGUI()

@@ -18,6 +18,9 @@ struct FKeyEvent
 std::vector<FKeyEvent> KeyEventsFromLastFrame;
 bool AreKeyDown[EKeyCode::KEY_INVALID] = { false };
 std::vector<FKeyEvent> KeyEventsThisFrame;
+TVector2f LastMousePosition;
+TVector2f MouseMovement;
+bool CursorIsLocked = false;
 
 ///---------------------------------------------------------------------------------------------------------------------
 MInput* MInput::Instance = nullptr;
@@ -29,10 +32,32 @@ void MInput::InitializeInput()
 
     KeyEventsFromLastFrame.reserve(64);
     KeyEventsThisFrame.reserve(64);
+    
+    POINT cursorPos = {0, 0};
+    assert(GetCursorPos(&cursorPos));
+    {
+        LastMousePosition = { (float)cursorPos.x, (float)cursorPos.y };
+    }
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::DetectInputs()
 {
+    POINT cursorPos = {0, 0};
+    assert(GetCursorPos(&cursorPos));
+    {
+        TVector2f newMousePosition = { (float)cursorPos.x, (float)cursorPos.y };
+        MouseMovement = LastMousePosition - newMousePosition;
+        LastMousePosition = newMousePosition;
+    }
+    if (CursorIsLocked == true)
+    {
+        cursorPos.x = (int)MGameWindow::GetGameWindowWidth() / 2;
+        cursorPos.y = (int)MGameWindow::GetGameWindowHeight() / 2;
+        ClientToScreen(MGameWindow::GetWindowHandle(), &cursorPos);
+        SetCursorPos(cursorPos.x, cursorPos.y);
+        LastMousePosition = { (float)cursorPos.x, (float)cursorPos.y };
+    }
+    
     if (KeyEventsFromLastFrame.empty())
         return;
     
@@ -58,16 +83,38 @@ TInputHolder* MInput::GetInputHolder()
     return &Instance->InputHolder;
 }
 ///---------------------------------------------------------------------------------------------------------------------
+bool MInput::IsCursorLocked()
+{
+    return CursorIsLocked;
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::ToggleCursorLock()
+{
+    CursorIsLocked = !CursorIsLocked;
+    ShowCursor(!CursorIsLocked);
+}
+///---------------------------------------------------------------------------------------------------------------------
 TVector2f MInput::GetMousePosition()
 {
-    POINT cursorPos;
-    if (GetCursorPos(&cursorPos))
+    POINT cursorPos = {0, 0};
+    if (GetCursorPos(&cursorPos) == false)
     {
-        ScreenToClient(MGameWindow::GetWindowHandle(), &cursorPos);
+        return { 0.0f, 0.0f };
+    }
+    
+    if (ScreenToClient(MGameWindow::GetWindowHandle(), &cursorPos) == false)
+    {
+        return { 0.0f, 0.0f };
     }
     
     return { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
 }
+
+TVector2f MInput::GetMouseMovement()
+{
+    return MouseMovement;
+}
+
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::DispatchKeyEventsToScenes()
 {

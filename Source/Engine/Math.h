@@ -5,12 +5,16 @@
 #define MATH_EPSILON_FLOAT 1.19209290E-07F
 #define MATH_SMALL_NUMBER 0.005
 #define MATH_PI 3.1415926535f
+#include <string>
 
+struct RayTraceResult;
+struct CollisionMeshResult;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TVector2f;
 struct TVector3f;
 struct TVector4f;
 struct TMatrix4f;
+struct TTransform;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 class MMath
 {
@@ -31,6 +35,10 @@ public:
     static int RandomNumberIntegerInRange(int _min, int _max);
     static float RandomNumberIntegerInRange(float _min, float _max);
     static TVector3f RandomVectorIntegerInRange(TVector3f _min, TVector3f _max);
+
+    static RayTraceResult RayTrace(const TVector2f& _screenPosition);
+    static CollisionMeshResult CollideRayWithMesh(const TVector3f& _start, const TVector3f& _end, const TTransform& _meshTransform, const struct SMeshData& _meshData);
+    static CollisionMeshResult DoCollisionSegmentTriangle(const TVector3f& _segmentStart, const TVector3f& _segmentEnd, const TVector3f _triangle[3]);
 };
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,6 +47,66 @@ struct TVector2f
     float x, y;
 
     static const TVector2f Zero;
+
+#pragma region operator_region
+    
+    FORCE_INLINE TVector2f operator-() const
+    {
+        return { -x, -y };
+    }
+
+    FORCE_INLINE TVector2f operator-(const TVector2f& _v2) const
+    {
+        return { x - _v2.x, y - _v2.y };
+    }
+    
+    FORCE_INLINE TVector2f& operator*=(const float& _f)
+    {
+        this->x *= _f;
+        this->y *= _f;
+        return *this;
+    }
+    
+    FORCE_INLINE TVector2f operator+(const TVector2f& _v) const
+    {
+        return { this->x + _v.x, this->y + _v.y };
+    }
+    
+    FORCE_INLINE TVector2f& operator+=(const TVector2f& _v)
+    {
+        this->x += _v.x;
+        this->y += _v.y;
+        return *this;
+    }
+    
+    FORCE_INLINE TVector2f& operator-=(const TVector2f& _v)
+    {
+        this->x -= _v.x;
+        this->y -= _v.y;
+        return *this;
+    }
+
+    TVector2f operator*(float _f) const
+    {
+        return { this->x * _f, this->y * _f };
+    }
+    
+    FORCE_INLINE friend TVector2f operator*(float _f, const TVector2f& _v)
+    {
+        return { _v.x *_f, _v.y * _f };
+    }
+
+    TVector2f operator/(float _f) const
+    {
+        return { this->x / _f, this->y / _f };
+    }
+    
+    FORCE_INLINE friend TVector2f operator/(float _f, const TVector2f& _v)
+    {
+        return { _v.x / _f, _v.y };
+    }
+
+#pragma endregion // operator_region
     
     FORCE_INLINE static float Dot(const TVector2f& _v1, const TVector2f& _v2)
     {
@@ -57,13 +125,17 @@ struct alignas(16) TVector3f
     static const TVector3f Left;
     static const TVector3f Up;
     static const TVector3f Down;
+
+    static void PrintDebugVector(const TVector3f _v);
     
     TVector3f() {}
     TVector3f(float _x, float _y) : x(_x), y(_y), z(0.0f) {}
     TVector3f(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
 #pragma region operator_region
-    
+
+    bool operator==(const TVector3f& _v);
+
     FORCE_INLINE TVector3f operator-() const
     {
         return { -x, -y, -z };
@@ -125,8 +197,9 @@ struct alignas(16) TVector3f
 
 #pragma endregion // operator_region
     
-    static TVector3f TransformCoord(const TVector3f& _v, const TMatrix4f& _m);
-    
+    static TVector3f TransformDirection(const TVector3f& _v, const TMatrix4f& _m);
+    static TVector3f TransformPosition(const TVector3f& _v, const TMatrix4f& _m);
+
     FORCE_INLINE static float Dot(const TVector3f& _v1, const TVector3f& _v2)
     {
         return _v1.x * _v2.x + _v1.y * _v2.y + _v1.z * _v2.z;
@@ -135,9 +208,9 @@ struct alignas(16) TVector3f
     {
         return
         {
-            _v1.y * _v2.z - _v1.z * _v2.y,
-            _v1.x * _v2.z - _v1.z * _v2.x,
-            _v1.x * _v2.y - _v1.y * _v2.x,
+            _v1.y * _v2.z - _v1.z * _v2.y,  // X
+            _v1.z * _v2.x - _v1.x * _v2.z,  // Y
+            _v1.x * _v2.y - _v1.y * _v2.x   // Z
         };
     }
     FORCE_INLINE static float SquareLength(const TVector3f& _v)
@@ -162,7 +235,7 @@ struct alignas(16) TVector3f
     }
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-struct TVector4f
+struct alignas(16) TVector4f
 {
     float x, y, z, w;
 
@@ -226,27 +299,31 @@ struct TVector4f
     }
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
-struct alignas(16) TMatrix4f
+struct alignas(16) TMatrix4f // row-major matrices to stay consistent with  DirectX::XMMATRIX
 {
-    TVector4f x, y, z, w;
+    TVector4f row0;
+    TVector4f row1;
+    TVector4f row2;
+    TVector4f row3;
 
 #pragma region operator_region
 
     FORCE_INLINE friend bool operator==(const TMatrix4f& _m1, const TMatrix4f& _m2)
     {
-        return _m1.x == _m2.x
-            && _m1.y == _m2.y
-            && _m1.z == _m2.z
-            && _m1.w == _m2.w;
+        return _m1.row0 == _m2.row0 && _m1.row1 == _m2.row1 && _m1.row2 == _m2.row2 && _m1.row3 == _m2.row3;
     }
     
     TMatrix4f& operator*=(const TMatrix4f& _m)
     {
         const TMatrix4f mt = TMatrix4f::Transpose(_m);
-        this->x = { TVector4f::Dot(this->x, mt.x),    TVector4f::Dot(this->x, mt.y),    TVector4f::Dot(this->x, mt.z),    TVector4f::Dot(this->x, mt.w) };
-        this->y = { TVector4f::Dot(this->y, mt.x),    TVector4f::Dot(this->y, mt.y),    TVector4f::Dot(this->y, mt.z),    TVector4f::Dot(this->y, mt.w) };
-        this->z = { TVector4f::Dot(this->z, mt.x),    TVector4f::Dot(this->z, mt.y),    TVector4f::Dot(this->z, mt.z),    TVector4f::Dot(this->z, mt.w) };
-        this->w = { TVector4f::Dot(this->w, mt.x),    TVector4f::Dot(this->w, mt.y),    TVector4f::Dot(this->w, mt.z),    TVector4f::Dot(this->w, mt.w) };
+        row0 = { TVector4f::Dot(row0, mt.row0), TVector4f::Dot(row0, mt.row1),
+                 TVector4f::Dot(row0, mt.row2), TVector4f::Dot(row0, mt.row3) };
+        row1 = { TVector4f::Dot(row1, mt.row0), TVector4f::Dot(row1, mt.row1),
+                 TVector4f::Dot(row1, mt.row2), TVector4f::Dot(row1, mt.row3) };
+        row2 = { TVector4f::Dot(row2, mt.row0), TVector4f::Dot(row2, mt.row1),
+                 TVector4f::Dot(row2, mt.row2), TVector4f::Dot(row2, mt.row3) };
+        row3 = { TVector4f::Dot(row3, mt.row0), TVector4f::Dot(row3, mt.row1),
+                 TVector4f::Dot(row3, mt.row2), TVector4f::Dot(row3, mt.row3) };
         return *this;
     }
 
@@ -255,17 +332,19 @@ struct alignas(16) TMatrix4f
         _m1 *= _m2;
         return _m1;
     }
+
+    static void DisplayOnDebugHUD(const std::string& _name, const TMatrix4f& _m);
     
 #pragma endregion // operator_region
     
     static const TMatrix4f Identity;
-    static const TMatrix4f World;
+    static const TMatrix4f WorldIdentity;
     
     static TMatrix4f MatrixTranslation(const TVector3f& _translation);
     static TMatrix4f MatrixRotationPitch(const float _pitch);
-    static TMatrix4f MatrixRotationRoll(const float _roll);
     static TMatrix4f MatrixRotationYaw(const float _yaw);
-    static TMatrix4f MatrixRotationPitchRollYaw(const float _pitch, const float _roll, const float _yaw);
+    static TMatrix4f MatrixRotationRoll(const float _roll);
+    static TMatrix4f MatrixRotationPitchYawRoll(const float _pitch, const float _yaw, const float _roll);
     static TMatrix4f MatrixScale(const float _scale);
     static TMatrix4f MatrixPerspectiveFov(const float _fovAngleY, const float _aspectRatio, const float _nearZ, const float _farZ);
     static TMatrix4f MatrixOrthographic(float _viewWidth, float _viewHeight, float _nearZ, float _farZ);
@@ -276,25 +355,35 @@ struct alignas(16) TMatrix4f
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TRotator
 {
-    float Yaw = 0.0f;
     float Pitch = 0.0f;
+    float Yaw = 0.0f;
     float Roll = 0.0f;
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TTransform
 {
-    static const TTransform Identity;
-    
-    static TMatrix4f ToMatrix(const TTransform& _t)
-    {
-        // TODO Julien Rogel (01/02/2025): Optimize by removing unnecessary matrix multiplication when rotation values are 0
-        return TMatrix4f::Identity
-             * TMatrix4f::MatrixRotationPitch(_t.Rotator.Pitch)
-             * TMatrix4f::MatrixRotationYaw(_t.Rotator.Yaw)
-             * TMatrix4f::MatrixRotationRoll(_t.Rotator.Roll)
-             * TMatrix4f::MatrixTranslation(_t.Position);
-    }
     TVector3f Position = TVector3f::Zero;
     TRotator Rotator = { 0.0f, 0.0f, 0.0f };
+    
+    static const TTransform Identity;
+
+    static void DebugPrintTransform(const TTransform& _t);
+    
+    TMatrix4f WorldMatrix() const;
+    TMatrix4f PositionMatrix() const;
+    TMatrix4f RotationMatrix() const;
+    TVector3f Forward() const;
+    TVector3f Right() const;
+    TVector3f Up() const;
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+struct RayTraceResult
+{
+    TVector3f Start;  
+    TVector3f End; 
+};
+struct CollisionMeshResult
+{
+    bool Success = false;
+    TVector3f Intersection;
+};

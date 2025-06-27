@@ -4,27 +4,27 @@
 
 class TFreeLookCamera
 {
-
 public:
+    void InitializeCamera();
     void UpdateCamera(const float dt);
-    TVector3f GetCameraWorldViewDir() const { return -CamForward; }
-    TMatrix4f GetCameraWorldMatrix() const { return CamMatrix; }
-    TMatrix4f GetViewMatrix() const { return TMatrix4f::Inverse(CamMatrix); }
-    void SetPosition(TVector3f _newPosition) { Position = _newPosition; }
-    void SetRotation(TRotator _newRotation) { CamYaw = _newRotation.Yaw; CamPitch = _newRotation.Pitch; }
+    TVector3f GetCameraWorldViewDir() const { return Transform.Forward(); }
+    TMatrix4f GetCameraWorldMatrix() const { return Transform.WorldMatrix(); }
+    TMatrix4f GetCameraViewMatrix() const { return TMatrix4f::MatrixLookTo(Transform.Position, Transform.Forward(), Transform.Up()); }
+    TVector3f GetCameraPosition() const { return  Transform.Position; }
+    void SetCameraPosition(TVector3f _newPosition) {  Transform.Position = _newPosition; }
+    void SetCameraRotation(TRotator newRotator) {  Transform.Rotator = newRotator; }
+
+private:
+    void DrawCameraDebugWindow();
     
 private:
-    TMatrix4f CamMatrix = TMatrix4f::Identity;
+    TTransform Transform;
     
-private: // Transform
-    TVector3f CamForward = TVector3f::Forward;
-    TVector3f CamRight = TVector3f::Right;
-    TVector3f CamUp = TVector3f::Up;
-    TVector3f Position = { 0.0f, 0.0f, .0f };
-    float CamYaw = 0.0f;
-    float CamPitch = 0.0f;
 private:
     float SpeedRotation = 0.04f;
-    float SpeedMovement = 15.0f;
+    float MovementSensibility = 15.0f;
     float AddedSpeedMovementByCameraSpeedModifier = 3.0f;
+
+private: // Debugs
+    TVector3f ChangesFromInputs;
 };

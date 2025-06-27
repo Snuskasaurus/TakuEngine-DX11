@@ -21,10 +21,10 @@ public:
     ~CDrawable_InstancedMesh();
 public:
     std::vector<TTransform> Instances;
+    SMeshData* MeshData = nullptr;
 private:
     ID3D11Buffer* VertexBuffer = nullptr;
     ID3D11Buffer* IndexBuffer = nullptr;
-    SMeshData* MeshData = nullptr;
     STextureData* ColorTexture = nullptr;
     STextureData* NormalTexture = nullptr;
     STextureData* EmissionTexture = nullptr;

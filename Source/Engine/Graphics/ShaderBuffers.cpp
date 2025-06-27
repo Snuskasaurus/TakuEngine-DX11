@@ -17,7 +17,6 @@ void SShaderBufferHolder::CreateShaderBuffer(EShaderType _shaderType, UINT _slot
     this->SizeBuffer = _sizeStruct;
 #endif
     
-    
     D3D11_BUFFER_DESC bufferDesc = {};
     bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -70,17 +69,17 @@ void CopyBufferDataToDeviceContext(UINT _slot, ID3D11Buffer** _buffer, const voi
 void SShaderBufferHolder::FillBuffer_VS_Object(SShaderBufferHolder* _shaderBufferHolder, const TTransform* _transforms, UINT _start, UINT _nbInstances)
 {
     b01_vs_buffer_object BufferData = {};
+    
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(_shaderBufferHolder != nullptr);
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
 #endif
-    
+
     int iBufferStruct = 0;
     const UINT End = _start + _nbInstances;
     for (UINT iTransform = _start; iTransform < End ; ++iTransform)
     {
-        const TMatrix4f objectWorldMatrix = TTransform::ToMatrix(_transforms[iTransform]);
-        BufferData.world[iBufferStruct] = TMatrix4f::Transpose(objectWorldMatrix);
+        BufferData.world[iBufferStruct] = TMatrix4f::Transpose(_transforms[iTransform].WorldMatrix());
         iBufferStruct++;
     }
 
@@ -90,31 +89,32 @@ void SShaderBufferHolder::FillBuffer_VS_Object(SShaderBufferHolder* _shaderBuffe
 void SShaderBufferHolder::FillBuffer_VS_SceneEachFrame(SShaderBufferHolder* _shaderBufferHolder, bool _isViewLight)
 {
     b00_vs_buffer_sceneEachFrame BufferData = {};
+
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(_shaderBufferHolder != nullptr);
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
 #endif
-    
+
     if (_isViewLight)
     {
-        const CSceneLight& SceneLight = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight();
-        const TMatrix4f lightViewMatrix = SceneLight.GetViewMatrix();
-        const TMatrix4f lightProjectionMatrix = SceneLight.GetProjectionMatrix();
-        BufferData.cameraViewProjection = TMatrix4f::Transpose(lightViewMatrix * TMatrix4f::World * lightProjectionMatrix); 
+        const CSceneLight& sceneLight = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight();
+        const TMatrix4f lightViewMatrix = sceneLight.GetViewMatrix();
+        const TMatrix4f lightProjectionMatrix = sceneLight.GetProjectionMatrix();
+        BufferData.viewMatrix = TMatrix4f::Transpose(lightViewMatrix); 
+        BufferData.projectionMatrix = TMatrix4f::Transpose(lightProjectionMatrix); 
     }
     else
     {
-        const TMatrix4f cameraViewMatrix = MWorld::GetWorld()->FreeLookCamera.GetViewMatrix();
-        const TMatrix4f cameraProjectionMatrix = MGameWindow::GetCameraProjectionMatrix();
-    
-        const CSceneLight& SceneLight = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight();
-        const TMatrix4f lightViewMatrix = SceneLight.GetViewMatrix();
-        const TMatrix4f lightProjectionMatrix = SceneLight.GetProjectionMatrix();
-        BufferData.cameraViewProjection = TMatrix4f::Transpose(cameraViewMatrix * TMatrix4f::World * cameraProjectionMatrix);
-        BufferData.lightViewMatrix = TMatrix4f::Transpose(lightViewMatrix * TMatrix4f::World);
+        BufferData.viewMatrix = TMatrix4f::Transpose(MWorld::GetViewMatrix());
+        BufferData.projectionMatrix = TMatrix4f::Transpose(MWorld::GetProjectionMatrix()); 
+
+        const CSceneLight& sceneLight = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight();
+        const TMatrix4f lightViewMatrix = sceneLight.GetViewMatrix();
+        const TMatrix4f lightProjectionMatrix = sceneLight.GetProjectionMatrix();
+        BufferData.lightViewMatrix = TMatrix4f::Transpose(lightViewMatrix);
         BufferData.lightProjectionMatrix = TMatrix4f::Transpose(lightProjectionMatrix);
     }
-    
+
     CopyBufferDataToDeviceContext(_shaderBufferHolder->Slot, &_shaderBufferHolder->Buffer, &BufferData, sizeof(BufferData), _shaderBufferHolder->ShaderType);
 }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -126,9 +126,6 @@ void SShaderBufferHolder::FillBuffer_VS_DebugLine(SShaderBufferHolder* _shaderBu
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);
 #endif
     
-    const TMatrix4f cameraViewMatrix = MWorld::GetWorld()->FreeLookCamera.GetViewMatrix();
-    const TMatrix4f cameraProjectionMatrix = MGameWindow::GetCameraProjectionMatrix();
-    
     int iBufferStruct = 0;
     const UINT End = _start + _nbInstances;
 
@@ -136,7 +133,7 @@ void SShaderBufferHolder::FillBuffer_VS_DebugLine(SShaderBufferHolder* _shaderBu
     {
         for (int i = 0; i < 2; ++i)
         {
-            const TMatrix4f wvp = TTransform::ToMatrix(_debugLines[iTransform].Transforms[i]);
+            const TMatrix4f wvp = _debugLines[iTransform].Transforms[i].PositionMatrix();
             BufferData.debugLines[iBufferStruct].wvp[i] = TMatrix4f::Transpose(wvp);
         }
         BufferData.debugLines[iBufferStruct].r = _debugLines[iBufferStruct].Color.r;

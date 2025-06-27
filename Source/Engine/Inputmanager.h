@@ -121,7 +121,11 @@ public:
     static void DetectInputs();
     static void ClearInputs();
     static TInputHolder* GetInputHolder();
+
+    static bool IsCursorLocked();
+    static void ToggleCursorLock();
     static TVector2f GetMousePosition();
+    static TVector2f GetMouseMovement();
 
     static void DispatchKeyEventsToScenes();
     

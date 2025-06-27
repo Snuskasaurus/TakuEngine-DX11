@@ -53,6 +53,8 @@ void LoadDrawables()
     MDrawableResources::CreateDrawableData(G_ASSET_GIZMO, {G_ASSET_MESH_GIZMO, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
 
     MDrawableResources::CreateDrawableData(G_ASSET_2D_CIRCLE, {"Debugs/2D_Circle", "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
+
+    MDrawableResources::CreateDrawableData(G_ASSET_SHAPE_TORUS, {"Shapes/Torus", "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, false});
 }
 
 void MAsset::LoadAssets()

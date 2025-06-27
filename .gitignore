@@ -32,3 +32,5 @@ Intermediates/
 .idea/
 .vs/
 __pycache__
+Game/TakuEngine_debug.exe
+Game/TakuEngine_debug.pdb

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+inline const char* G_ASSET_SHAPE_TORUS = "Torus";
+
 inline const char* G_ASSET_ARROW = "Arrow";
 inline const char* G_ASSET_GIZMO = "Gizmo";
 inline const char* G_ASSET_2D_CIRCLE = "2D_Circle";

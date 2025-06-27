@@ -10,7 +10,8 @@
 
 struct alignas(16) b00_vs_buffer_sceneEachFrame
 {
-    TMatrix4f cameraViewProjection;
+    TMatrix4f viewMatrix;
+    TMatrix4f projectionMatrix;
     TMatrix4f lightViewMatrix;
     TMatrix4f lightProjectionMatrix;
 };

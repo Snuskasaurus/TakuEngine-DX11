@@ -2,7 +2,8 @@
 
 cbuffer vs_buffer_sceneEachFrame : register(b0)
 {
-    matrix cameraViewProjection;
+    matrix viewMatrix;
+    matrix projectionMatrix;
     matrix lightViewMatrix;
     matrix lightProjectionMatrix;
 };
@@ -34,7 +35,7 @@ VS_Output Main(VS_Input input)
 {
     VS_Output output;
 
-    matrix wvp = mul(world[input.instanceID], cameraViewProjection);
+    matrix wvp = mul(world[input.instanceID], mul(viewMatrix, projectionMatrix));
 
     output.position = mul(float4(input.position, 1.0f), wvp);
 

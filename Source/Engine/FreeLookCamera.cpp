@@ -1,9 +1,8 @@
 ﻿#include "FreeLookCamera.h"
 
-#include <Windows.h>
-
-#include "IncludesExternal.h"
+#include <format>
 #include "Inputmanager.h"
+#include "Debug/DebugGUIManager.h"
 
 float GetCameraInputForward()
 {
@@ -19,10 +18,10 @@ float GetCameraInputForward()
 float GetCameraInputRight()
 {
     if (MInput::IsKeyDown(EKeyCode::KEY_D))
-        return 1.0f;
+        return -1.0f;
 
     if (MInput::IsKeyDown(EKeyCode::KEY_A))
-        return -1.0f;
+        return 1.0f;
 
     return 0.0f;
 }
@@ -38,58 +37,70 @@ float GetCameraInputUp()
     return 0.0f;
 }
 
-void TFreeLookCamera::UpdateCamera(const float dt)
+void TFreeLookCamera::InitializeCamera()
+{
+    MDebugGUI::AddWindow("CameraDebug", [this]() { this->DrawCameraDebugWindow(); });
+}
+
+void TFreeLookCamera::UpdateCamera(const float _dt)
 {
     // Inputs ----------------------------------------------------------------------------------------------------------
 
-    SpeedMovement += 1.0f * AddedSpeedMovementByCameraSpeedModifier * dt;
-    //SpeedMovement += GET_INPUT(CameraSpeedModifier) * AddedSpeedMovementByCameraSpeedModifier * dt;
-    if (SpeedMovement <= 0.0f)
-        SpeedMovement = 0.0f;
+    // TODO Julien Rogel (25/06/2025): Rework this when adding mouse wheel events
+    MovementSensibility = MovementSensibility + (0.0f * AddedSpeedMovementByCameraSpeedModifier * _dt);
+    if (MovementSensibility <= 0.0f)
+        MovementSensibility = 0.0f;
 
-    const float SpeedForward = GetCameraInputForward() * SpeedMovement * dt;
-    const float SpeedRight = GetCameraInputRight() * SpeedMovement * dt;
-    const float SpeedUp = GetCameraInputUp() * SpeedMovement * dt;
-    
-    const float InputYaw = GET_INPUT(CameraYaw) * SpeedRotation * dt;
-    const float InputPitch = GET_INPUT(CameraPitch) * SpeedRotation * dt;
+    const float changeForward = GetCameraInputForward() * MovementSensibility * _dt;
+    const float changeRight = GetCameraInputRight() * MovementSensibility * _dt;
+    const float changeUp = GetCameraInputUp() * MovementSensibility * _dt;
 
-    // Update Yaw and Pitch --------------------------------------------------------------------------------------------
-    
-    CamYaw += InputYaw;
-    CamPitch = MMath::Clamp(CamPitch + InputPitch, -1.55334f, 1.55334f);
-    
-    // Position / Rotation / Matrix ------------------------------------------------------------------------------------
-  
-    const TMatrix4f CamRotationMatrix = TMatrix4f::MatrixRotationPitch(CamPitch) * TMatrix4f::MatrixRotationYaw(CamYaw) * TMatrix4f::MatrixRotationRoll(0.0f);
-    
-    CamForward = TVector3f::TransformCoord(TVector3f::Forward, CamRotationMatrix);
-    CamForward = TVector3f::Normalize(CamForward);
+    float changeYaw = 0.0f;
+    float changePitch = 0.0f;
+    if (MInput::IsCursorLocked())
+    {
+        changeYaw = -MInput::GetMouseMovement().x * SpeedRotation * _dt;
+        changePitch = MInput::GetMouseMovement().y * SpeedRotation * _dt;
+    }
 
-    CamRight = TVector3f::TransformCoord(TVector3f::Right, CamRotationMatrix);
-    CamRight = TVector3f::Normalize(CamRight);
-
-    CamUp = TVector3f::Cross(CamForward, CamRight);
-    CamUp = TVector3f::Normalize(CamUp);
-
-    Position += CamRight * SpeedRight;
-    Position += CamForward * SpeedForward;
-    Position += TVector3f::Up * SpeedUp;
+    ChangesFromInputs.x = changeRight;
+    ChangesFromInputs.y = changeUp;
+    ChangesFromInputs.z = changeForward;
     
-    const TMatrix4f CamPositionMatrix = TMatrix4f::MatrixTranslation(Position);
-    CamMatrix = CamRotationMatrix * CamPositionMatrix;
+    // Update Transform ------------------------------------------------------------------------------------
 
-    // Logs ------------------------------------------------------------------------------------------------------------
+    Transform.Rotator.Yaw += changeYaw;
+    Transform.Rotator.Pitch = MMath::Clamp(Transform.Rotator.Pitch + changePitch, -1.55334f, 1.55334f);
     
-    //OutputDebugStringA(("dt=" + std::to_string(dt) + "\n").c_str());
-    
-#define PRINT_VEC(VecName, Vec) OutputDebugStringA((VecName " = [" + std::to_string(Vec.x) + "|" + std::to_string(Vec.y) + "|" + std::to_string(Vec.z) + "]\n").c_str());
+    const TVector3f cameraForward = Transform.Forward();
+    const TVector3f cameraRight = Transform.Right();
+    const TVector3f positionChange = (cameraRight * changeRight) + (cameraForward * changeForward) + (TVector3f::Up * changeUp);
 
-    // OutputDebugStringA("---------------------------\n");
-    // PRINT_VEC("Camera Position", Position)
-    // PRINT_VEC("Camera FORWARD", CamForward)
-    // PRINT_VEC("Camera RIGHT", CamRight)
-    // PRINT_VEC("Camera UP", CamUp)
+    Transform.Position += positionChange;
+}
+void TFreeLookCamera::DrawCameraDebugWindow()
+{
+    const std::string textPosition = std::format("World Position: x:{:.2f} y:{:.2f} z:{:.2f}", Transform.Position.x, Transform.Position.y, Transform.Position.z);
+    ImGui::Text(textPosition.c_str());
+
+    const std::string textRotation = std::format("World Rotation: pitch:{:.2f} yaw:{:.2f} roll:{:.2f}", Transform.Rotator.Pitch, Transform.Rotator.Yaw, Transform.Rotator.Roll);
+    ImGui::Text(textRotation.c_str());
     
-#undef PRINT_VEC
+    const std::string textInputs = std::format("Inputs: x:{:.2f} y:{:.2f} z:{:.2f}", ChangesFromInputs.x, ChangesFromInputs.y, ChangesFromInputs.z);
+    ImGui::Text(textInputs.c_str());
+    
+    const TVector3f cameraRight = Transform.Right();
+    const std::string textRight = std::format("Right: x:{:.2f} y:{:.2f} z:{:.2f}", cameraRight.x, cameraRight.y, cameraRight.z);
+    ImGui::Text(textRight.c_str());
+
+    const TVector3f cameraForward = Transform.Forward();
+    const std::string textForward = std::format("Forward: x:{:.2f} y:{:.2f} z:{:.2f}", cameraForward.x, cameraForward.y, cameraForward.z);
+    ImGui::Text(textForward.c_str());
+    
+    const TVector3f cameraUp = Transform.Up();
+    const std::string textUp = std::format("Up: x:{:.2f} y:{:.2f} z:{:.2f}", cameraUp.x, cameraUp.y, cameraUp.z);
+    ImGui::Text(textUp.c_str());
+    
+    const std::string textCameraSpeed = std::format("Movement Sensibility: x:{:.2f}", MovementSensibility);
+    ImGui::Text(textCameraSpeed.c_str());
 }

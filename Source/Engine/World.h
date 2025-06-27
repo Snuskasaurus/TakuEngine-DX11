@@ -22,14 +22,25 @@ private:
     static MWorld* Instance;
     
 public:
+    static MWorld* GetWorld() { return Instance; }
     static void InitializeWorld();
     static void UninitializeWorld();
     static void NotifyKeyPressedToGameScene(EKeyCode _keyCode);
     static void NotifyKeyReleasedToGameScene(EKeyCode _keyCode);
-    static MWorld* GetWorld() { return Instance; }
     static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
 public:
     CGameScene* GetCurrentScene() const { return CurrentGameScene; }
+
+    TFreeLookCamera& GetFreeLookCamera() { return FreeLookCamera; }
+    static TVector3f GetCameraPosition();
+    static TVector3f GetCameraForward();
+    static TMatrix4f GetCameraWorldMatrix();
+    static TMatrix4f GetViewMatrix();
+    static TMatrix4f GetProjectionMatrix();
+
+private:
+    void BeginDraw();
+    void DrawDebugMatrix();
     
 private:
     void OnInitialize();

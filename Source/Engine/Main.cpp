@@ -17,12 +17,12 @@ void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 	MDebugDraw::Prepare();
 	MGameWindow::InitializeGameWindow(hInstance);
 	MGraphic::InitializeGraphic();
+	MDebugGUI::InitializeDebugGUI();
 	MAsset::LoadAssets();
 	MGraphic::InitializeShaders();
 	MTime::InitializeTime();
 	MInput::InitializeInput();
 	MWorld::InitializeWorld();
-	MDebugGUI::InitializeDebugGUI();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Update()
@@ -43,6 +43,7 @@ void Draw()
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Uninitialization()
 {
+	MDebugGUI::UninitializeDebugGUI();
 	MGraphic::PrepareUninitializeGraphic();
 	MWorld::UninitializeWorld();
 	MAsset::UnloadAssets();

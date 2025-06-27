@@ -123,11 +123,4 @@ UINT MGameWindow::GetGameWindowHeight() { return WindowSizeY; }
 UINT MGameWindow::GetGameWindowWidth() {  return WindowSizeX; }
 HWND MGameWindow::GetWindowHandle() { return GameWindowHandle; }
 bool MGameWindow::HasFocus() { return HasWindowFocus; }
-TMatrix4f MGameWindow::GetCameraProjectionMatrix()
-{
-    // TODO Julien Rogel (02/02/2025): no need to compute it each time we call it but only when ScreenRatio change
-    const float ScreenRatio = (float)WindowSizeY / (float)WindowSizeX;
-    const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFov(0.4f * 3.14f, ScreenRatio, 0.1f, 300.0f);
-    return PerspectiveMatrix;
-}
 //---------------------------------------------------------------------------------------------------------------------------------------------------------

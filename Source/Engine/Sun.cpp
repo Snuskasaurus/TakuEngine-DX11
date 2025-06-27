@@ -39,12 +39,12 @@ TMatrix4f CSceneLight::GetProjectionMatrix() const
 }
 void CSceneLight::OnValueChanged()
 {
-      const TMatrix4f LightRotationMatrix = TMatrix4f::MatrixRotationPitch(MMath::Deg2Rad(-CurrentPitch)) * TMatrix4f::MatrixRotationYaw(MMath::Deg2Rad(-CurrentYaw)) * TMatrix4f::MatrixRotationRoll(0.0f);
+      const TMatrix4f LightRotationMatrix = TMatrix4f::MatrixRotationPitchYawRoll(CurrentPitch, CurrentYaw, 0.0f);
 
-      Forward = TVector3f::TransformCoord(TVector3f::Forward, LightRotationMatrix);
+      Forward = TVector3f::TransformDirection(TVector3f::Forward, LightRotationMatrix);
       Forward = TVector3f::Normalize(Forward);
  
-      TVector3f Right = TVector3f::TransformCoord(TVector3f::Right, LightRotationMatrix);
+      TVector3f Right = TVector3f::TransformDirection(TVector3f::Right, LightRotationMatrix);
       Right = TVector3f::Normalize(Right);
  
       TVector3f up = TVector3f::Cross(Forward, Right);

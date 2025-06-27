@@ -79,12 +79,17 @@ void CGameScene::OnUpdate_Internal(const float& _dt)
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnKeyPressed_Internal(EKeyCode _key)
 {
+}
+//---------------------------------------------------------------------------------------------------------------------
+void CGameScene::OnKeyReleased_Internal(EKeyCode _key)
+{
     if (_key == EKeyCode::KEY_ESCAPE)
     {
         PostQuitMessage(1);
     }
     else if (_key == EKeyCode::KEY_BACKSPACE)
     {
+        MInput::ToggleCursorLock();
         ToggleDebugs();
     }
     else if (_key == EKeyCode::KEY_NUM_LOCK)
@@ -97,11 +102,6 @@ void CGameScene::OnKeyPressed_Internal(EKeyCode _key)
         SceneLight.AddYaw(-10.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_6)
         SceneLight.AddYaw(10.0f);
-}
-//---------------------------------------------------------------------------------------------------------------------
-void CGameScene::OnKeyReleased_Internal(EKeyCode _key)
-{
-    
 }
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw_DEPRECATED(const char* _meshName)

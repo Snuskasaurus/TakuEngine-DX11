@@ -70,7 +70,7 @@ SMeshData* TryToImportMesh(const std::string& _filename)
 {
     static Assimp::Importer importer;
     const aiScene* assimpScene = importer.ReadFile(_filename,
-      aiProcess_FlipUVs                             |
+      aiProcess_FlipUVs                       |
       aiProcess_Triangulate                         |
       aiProcess_JoinIdenticalVertices               |
       aiProcess_GenNormals                          |
