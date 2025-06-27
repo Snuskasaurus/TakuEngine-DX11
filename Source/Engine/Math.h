@@ -358,6 +358,8 @@ struct TRotator
     float Pitch = 0.0f;
     float Yaw = 0.0f;
     float Roll = 0.0f;
+
+    static TRotator CreateFromUp(const TVector3f& _up);
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 struct TTransform
@@ -386,4 +388,5 @@ struct CollisionMeshResult
 {
     bool Success = false;
     TVector3f Intersection;
+    TVector3f Normal;
 };

@@ -12,6 +12,9 @@ void CGameTerrainScene::OnEvent_Create()
 {
     SceneLight.SetYaw(120.0f);
     SceneLight.SetPitch(130.0f);
+
+    MWorld::GetWorld()->GetFreeLookCamera().SetCameraPosition({65.0f, 76.0f, 90.0f});
+    MWorld::GetWorld()->GetFreeLookCamera().SetCameraRotation({-0.52f, 2.44f, 0.00f});
     
     MDebugDraw::Line(TVector3f::Zero, TVector3f::Right * 100.0f, TColor::Red);     // +X
     MDebugDraw::Line(TVector3f::Zero, TVector3f::Up * 100.0f, TColor::Green);      // +Y
@@ -30,10 +33,6 @@ void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
     if (_key == EKeyCode::KEY_ESCAPE)
     {
         PostQuitMessage(1);
-    }
-    if (_key == EKeyCode::KEY_ENTER)
-    {
-        //HandleCursorTerrainCollision();
     }
     else if (_key == EKeyCode::KEY_KEYPAD_8)
         SceneLight.AddPitch(5.0f);
@@ -63,18 +62,15 @@ void CGameTerrainScene::OnEvent_Destroy()
 void CGameTerrainScene::HandleCursorTerrainCollision()
 {
     const TVector2f mousePosition = MInput::GetMousePosition();
-
-    const auto [Start, End] = MMath::RayTrace(mousePosition);
-    //MDebugDraw::Line(Start, End, TColor::Yellow);
-
-    const auto [Success, Intersection] = MMath::CollideRayWithMesh(Start, End, TerrainMesh->Instances[0], *TerrainMesh->MeshData);
-    if (Success == true)
+    const RayTraceResult rayResult = MMath::RayTrace(mousePosition);
+    const CollisionMeshResult collisionResult = MMath::CollideRayWithMesh(rayResult.Start, rayResult.End, TerrainMesh->Instances[0], *TerrainMesh->MeshData);
+    SelectorMesh->Instances[0].Position = TVector3f::Zero;
+    if (collisionResult.Success == true)
     {
-        SelectorMesh->Instances[0].Position = Intersection + TVector3f::Up * 1.0f;
-    }
-    else
-    {
-        SelectorMesh->Instances[0].Position = TVector3f::Zero;
+        SelectorMesh->Instances[0].Position = collisionResult.Intersection;
+        SelectorMesh->Instances[0].Rotator = TRotator::CreateFromUp(collisionResult.Normal);
+        
+        //MDebugDraw::Line(collisionResult.Intersection, collisionResult.Intersection + collisionResult.Normal * 5.0f, TColor::Red);   
     }
 }
 //---------------------------------------------------------------------------------------------------------------------

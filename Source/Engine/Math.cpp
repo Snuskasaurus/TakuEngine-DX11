@@ -162,7 +162,7 @@ CollisionMeshResult MMath::CollideRayWithMesh(const TVector3f& _start, const TVe
 {
     CollisionMeshResult result;
 
-    std::vector<TVector3f> Intersections;
+    std::vector<CollisionMeshResult> collisionResults;
     const UINT triangleCount = _meshData.IndexCount / 3;
     for (size_t i = 0; i < triangleCount; ++i)
     {
@@ -174,38 +174,32 @@ CollisionMeshResult MMath::CollideRayWithMesh(const TVector3f& _start, const TVe
             continue;
 
         const TVector3f triangle[3] = { _meshData.VertexBuffer[i0].position, _meshData.VertexBuffer[i1].position, _meshData.VertexBuffer[i2].position };
-        auto [collisionSuccess, collisionIntersection] = MMath::DoCollisionSegmentTriangle(_start, _end, triangle);
-        if (collisionSuccess)
-            Intersections.push_back(collisionIntersection);
+        const auto newCollisionResult = MMath::DoCollisionSegmentTriangle(_start, _end, triangle);
+        if (newCollisionResult.Success == true)
+            collisionResults.push_back(newCollisionResult);
     }
 
     // Find the closest intersection from start
-    result.Success = Intersections.size() > 0;
+    result.Success = collisionResults.size() > 0;
     if (result.Success == false)
         return result;
     
-    if (Intersections.size() > 1)
+    int indexClosestCollision = 0;
+    if (collisionResults.size() > 1)
     {
-        TVector3f ClosestIntersection = TVector3f::Zero;
         float closestSquaredDistance = 9999999999999.0f;
-        for (const auto& intersection : Intersections)
+        for (int i = 0; i < collisionResults.size(); ++i)
         {
-            TVector3f distanceFromStart = intersection - _start;
+            TVector3f distanceFromStart = collisionResults[i].Intersection - _start;
             float distanceSquared = TVector3f::SquareLength(distanceFromStart);
             if (distanceSquared < closestSquaredDistance)
             {
                 closestSquaredDistance = distanceSquared;
-                ClosestIntersection = intersection;
+                indexClosestCollision = i;
             }
         }
-        result.Intersection = ClosestIntersection;
     }
-    else
-    {
-        result.Intersection = Intersections[0];
-    }
-    
-    return result;
+    return collisionResults[indexClosestCollision];
 }
 
 CollisionMeshResult MMath::DoCollisionSegmentTriangle(const TVector3f& _segmentStart, const TVector3f& _segmentEnd, const TVector3f _triangle[3])
@@ -254,8 +248,9 @@ CollisionMeshResult MMath::DoCollisionSegmentTriangle(const TVector3f& _segmentS
     if (intersectionDistance < 0.0f || intersectionDistance > 1.0f)
         return result; // Intersection point is outside the segment
 
-    // Compute intersection point and return result
+    // Compute intersection position and normal
     result.Intersection = _segmentStart + segment * intersectionDistance;
+    result.Normal = TVector3f::Normalize(TVector3f::Cross(edge1, edge2));
     result.Success = true;
     return result;
 }
@@ -417,6 +412,14 @@ TMatrix4f TMatrix4f::Inverse(const TMatrix4f& _m)
 {
     const DirectX::XMMATRIX matrix = ConvertMatrixToDXMatrix(_m);
     return ConvertDXMatrixToMatrix(DirectX::XMMatrixInverse(nullptr, matrix));
+}
+//----------------------------------------------------------------------------------------------------------------------
+TRotator TRotator::CreateFromUp(const TVector3f& _up)
+{
+    // This only works well when _up is not aligned with negative Y (straight down), or results may be unstable due to gimbal lock.
+    const float pitch = asinf(-_up.z);
+    const float yaw = atan2f(_up.x, _up.y);
+    return { pitch, yaw, 0.0f };
 }
 //----------------------------------------------------------------------------------------------------------------------
 //------------------------------------------- TTransform
