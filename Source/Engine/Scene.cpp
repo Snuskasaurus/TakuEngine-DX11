@@ -49,13 +49,6 @@ void CGameScene::Update(const float& _dt)
 {
     OnUpdate_Internal(_dt);
     OnEvent_Update(_dt);
-
-    if (G_DEBUG_ENABLED == true)
-    {
-        MDebugDraw::Line(TVector3f::Zero, TVector3f::Right * 100.0f, TColor::Red, 0.0f);     // +X
-        MDebugDraw::Line(TVector3f::Zero, TVector3f::Up * 100.0f, TColor::Green, 0.0f);      // +Y
-        MDebugDraw::Line(TVector3f::Zero, TVector3f::Forward * 100.0f, TColor::Blue, 0.0f);  // +Z
-    }
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Destroy()
@@ -82,6 +75,9 @@ void CGameScene::OnUpdate_Internal(const float& _dt)
     if (G_DEBUG_ENABLED)
     {
         G_DEBUG_SCENE_LIGHT_MESH->Instances[0] = {{0.0f, 0.0f, 0.0f}, { MMath::Deg2Rad(SceneLight.CurrentYaw), MMath::Deg2Rad(SceneLight.CurrentPitch), 0.0f }};
+        MDebugDraw::Line(TVector3f::Zero, TVector3f::Right * 100.0f, TColor::Red, 0.0f);     // +X
+        MDebugDraw::Line(TVector3f::Zero, TVector3f::Up * 100.0f, TColor::Green, 0.0f);      // +Y
+        MDebugDraw::Line(TVector3f::Zero, TVector3f::Forward * 100.0f, TColor::Blue, 0.0f);  // +Z
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
