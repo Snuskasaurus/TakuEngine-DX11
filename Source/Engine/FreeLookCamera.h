@@ -22,7 +22,7 @@ private:
     
 private:
     float SpeedRotation = 0.04f;
-    float MovementSensibility = 15.0f;
+    float MovementSensibility = 30.0f;
     float AddedSpeedMovementByCameraSpeedModifier = 3.0f;
 
 private: // Debugs
