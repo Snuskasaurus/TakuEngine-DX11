@@ -32,7 +32,7 @@ private: // Settings
     float MinPitch = -0.80f; 
     float MinHeight = 62.0f; 
     float MaxPitch = -1.21f;
-    float MaxHeight = 120.0f;
+    float MaxHeight = 200.0f;
     
 private: // Internals
     float TargetZoomValue = 0.5f;
