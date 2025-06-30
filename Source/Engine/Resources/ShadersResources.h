@@ -32,11 +32,10 @@ namespace VS_INPUT_DESC
     };
 
     constexpr D3D11_INPUT_ELEMENT_DESC POS_NORM_TAN_UV_INST[] = {
-        { "POSITION",       0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      0u,     D3D11_INPUT_PER_VERTEX_DATA,      0u },
-        { "NORMAL",         0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      16u,    D3D11_INPUT_PER_VERTEX_DATA,      0u },
-        { "TANGENT",        0u,  DXGI_FORMAT_R32G32B32_FLOAT,   0u,      32u,    D3D11_INPUT_PER_VERTEX_DATA,      0u },
-        { "TEXCOORD",       0u,  DXGI_FORMAT_R32G32_FLOAT,      0u,      48u,    D3D11_INPUT_PER_VERTEX_DATA,      0u },
-        { "SV_InstanceID",  0u,  DXGI_FORMAT_R32_UINT,          1u,      56u,    D3D11_INPUT_PER_INSTANCE_DATA,    0u },
+        { "POSITION",   0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u,  0u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+        { "NORMAL",     0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 16u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+        { "TANGENT",    0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 32u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
+        { "TEXCOORD",   0u, DXGI_FORMAT_R32G32_FLOAT,    0u, 48u,  D3D11_INPUT_PER_VERTEX_DATA, 0u },
     };
 };
 

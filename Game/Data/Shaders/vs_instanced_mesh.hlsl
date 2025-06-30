@@ -29,24 +29,35 @@ struct VS_Output
     float3 tan : TANGENT;
     float2 uv : TEXCOORD0;
     float4 positionLight : TEXCOORD1;
+    float3 worldPos : TEXCOORD2;
 };
 
 VS_Output Main(VS_Input input)
 {
     VS_Output output;
 
-    matrix wvp = mul(world[input.instanceID], mul(viewMatrix, projectionMatrix));
+    // World matrix
+    matrix worldMatrix = world[input.instanceID];
 
+    // Compute world position
+    float4 worldPos = mul(float4(input.position, 1.0f), worldMatrix);
+    output.worldPos = worldPos.xyz;
+
+    // Compute final vertex position (clip space)
+    matrix wvp = mul(worldMatrix, mul(viewMatrix, projectionMatrix));
     output.position = mul(float4(input.position, 1.0f), wvp);
 
-    output.positionLight = mul(float4(input.position, 1.0f), world[input.instanceID]);
-    output.positionLight = mul(output.positionLight, lightViewMatrix);
-    output.positionLight = mul(output.positionLight, lightProjectionMatrix);
+    // Shadow projection
+    float4 lightSpacePos = mul(worldPos, lightViewMatrix);
+    output.positionLight = mul(lightSpacePos, lightProjectionMatrix);
 
-    output.normal = mul(input.normal, world[input.instanceID]).rgb;
-    output.tan = mul(input.tan, world[input.instanceID]).rgb;
+    // Transform normal and tangent (ignore translation)
+    float3x3 world3x3 = (float3x3)worldMatrix;
+    output.normal = mul(input.normal, world3x3);
+    output.tan = mul(input.tan, world3x3);
 
+    // Pass UVs
     output.uv = input.uv;
-    
+
     return output;
 }

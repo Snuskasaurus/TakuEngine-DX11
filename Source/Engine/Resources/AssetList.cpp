@@ -46,7 +46,9 @@ void LoadDrawables()
     MDrawableResources::CreateDrawableData(G_ASSET_TILE_2202, {G_ASSET_MESH_TILE_2202, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
     MDrawableResources::CreateDrawableData(G_ASSET_TILE_2222, {G_ASSET_MESH_TILE_2222, "", "", G_ASSET_T_TILES_C, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_DARK, G_ASSET_T_TILES_SO, false});
     
-    MDrawableResources::CreateDrawableData(G_ASSET_NAME_TERRAIN, {G_ASSET_MESH_TERRAIN, "", "", G_ASSET_T_COLOR_TERRAIN, G_ASSET_T_NORMAL_TERRAIN, G_ASSET_T_NONE_DARK, G_ASSET_T_MRO_TERRAIN, true});
+    MDrawableResources::CreateDrawableData(G_ASSET_NAME_TERRAIN, {"Terrain/SM_Terrain",
+        "", "", "Terrain/TC_Terrain", "Terrain/TN_Terrain",
+        G_ASSET_T_NONE_DARK, "Terrain/TSO_Terrain", true});
 
     MDrawableResources::CreateDrawableData(G_ASSET_TILE_BORDER, {G_ASSET_MESH_TILE_BORDER, "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, false});
     MDrawableResources::CreateDrawableData(G_ASSET_ARROW, {G_ASSET_MESH_ARROW, "", "", G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, G_ASSET_T_DEBUG, G_ASSET_T_NONE_WHITE, false});
