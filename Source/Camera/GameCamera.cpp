@@ -46,8 +46,18 @@ void AGameCamera::InitializeCameraGame()
 ///---------------------------------------------------------------------------------------------------------------------
 void AGameCamera::UpdateCamera(const float _dt)
 {
+    // Update Current and Target Zoom Values ---------------------------------------------------------------------------
+    
+    TargetZoomValue += MInput::GetMouseWheelDelta() * ZoomSpeed * _dt;
+    TargetZoomValue = MMath::Clamp(TargetZoomValue, 0.0f, 1.0f);
+    CurrentZoomValue = MMath::MoveTowards(CurrentZoomValue, TargetZoomValue, _dt);
+    
     // Inputs ----------------------------------------------------------------------------------------------------------
-
+    
+    float MovementSpeed = MMath::Lerp(MinMoveSpeed, MaxMoveSpeed, CurrentZoomValue);
+    if (MInput::IsKeyDown(EKeyCode::KEY_LEFT_SHIFT))
+        MovementSpeed += MoveSpeedBonusFromShift;
+    
     const float changeForward = GetCameraInputForward() * MovementSpeed * _dt;
     const float changeRight = GetCameraInputRight() * MovementSpeed * _dt;
     const float changeYaw = GetCameraInputYaw() * YawSpeed * _dt;
@@ -64,9 +74,6 @@ void AGameCamera::UpdateCamera(const float _dt)
     
     // Update Transform from zoom --------------------------------------------------------------------------
     
-    TargetZoomValue += MInput::GetMouseWheelDelta() * ZoomSpeed * _dt;
-    TargetZoomValue = MMath::Clamp(TargetZoomValue, 0.0f, 1.0f);
-    CurrentZoomValue = MMath::MoveTowards(CurrentZoomValue, TargetZoomValue, _dt);
     Transform.Rotator.Pitch = MMath::Lerp(MinPitch, MaxPitch, CurrentZoomValue);
     Transform.Position.y = MMath::Lerp(MinHeight, MaxHeight, CurrentZoomValue);
 }

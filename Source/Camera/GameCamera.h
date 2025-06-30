@@ -26,13 +26,17 @@ private:
 
 private: // Settings
     float ZoomSpeed = 0.1f;
-    float MovementSpeed = 55.0f;
     float YawSpeed = 1.2f;
+    float MoveSpeedBonusFromShift = 55.0f;
 
+    float MinMoveSpeed = 45.0f; 
+    float MaxMoveSpeed = 120.0f;
+    
     float MinPitch = -0.80f; 
-    float MinHeight = 62.0f; 
     float MaxPitch = -1.21f;
+    
     float MaxHeight = 200.0f;
+    float MinHeight = 62.0f;
     
 private: // Internals
     float TargetZoomValue = 0.5f;
