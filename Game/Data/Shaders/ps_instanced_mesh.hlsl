@@ -53,7 +53,8 @@ float4 Main(PS_Input input) : SV_Target
     const float3 sampleSO = tex_so.Sample(samplerState, input.uv).rgb; 
     const float3 sampleNormal = tex_normal.Sample(samplerState, input.uv).rgb;
     
-    const float specFromSample = sampleSO.r;
+    //const float specFromSample = sampleSO.r;
+    const float specFromSample = 0.0f;
     //return float4(specFromSample.xxx, 1.0f);
     const float occlusionFromSample = sampleSO.g;
     

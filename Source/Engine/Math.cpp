@@ -215,7 +215,7 @@ CollisionMeshResult MMath::DoCollisionSegmentTriangle(const TVector3f& _segmentS
     const TVector3f crossSegmentEdge2 = TVector3f::Cross(segment, edge2);
     const float determinant = TVector3f::Dot(edge1, crossSegmentEdge2);
 
-    if (fabs(determinant) < MATH_EPSILON_FLOAT)
+    if (fabs(determinant) < G_MATH_EPSILON_FLOAT)
         return result; // If determinant is near 0, the segment is parallel to the triangle: no intersection.
 
     const float invertDeterminant = 1.0f / determinant;
@@ -286,9 +286,9 @@ void TVector3f::PrintDebugVector(const TVector3f _v)
 
 bool TVector3f::operator==(const TVector3f& _v)
 {
-    return fabsf(x - _v.x) < MATH_EPSILON_FLOAT
-        && fabsf(y - _v.y) < MATH_EPSILON_FLOAT
-        && fabsf(z - _v.z) < MATH_EPSILON_FLOAT;
+    return fabsf(x - _v.x) < G_MATH_EPSILON_FLOAT
+        && fabsf(y - _v.y) < G_MATH_EPSILON_FLOAT
+        && fabsf(z - _v.z) < G_MATH_EPSILON_FLOAT;
 }
 //----------------------------------------------------------------------------------------------------------------------
 TVector3f TVector3f::TransformDirection(const TVector3f& _v, const TMatrix4f& _m)
@@ -431,7 +431,7 @@ TRotator TRotator::CreateFromOrthogonal(const TVector3f& _up, const TVector3f& _
 {
     TRotator rotator;
 
-    rotator.Pitch = asinf(-_forward.y); // forward.y = sin(-pitch)
+    rotator.Pitch = asinf(-_forward.y);
     const float cosPitch = cosf(rotator.Pitch);
     if (fabsf(cosPitch) > 1e-6f)
     {

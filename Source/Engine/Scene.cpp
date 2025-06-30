@@ -56,7 +56,7 @@ void CGameScene::OnDestroy_Internal()
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnUpdate_Internal(const float& _dt)
 {
-    constexpr float lightSpeed = 0.01f;
+    constexpr float lightSpeed = 0.5f;
     SceneLight.AddYaw(lightSpeed * _dt);
     
     if (DebugModeEnabled)

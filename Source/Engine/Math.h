@@ -1,11 +1,12 @@
 ﻿#pragma once
 
+#include <string>
+
 #define FORCE_INLINE __forceinline
 
-#define MATH_EPSILON_FLOAT 1.19209290E-07F
-#define MATH_SMALL_NUMBER 0.005
-#define MATH_PI 3.1415926535f
-#include <string>
+constexpr float G_MATH_EPSILON_FLOAT = 1.19209290E-07f;
+constexpr float G_MATH_SMALL_NUMBER = 0.005f;
+constexpr float G_MATH_PI = 3.1415926535f;
 
 struct RayTraceResult;
 struct CollisionMeshResult;
@@ -29,8 +30,8 @@ public:
     template<typename T> FORCE_INLINE static T Max(T _t1, T _t2) { return (_t1 > _t2) ? _t1 : _t2; }
     template<typename T> FORCE_INLINE static T Min(T _t1, T _t2) { return (_t1 < _t2) ? _t1 : _t2; }
     
-    FORCE_INLINE static float Deg2Rad(float _deg) { return (_deg) * MATH_PI / 180.0f; }
-    FORCE_INLINE static float Rad2Deg(float _rad) { return _rad * (180.0f / MATH_PI); }
+    FORCE_INLINE static float Deg2Rad(float _deg) { return (_deg) * G_MATH_PI / 180.0f; }
+    FORCE_INLINE static float Rad2Deg(float _rad) { return _rad * (180.0f / G_MATH_PI); }
     
     static int RandomNumberIntegerInRange(int _min, int _max);
     static float RandomNumberIntegerInRange(float _min, float _max);
@@ -231,7 +232,7 @@ struct alignas(16) TVector3f
     FORCE_INLINE bool IsNormalized() const
     {
         const float squareLength = TVector3f::SquareLength(*this);
-        return MMath::Abs(squareLength) - MATH_SMALL_NUMBER <= 1.0f;
+        return MMath::Abs(squareLength) - G_MATH_SMALL_NUMBER <= 1.0f;
     }
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -250,7 +251,7 @@ struct alignas(16) TVector4f
                       + MMath::Abs(_v1.y - _v2.y)
                       + MMath::Abs(_v1.z - _v2.z)
                       + MMath::Abs(_v1.w - _v2.w);
-        return f < MATH_SMALL_NUMBER;
+        return f < G_MATH_SMALL_NUMBER;
     }
     
     FORCE_INLINE TVector4f operator-() const
