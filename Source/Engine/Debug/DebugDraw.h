@@ -24,6 +24,5 @@ public:
     static void UpdateDebugDraws(const float _dt);
     static void Prepare();
     static void Line(TVector3f _positionStart, TVector3f _positionEnd, TColor _color, const float _time);
-private:
     static std::vector<SDrawDebugHolder>& GetDebugLines();
 };

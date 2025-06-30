@@ -4,6 +4,7 @@
 
 #include "GameWindow.h"
 #include "IncludesExternal.h"
+#include "Debug/DebugDraw.h"
 #include "Debug/DebugGUIManager.h"
 
 #include "Graphics/Graphic.h"
@@ -39,27 +40,37 @@ void MWorld::NotifyKeyReleasedToGameScene(EKeyCode _keyCode)
     Instance->CurrentGameScene->OnKeyReleased_Internal(_keyCode);
     Instance->CurrentGameScene->OnEvent_KeyReleased(_keyCode);
 }
-
+//---------------------------------------------------------------------------------------------------------------------
+void MWorld::UpdateWorld(const float& _dt)
+{
+    Instance->FreeLookCamera.UpdateCamera(_dt);
+    
+    if (Instance->CurrentGameScene != nullptr)
+    {
+        Instance->CurrentGameScene->UpdateScene(_dt);
+    }
+}
+//---------------------------------------------------------------------------------------------------------------------
 TMatrix4f MWorld::GetCameraWorldMatrix()
 {
     return Instance->FreeLookCamera.GetCameraWorldMatrix();
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 TVector3f MWorld::GetCameraPosition()
 {
     return Instance->FreeLookCamera.GetCameraPosition();
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 TVector3f MWorld::GetCameraForward()
 {
     return -Instance->FreeLookCamera.GetCameraWorldViewDir();
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 TMatrix4f MWorld::GetViewMatrix()
 {
     return Instance->FreeLookCamera.GetCameraViewMatrix();
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 TMatrix4f MWorld::GetProjectionMatrix()
 {
     // TODO Julien Rogel (02/02/2025): no need to compute it each time we call it but only when ScreenRatio change
@@ -67,32 +78,18 @@ TMatrix4f MWorld::GetProjectionMatrix()
     const TMatrix4f PerspectiveMatrix = TMatrix4f::MatrixPerspectiveFov(0.4f * 3.14f, ScreenRatio, 0.1f, 300.0f);
     return PerspectiveMatrix;
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 void MWorld::BeginDraw()
 {
     MDebugGUI::AddWindow("WorldDebug", [this]() { this->DrawDebugMatrix(); });
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 void MWorld::DrawDebugMatrix()
 {
-    TTransform transformTest;
-    
-    transformTest.Position.x = 100.0f;
-    transformTest.Position.y = 0.0f;
-    transformTest.Position.z = 0.0f;
-    TMatrix4f::DisplayOnDebugHUD("matrix X", transformTest.WorldMatrix());
-    
-    transformTest.Position.x = 0.0f;
-    transformTest.Position.y = 100.0f;
-    transformTest.Position.z = 0.0f;
-    TMatrix4f::DisplayOnDebugHUD("matrix Y", transformTest.WorldMatrix());
-    
-    transformTest.Position.x = 0.0f;
-    transformTest.Position.y = 0.0f;
-    transformTest.Position.z = 100.0f;
-    TMatrix4f::DisplayOnDebugHUD("matrix Z", transformTest.WorldMatrix());
-}
+    auto debugs = MDebugDraw::GetDebugLines();
 
+    ImGui::Text("Nb Debug Lines = %i", debugs.size());
+}
 //---------------------------------------------------------------------------------------------------------------------
 void MWorld::OnInitialize()
 {
@@ -110,15 +107,6 @@ void MWorld::OnUninitialize()
         CurrentGameScene->Destroy();
         delete CurrentGameScene;
         CurrentGameScene = nullptr;
-    }
-}
-///---------------------------------------------------------------------------------------------------------------------
-void MWorld::OnUpdate(const float& _dt)
-{
-    FreeLookCamera.UpdateCamera(_dt);
-    if (CurrentGameScene != nullptr)
-    {
-        CurrentGameScene->Update(_dt);
     }
 }
 ///---------------------------------------------------------------------------------------------------------------------

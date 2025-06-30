@@ -4,7 +4,7 @@ static std::vector<SDrawDebugHolder> G_DEBUG_LINES;
 
 void MDebugDraw::UpdateDebugDraws(const float _dt)
 {
-    for (int i = (int)G_DEBUG_LINES.size() - 1; i > 0 ; --i)
+    for (int i = (int)G_DEBUG_LINES.size() - 1; i >= 0 ; --i)
     {
         G_DEBUG_LINES[i].TimeRemaining -= _dt;
         if (G_DEBUG_LINES[i].TimeRemaining <= 0.0f)

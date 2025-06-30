@@ -27,7 +27,7 @@ public:
     static void UninitializeWorld();
     static void NotifyKeyPressedToGameScene(EKeyCode _keyCode);
     static void NotifyKeyReleasedToGameScene(EKeyCode _keyCode);
-    static void UpdateWorld(const float& _dt) { Instance->OnUpdate(_dt); }
+    static void UpdateWorld(const float& _dt);
 public:
     CGameScene* GetCurrentScene() const { return CurrentGameScene; }
 

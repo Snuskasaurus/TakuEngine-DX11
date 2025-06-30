@@ -45,7 +45,7 @@ protected:
 
 private:
     void Create();
-    void Update(const float& _dt);
+    void UpdateScene(const float& _dt);
     void Destroy();
 
 public:

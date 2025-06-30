@@ -15,28 +15,11 @@
 #include "Debug/DebugDraw.h"
 
 bool G_DEBUG_ENABLED = false;
-CDrawable_InstancedMesh* G_DEBUG_GIZMO_MESH = nullptr;
-CDrawable_InstancedMesh* G_DEBUG_SCENE_LIGHT_MESH = nullptr;
 
 //---------------------------------------------------------------------------------------------------------------------
 void ToggleDebugs()
 {
     G_DEBUG_ENABLED = !G_DEBUG_ENABLED;
-    if (G_DEBUG_ENABLED == true)
-    {
-        if (G_DEBUG_GIZMO_MESH == nullptr)
-            G_DEBUG_GIZMO_MESH = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData(G_ASSET_GIZMO);
-        G_DEBUG_GIZMO_MESH->Instances.push_back(TTransform::Identity);
-        
-        if (G_DEBUG_SCENE_LIGHT_MESH == nullptr)
-            G_DEBUG_SCENE_LIGHT_MESH = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData(G_ASSET_ARROW);
-        G_DEBUG_SCENE_LIGHT_MESH->Instances.push_back(TTransform::Identity);
-    }
-    else
-    {
-        G_DEBUG_GIZMO_MESH->Instances.clear();
-        G_DEBUG_SCENE_LIGHT_MESH->Instances.clear();
-    }
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Create()
@@ -45,7 +28,7 @@ void CGameScene::Create()
     OnEvent_Create();
 }
 
-void CGameScene::Update(const float& _dt)
+void CGameScene::UpdateScene(const float& _dt)
 {
     OnUpdate_Internal(_dt);
     OnEvent_Update(_dt);
