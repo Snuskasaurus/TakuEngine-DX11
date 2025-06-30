@@ -59,6 +59,7 @@ void CGameScene::Destroy()
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnCreate_Internal()
 {
+    SceneLight.SetPitch(12.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnDestroy_Internal()
@@ -72,12 +73,16 @@ void CGameScene::OnDestroy_Internal()
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnUpdate_Internal(const float& _dt)
 {
+    constexpr float lightSpeed = 0.01f;
+    SceneLight.AddYaw(lightSpeed * _dt);
+    
     if (G_DEBUG_ENABLED)
     {
-        G_DEBUG_SCENE_LIGHT_MESH->Instances[0] = {{0.0f, 0.0f, 0.0f}, { MMath::Deg2Rad(SceneLight.CurrentYaw), MMath::Deg2Rad(SceneLight.CurrentPitch), 0.0f }};
         MDebugDraw::Line(TVector3f::Zero, TVector3f::Right * 100.0f, TColor::Red, 0.0f);     // +X
         MDebugDraw::Line(TVector3f::Zero, TVector3f::Up * 100.0f, TColor::Green, 0.0f);      // +Y
-        MDebugDraw::Line(TVector3f::Zero, TVector3f::Forward * 100.0f, TColor::Blue, 0.0f);  // +Z
+        MDebugDraw::Line(TVector3f::Zero, TVector3f::Forward * 100.0f, TColor::Blue, 0.0f);  // +
+        
+        MDebugDraw::Line(TVector3f::Zero, GetSceneLight().GetWorldLightDir() * 100.0f, TColor::Yellow, 0.0f);  // Sun
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
@@ -99,13 +104,13 @@ void CGameScene::OnKeyReleased_Internal(EKeyCode _key)
     else if (_key == EKeyCode::KEY_NUM_LOCK)
         MGraphic::ReportLiveObjects(true);
     else if (_key == EKeyCode::KEY_KEYPAD_8)
-        SceneLight.AddPitch(10.0f);
+        SceneLight.AddPitch(1.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_2)
-        SceneLight.AddPitch(-10.0f);
+        SceneLight.AddPitch(-1.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_4)
-        SceneLight.AddYaw(-10.0f);
+        SceneLight.AddYaw(-1.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_6)
-        SceneLight.AddYaw(10.0f);
+        SceneLight.AddYaw(1.0f);
 }
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw_DEPRECATED(const char* _meshName)

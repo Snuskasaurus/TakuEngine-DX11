@@ -10,9 +10,6 @@
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Create()
 {
-    SceneLight.SetYaw(120.0f);
-    SceneLight.SetPitch(130.0f);
-
     MWorld::GetWorld()->GetFreeLookCamera().SetCameraPosition({65.0f, 76.0f, 90.0f});
     MWorld::GetWorld()->GetFreeLookCamera().SetCameraRotation({-0.52f, 2.44f, 0.00f});
     
