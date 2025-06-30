@@ -88,10 +88,16 @@ bool MInput::IsCursorLocked()
     return CursorIsLocked;
 }
 ///---------------------------------------------------------------------------------------------------------------------
-void MInput::ToggleCursorLock()
+void MInput::UnlockCursor()
 {
-    CursorIsLocked = !CursorIsLocked;
-    ShowCursor(!CursorIsLocked);
+    CursorIsLocked = false;
+    ShowCursor(true);
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::LockCursor()
+{
+    CursorIsLocked = true;
+    ShowCursor(false);
 }
 ///---------------------------------------------------------------------------------------------------------------------
 TVector2f MInput::GetMousePosition()

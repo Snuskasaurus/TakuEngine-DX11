@@ -3,6 +3,8 @@
 #include "IncludesExternal.h"
 #include "Inputmanager.h"
 #include "Sun.h"
+#include "Camera/DebugCamera.h"
+#include "Camera/GameCamera.h"
 #include "Graphics/Drawable.h"
 
 enum EGameSceneType
@@ -35,6 +37,7 @@ private:
     void OnDestroy_Internal();
     void OnKeyPressed_Internal(EKeyCode _key);
     void OnKeyReleased_Internal(EKeyCode _key);
+    void OnDebugModeToggle_Internal();
     
 protected:
     virtual void OnEvent_Create() {}
@@ -42,6 +45,7 @@ protected:
     virtual void OnEvent_Destroy() {}
     virtual void OnEvent_KeyPressed(EKeyCode _key) {}
     virtual void OnEvent_KeyReleased(EKeyCode _key) {}
+    virtual void OnEvent_DebugModeToggle() {}
 
 private:
     void Create();
@@ -54,7 +58,10 @@ public:
 
 protected:
     CSceneLight SceneLight;
+    ADebugCamera DebugCamera;
+    AGameCamera GameCamera;
     
 private:
+    bool DebugModeEnabled = false;
     std::vector<CDrawable_InstancedMesh*> InstancedMeshes;
 };

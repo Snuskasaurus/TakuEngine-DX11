@@ -123,7 +123,8 @@ public:
     static TInputHolder* GetInputHolder();
 
     static bool IsCursorLocked();
-    static void ToggleCursorLock();
+    static void UnlockCursor();
+    static void LockCursor();
     static TVector2f GetMousePosition();
     static TVector2f GetMouseMovement();
 

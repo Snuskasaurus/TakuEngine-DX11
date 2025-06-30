@@ -2,6 +2,7 @@
 
 #include "../Resources/MeshResources.h"
 #include "../Resources/ShadersResources.h"
+#include "Engine/Resources/ShadersResources.h"
 
 class CDrawable_InstancedMesh;
 struct ID3D11Resource;

@@ -4,8 +4,6 @@
 #include "../HResultHandler.h"
 #include "../Sun.h"
 #include "../World.h"
-#include "../GameWindow.h"
-#include "../FreeLookCamera.h"
 #include "../Debug/DebugDraw.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -155,7 +153,7 @@ void SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(SShaderBufferHolder* _sha
 #endif
     
     const SLightInfo& lightInfo = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight().GetSceneLightInfo();
-    BufferData.camDir = MWorld::GetWorld()->FreeLookCamera.GetCameraWorldViewDir();
+    BufferData.camDir = MWorld::GetWorld()->GetCameraForward();
     BufferData.lightDir = lightInfo.Direction;
     BufferData.lightColor = { lightInfo.Color.r, lightInfo.Color.g, lightInfo.Color.b };
     BufferData.lightColorIntensity = lightInfo.ColorIntensity;

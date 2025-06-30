@@ -10,9 +10,6 @@
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Create()
 {
-    MWorld::GetWorld()->GetFreeLookCamera().SetCameraPosition({65.0f, 76.0f, 90.0f});
-    MWorld::GetWorld()->GetFreeLookCamera().SetCameraRotation({-0.52f, 2.44f, 0.00f});
-    
     assert(TerrainMesh == nullptr);
     TerrainMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_NAME_TERRAIN);
     TerrainMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
@@ -39,11 +36,6 @@ void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
         SceneLight.AddYaw(-5.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_6)
         SceneLight.AddYaw(5.0f);
-    else if (_key == EKeyCode::KEY_T)
-    {
-        MWorld::GetWorld()->GetFreeLookCamera().SetCameraPosition(TVector3f(0.0f, -5.0f, 0.0f));
-        MWorld::GetWorld()->GetFreeLookCamera().SetCameraRotation(TRotator(MMath::Deg2Rad(180.0f), 0.0f, 0.0f));
-    }
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Update(const float& _dt)

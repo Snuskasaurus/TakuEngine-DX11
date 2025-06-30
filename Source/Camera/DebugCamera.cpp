@@ -1,10 +1,10 @@
-﻿#include "FreeLookCamera.h"
-
+﻿#include "DebugCamera.h"
 #include <format>
-#include "Inputmanager.h"
-#include "Debug/DebugGUIManager.h"
+#include "Engine/Inputmanager.h"
+#include "Engine/Debug/DebugGUIManager.h"
 
-float GetCameraInputForward()
+///---------------------------------------------------------------------------------------------------------------------
+inline float GetCameraInputForward()
 {
     if (MInput::IsKeyDown(EKeyCode::KEY_W))
        return 1.0f;
@@ -14,8 +14,8 @@ float GetCameraInputForward()
 
     return 0.0f;
 }
-
-float GetCameraInputRight()
+///---------------------------------------------------------------------------------------------------------------------
+inline float GetCameraInputRight()
 {
     if (MInput::IsKeyDown(EKeyCode::KEY_D))
         return -1.0f;
@@ -25,8 +25,8 @@ float GetCameraInputRight()
 
     return 0.0f;
 }
-
-float GetCameraInputUp()
+///---------------------------------------------------------------------------------------------------------------------
+inline float GetCameraInputUp()
 {
     if (MInput::IsKeyDown(EKeyCode::KEY_LEFT_SHIFT))
         return 1.0f;
@@ -36,13 +36,13 @@ float GetCameraInputUp()
 
     return 0.0f;
 }
-
-void TFreeLookCamera::InitializeCamera()
+///---------------------------------------------------------------------------------------------------------------------
+void ADebugCamera::InitializeCameraDebug()
 {
     MDebugGUI::AddWindow("CameraDebug", [this]() { this->DrawCameraDebugWindow(); });
 }
-
-void TFreeLookCamera::UpdateCamera(const float _dt)
+///---------------------------------------------------------------------------------------------------------------------
+void ADebugCamera::UpdateCamera(const float _dt)
 {
     // Inputs ----------------------------------------------------------------------------------------------------------
 
@@ -78,7 +78,8 @@ void TFreeLookCamera::UpdateCamera(const float _dt)
 
     Transform.Position += positionChange;
 }
-void TFreeLookCamera::DrawCameraDebugWindow()
+///---------------------------------------------------------------------------------------------------------------------
+void ADebugCamera::DrawCameraDebugWindow()
 {
     const std::string textPosition = std::format("World Position: x:{:.2f} y:{:.2f} z:{:.2f}", Transform.Position.x, Transform.Position.y, Transform.Position.z);
     ImGui::Text(textPosition.c_str());
@@ -104,3 +105,4 @@ void TFreeLookCamera::DrawCameraDebugWindow()
     const std::string textCameraSpeed = std::format("Movement Sensibility: x:{:.2f}", MovementSensibility);
     ImGui::Text(textCameraSpeed.c_str());
 }
+///---------------------------------------------------------------------------------------------------------------------

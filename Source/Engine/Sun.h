@@ -14,12 +14,14 @@ class CSceneLight
 {
     friend class MGraphic;
     friend class CGameScene;
+    
 public:
     SLightInfo GetSceneLightInfo() const;
     void AddYaw(float _yaw) { SetYaw(CurrentYaw + _yaw); }
     void AddPitch(float _pitch) { SetPitch(CurrentPitch + _pitch); }
     void SetYaw(float _yaw);
     void SetPitch(float _pitch);
+    
 public:
     TVector3f GetWorldLightDir() const { return -Forward; }
     TMatrix4f GetViewMatrix() const { return TMatrix4f::Inverse(LightMatrix); }
@@ -27,6 +29,7 @@ public:
 
 private:
     void OnValueChanged();
+    
 private:
     float CurrentYaw = 0.0f;
     float CurrentPitch = 0.0f;

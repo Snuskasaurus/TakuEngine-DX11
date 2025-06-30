@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include "Math.h"
-#include "FreeLookCamera.h"
+#include "Camera/DebugCamera.h"
 #include "Inputmanager.h"
 #include "Scene.h"
+#include "Camera/GameCamera.h"
 
 struct alignas(16) SWorldLight
 {
@@ -31,7 +32,6 @@ public:
 public:
     CGameScene* GetCurrentScene() const { return CurrentGameScene; }
 
-    TFreeLookCamera& GetFreeLookCamera() { return FreeLookCamera; }
     static TVector3f GetCameraPosition();
     static TVector3f GetCameraForward();
     static TMatrix4f GetCameraWorldMatrix();
@@ -49,5 +49,4 @@ private:
     
 private:
     CGameScene* CurrentGameScene = nullptr;
-    TFreeLookCamera FreeLookCamera;
 };

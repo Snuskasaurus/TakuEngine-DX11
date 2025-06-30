@@ -1,26 +1,18 @@
 ﻿#include "Scene.h"
 
-#include "Resources/AssetList.h"
-#include "Graphics/Graphic.h"
-#include "World.h"
-#include "Graphics/Drawable.h"
-#include "Resources/MeshResources.h"
+#include "Engine/Resources/AssetList.h"
+#include "Engine/Graphics/Graphic.h"
+#include "Engine/World.h"
+#include "Engine/Graphics/Drawable.h"
+#include "Engine/Resources/MeshResources.h"
+#include "Engine/Debug/DebugDraw.h"
+#include "Engine/Resources/DrawableResources.h"
 
-#include "Resources/DrawableResources.h"
-#include "Resources/GamePath.h"
+#include "Game/Scenes/GridScene.h"
+#include "Game/Scenes/GameTerrainScene.h"
 
-#include "../Game/Scenes/GridScene.h"
-#include "../Game/Scenes/GameTerrainScene.h"
-#include "../imgui/imgui.h"
-#include "Debug/DebugDraw.h"
+#include "imgui/imgui.h"
 
-bool G_DEBUG_ENABLED = false;
-
-//---------------------------------------------------------------------------------------------------------------------
-void ToggleDebugs()
-{
-    G_DEBUG_ENABLED = !G_DEBUG_ENABLED;
-}
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::Create()
 {
@@ -43,6 +35,14 @@ void CGameScene::Destroy()
 void CGameScene::OnCreate_Internal()
 {
     SceneLight.SetPitch(12.0f);
+    
+    DebugCamera.InitializeCameraDebug();
+    DebugCamera.SetCameraPosition(TVector3f(18.0f, 22.0f, 20.0f));
+    DebugCamera.SetCameraRotation(TRotator(-0.52f, 2.44f, 0.0f));
+    
+    GameCamera.InitializeCameraGame();
+    GameCamera.SetCameraPosition(TVector3f(0.0f, 70.0f, 20.0f));
+    GameCamera.SetCameraRotation(TRotator(-0.94f, 0.0f, 0.0f));
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnDestroy_Internal()
@@ -59,14 +59,22 @@ void CGameScene::OnUpdate_Internal(const float& _dt)
     constexpr float lightSpeed = 0.01f;
     SceneLight.AddYaw(lightSpeed * _dt);
     
-    if (G_DEBUG_ENABLED)
+    if (DebugModeEnabled)
     {
+        
         MDebugDraw::Line(TVector3f::Zero, TVector3f::Right * 100.0f, TColor::Red, 0.0f);     // +X
         MDebugDraw::Line(TVector3f::Zero, TVector3f::Up * 100.0f, TColor::Green, 0.0f);      // +Y
         MDebugDraw::Line(TVector3f::Zero, TVector3f::Forward * 100.0f, TColor::Blue, 0.0f);  // +
         
         MDebugDraw::Line(TVector3f::Zero, GetSceneLight().GetWorldLightDir() * 100.0f, TColor::Yellow, 0.0f);  // Sun
+        
+        DebugCamera.UpdateCamera(_dt);
     }
+    else
+    {
+        GameCamera.UpdateCamera(_dt);
+    }
+
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameScene::OnKeyPressed_Internal(EKeyCode _key)
@@ -81,8 +89,8 @@ void CGameScene::OnKeyReleased_Internal(EKeyCode _key)
     }
     else if (_key == EKeyCode::KEY_BACKSPACE)
     {
-        MInput::ToggleCursorLock();
-        ToggleDebugs();
+        OnDebugModeToggle_Internal();
+        OnEvent_DebugModeToggle();
     }
     else if (_key == EKeyCode::KEY_NUM_LOCK)
         MGraphic::ReportLiveObjects(true);
@@ -95,6 +103,25 @@ void CGameScene::OnKeyReleased_Internal(EKeyCode _key)
     else if (_key == EKeyCode::KEY_KEYPAD_6)
         SceneLight.AddYaw(1.0f);
 }
+
+void CGameScene::OnDebugModeToggle_Internal()
+{
+    DebugModeEnabled = !DebugModeEnabled;
+    if (DebugModeEnabled == true)
+    {
+        MInput::LockCursor();
+
+        // Match debug camera view to the game camera view
+        const TTransform transformGameCamera = GameCamera.GetCameraTransform();
+        DebugCamera.SetCameraPosition(transformGameCamera.Position);
+        DebugCamera.SetCameraRotation(transformGameCamera.Rotator);
+    }
+    else
+    {
+        MInput::UnlockCursor();
+    }
+}
+
 //---------------------------------------------------------------------------------------------------------------------
 CDrawable_InstancedMesh* CGameScene::AddInstancedMeshToDraw_DEPRECATED(const char* _meshName)
 {

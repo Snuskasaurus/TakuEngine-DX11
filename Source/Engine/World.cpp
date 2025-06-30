@@ -43,8 +43,6 @@ void MWorld::NotifyKeyReleasedToGameScene(EKeyCode _keyCode)
 //---------------------------------------------------------------------------------------------------------------------
 void MWorld::UpdateWorld(const float& _dt)
 {
-    Instance->FreeLookCamera.UpdateCamera(_dt);
-    
     if (Instance->CurrentGameScene != nullptr)
     {
         Instance->CurrentGameScene->UpdateScene(_dt);
@@ -53,22 +51,34 @@ void MWorld::UpdateWorld(const float& _dt)
 //---------------------------------------------------------------------------------------------------------------------
 TMatrix4f MWorld::GetCameraWorldMatrix()
 {
-    return Instance->FreeLookCamera.GetCameraWorldMatrix();
+    if (Instance->CurrentGameScene->DebugModeEnabled == false)
+        return Instance->CurrentGameScene->GameCamera.GetCameraWorldMatrix();
+    
+    return Instance->CurrentGameScene->DebugCamera.GetCameraWorldMatrix();
 }
 //---------------------------------------------------------------------------------------------------------------------
 TVector3f MWorld::GetCameraPosition()
 {
-    return Instance->FreeLookCamera.GetCameraPosition();
+    if (Instance->CurrentGameScene->DebugModeEnabled == false)
+        return Instance->CurrentGameScene->GameCamera.GetCameraPosition();
+    
+    return Instance->CurrentGameScene->DebugCamera.GetCameraPosition();
 }
 //---------------------------------------------------------------------------------------------------------------------
 TVector3f MWorld::GetCameraForward()
 {
-    return -Instance->FreeLookCamera.GetCameraWorldViewDir();
+    if (Instance->CurrentGameScene->DebugModeEnabled == false)
+        return Instance->CurrentGameScene->GameCamera.GetCameraWorldViewDir();
+    
+    return Instance->CurrentGameScene->DebugCamera.GetCameraWorldViewDir();
 }
 //---------------------------------------------------------------------------------------------------------------------
 TMatrix4f MWorld::GetViewMatrix()
 {
-    return Instance->FreeLookCamera.GetCameraViewMatrix();
+    if (Instance->CurrentGameScene->DebugModeEnabled == false)
+        return Instance->CurrentGameScene->GameCamera.GetCameraViewMatrix();
+    
+    return Instance->CurrentGameScene->DebugCamera.GetCameraViewMatrix();
 }
 //---------------------------------------------------------------------------------------------------------------------
 TMatrix4f MWorld::GetProjectionMatrix()
@@ -93,10 +103,6 @@ void MWorld::DrawDebugMatrix()
 //---------------------------------------------------------------------------------------------------------------------
 void MWorld::OnInitialize()
 {
-    FreeLookCamera.InitializeCamera();
-    FreeLookCamera.SetCameraPosition(TVector3f(18.0f, 22.0f, 20.0f));
-    FreeLookCamera.SetCameraRotation(TRotator(-0.52f, 2.44f, 0.0f));
-    
     CGameScene::ChangeGameScene(GC_DEFAULT_SCENE);
 }
 //---------------------------------------------------------------------------------------------------------------------

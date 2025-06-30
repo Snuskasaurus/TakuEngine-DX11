@@ -71,15 +71,23 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(SolutionDir)\Intermediates\$(Configuration)</IntDir>
-    <OutDir>$(SolutionDir)\Game\</OutDir>
-    <LibraryPath>$(SolutionDir)\Libraries;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)Intermediates\$(Configuration)</IntDir>
+    <OutDir>$(SolutionDir)Game\</OutDir>
+    <LibraryPath>$(SolutionDir)Libraries;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Source\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>$(SolutionDir)\Intermediates\$(Configuration)</IntDir>
+    <IntDir>$(SolutionDir)Intermediates\$(Configuration)</IntDir>
     <TargetName>$(ProjectName)_debug</TargetName>
-    <OutDir>$(SolutionDir)\Game\</OutDir>
-    <LibraryPath>$(SolutionDir)\Libraries;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)Game\</OutDir>
+    <LibraryPath>$(SolutionDir)Libraries;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Source\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(VC_SourcePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(VC_SourcePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -162,7 +170,32 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Camera\DebugCamera.cpp" />
+    <ClCompile Include="Source\Camera\GameCamera.cpp" />
+    <ClCompile Include="Source\Engine\Color.cpp" />
+    <ClCompile Include="Source\Engine\CommonEngine.cpp" />
+    <ClCompile Include="Source\Engine\Debug\DebugDraw.cpp" />
     <ClCompile Include="Source\Engine\Debug\DebugGUIManager.cpp" />
+    <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
+    <ClCompile Include="Source\Engine\Defines.cpp" />
+    <ClCompile Include="Source\Engine\GameWindow.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
+    <ClCompile Include="Source\Engine\Graphics\ShaderBuffers.cpp" />
+    <ClCompile Include="Source\Engine\HResultHandler.cpp" />
+    <ClCompile Include="Source\Engine\Inputmanager.cpp" />
+    <ClCompile Include="Source\Engine\Main.cpp" />
+    <ClCompile Include="Source\Engine\Math.cpp" />
+    <ClCompile Include="Source\Engine\Resources\AssetList.cpp" />
+    <ClCompile Include="Source\Engine\Resources\DrawableResources.cpp" />
+    <ClCompile Include="Source\Engine\Resources\MeshResources.cpp" />
+    <ClCompile Include="Source\Engine\Resources\ShadersResources.cpp" />
+    <ClCompile Include="Source\Engine\Resources\TextureResources.cpp" />
+    <ClCompile Include="Source\Engine\Scene.cpp" />
+    <ClCompile Include="Source\Engine\Sun.cpp" />
+    <ClCompile Include="Source\Engine\TimeManager.cpp" />
+    <ClCompile Include="Source\Engine\World.cpp" />
+    <ClCompile Include="Source\Game\MGridSystem.cpp" />
     <ClCompile Include="Source\Game\Scenes\GameTerrainScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -276,125 +309,28 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <ClCompile Include="Source\Engine\Debug\DebugDraw.cpp" />
-    <ClCompile Include="Source\Engine\Defines.cpp" />
-    <ClCompile Include="Source\Engine\Graphics\ShaderBuffers.cpp" />
-    <ClCompile Include="Source\Engine\Graphics\Drawable.cpp" />
-    <ClCompile Include="Source\Engine\Graphics\Graphic.cpp" />
-    <ClCompile Include="Source\Engine\Resources\AssetList.cpp">
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <Optimization>Disabled</Optimization>
-      <SupportJustMyCode>true</SupportJustMyCode>
-      <AssemblerOutput>NoListing</AssemblerOutput>
-      <AssemblerListingLocation>D:\Projects\TakuEngine\\Intermediates\Debug\</AssemblerListingLocation>
-      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
-      <BrowseInformation>false</BrowseInformation>
-      <BrowseInformationFile>D:\Projects\TakuEngine\\Intermediates\Debug\</BrowseInformationFile>
-      <CompileAs>Default</CompileAs>
-      <ConformanceMode>true</ConformanceMode>
-      <DiagnosticsFormat>Column</DiagnosticsFormat>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <ErrorReporting>Prompt</ErrorReporting>
-      <ExpandAttributedSource>false</ExpandAttributedSource>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <EnableASAN>false</EnableASAN>
-      <EnableFuzzer>false</EnableFuzzer>
-      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <GenerateModuleDependencies>false</GenerateModuleDependencies>
-      <GenerateSourceDependencies>false</GenerateSourceDependencies>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <MinimalRebuild>false</MinimalRebuild>
-      <ModuleDependenciesFile>D:\Projects\TakuEngine\\Intermediates\Debug\</ModuleDependenciesFile>
-      <ModuleOutputFile>D:\Projects\TakuEngine\\Intermediates\Debug\</ModuleOutputFile>
-      <OmitDefaultLibName>false</OmitDefaultLibName>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ObjectFileName>D:\Projects\TakuEngine\\Intermediates\Debug\</ObjectFileName>
-      <CallingConvention>Cdecl</CallingConvention>
-      <ProgramDataBaseFileName>D:\Projects\TakuEngine\\Intermediates\Debug\vc143.pdb</ProgramDataBaseFileName>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>D:\Projects\TakuEngine\\Intermediates\Debug\TakuEngine_debug.pch</PrecompiledHeaderOutputFile>
-      <PreprocessToFile>false</PreprocessToFile>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
-      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
-      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
-      <ShowIncludes>false</ShowIncludes>
-      <SourceDependenciesFile>D:\Projects\TakuEngine\\Intermediates\Debug\</SourceDependenciesFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
-      <SpectreMitigation>false</SpectreMitigation>
-      <StructMemberAlignment>Default</StructMemberAlignment>
-      <TrackerLogDirectory>D:\Projects\TakuEngine\\Intermediates\Debug\TakuEngine.tlog\</TrackerLogDirectory>
-      <TranslateIncludes>false</TranslateIncludes>
-      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <UseFullPaths>true</UseFullPaths>
-      <WarningLevel>Level3</WarningLevel>
-      <XMLDocumentationFileName>D:\Projects\TakuEngine\\Intermediates\Debug\</XMLDocumentationFileName>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <IntelJCCErratum>false</IntelJCCErratum>
-      <BuildStlModules>false</BuildStlModules>
-      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
-      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
-      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
-      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;</PreprocessorDefinitions>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LinkCompiled>true</LinkCompiled>
-    </ClCompile>
-    <ClCompile Include="Source\Engine\Resources\DrawableResources.cpp" />
-    <ClCompile Include="Source\Engine\Resources\TextureResources.cpp" />
-    <ClCompile Include="Source\Engine\Sun.cpp" />
-    <ClCompile Include="Source\Game\MGridSystem.cpp" />
-    <ClCompile Include="Source\Engine\CommonEngine.cpp" />
-    <ClCompile Include="Source\Engine\Debug\Profiling.cpp" />
-    <ClCompile Include="Source\Engine\FreeLookCamera.cpp" />
-    <ClCompile Include="Source\Engine\Color.cpp" />
-    <ClCompile Include="Source\Engine\GameWindow.cpp" />
-    <ClCompile Include="Source\Engine\HResultHandler.cpp" />
-    <ClCompile Include="Source\Engine\Inputmanager.cpp" />
-    <ClCompile Include="Source\Engine\Main.cpp" />
-    <ClCompile Include="Source\Engine\Resources\MeshResources.cpp" />
-    <ClCompile Include="Source\Engine\Resources\ShadersResources.cpp" />
-    <ClCompile Include="Source\Engine\Scene.cpp" />
-    <ClCompile Include="Source\Engine\TimeManager.cpp" />
-    <ClCompile Include="Source\Engine\World.cpp" />
-    <ClCompile Include="Source\Engine\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Camera\DebugCamera.h" />
+    <ClInclude Include="Source\Camera\GameCamera.h" />
+    <ClInclude Include="Source\Engine\Color.h" />
     <ClInclude Include="Source\Engine\CommonEngine.h" />
     <ClInclude Include="Source\Engine\Debug\DebugDraw.h" />
     <ClInclude Include="Source\Engine\Debug\DebugGUIManager.h" />
+    <ClInclude Include="Source\Engine\Debug\Profiling.h" />
     <ClInclude Include="Source\Engine\Defines.h" />
+    <ClInclude Include="Source\Engine\GameWindow.h" />
     <ClInclude Include="Source\Engine\Graphics\Drawable.h" />
     <ClInclude Include="Source\Engine\Graphics\Graphic.h" />
     <ClInclude Include="Source\Engine\Graphics\ShaderBuffers.h" />
-    <ClInclude Include="Source\Engine\IncludesExternal.h" />
-    <ClInclude Include="Source\Engine\Debug\Profiling.h" />
-    <ClInclude Include="Source\Engine\FreeLookCamera.h" />
-    <ClInclude Include="Source\Engine\Color.h" />
-    <ClInclude Include="Source\Engine\GameWindow.h" />
     <ClInclude Include="Source\Engine\HResultHandler.h" />
+    <ClInclude Include="Source\Engine\IncludesExternal.h" />
     <ClInclude Include="Source\Engine\Inputmanager.h" />
     <ClInclude Include="Source\Engine\Math.h" />
     <ClInclude Include="Source\Engine\Resources\AssetList.h" />
+    <ClInclude Include="Source\Engine\Resources\DrawableResources.h" />
     <ClInclude Include="Source\Engine\Resources\GamePath.h" />
     <ClInclude Include="Source\Engine\Resources\MeshResources.h" />
-    <ClInclude Include="Source\Engine\Resources\DrawableResources.h" />
     <ClInclude Include="Source\Engine\Resources\ShadersResources.h" />
     <ClInclude Include="Source\Engine\Resources\TextureResources.h" />
     <ClInclude Include="Source\Engine\Scene.h" />
