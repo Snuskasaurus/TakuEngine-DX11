@@ -25,7 +25,9 @@ public:
     static float Tan(float _f);
     static float Cos(float _f);
     static float Abs(float _f);
-    
+    static float Lerp(const float _start, const float _end, const float _alpha);
+    static float MoveTowards(float _current, float _target, float _maxDelta);
+
     template<typename T> FORCE_INLINE static T Clamp(T _f, T _min, T _max) { return (_f < _min) ? _min : ((_f > _max) ? _max : _f); }
     template<typename T> FORCE_INLINE static T Max(T _t1, T _t2) { return (_t1 > _t2) ? _t1 : _t2; }
     template<typename T> FORCE_INLINE static T Min(T _t1, T _t2) { return (_t1 < _t2) ? _t1 : _t2; }

@@ -21,6 +21,7 @@ std::vector<FKeyEvent> KeyEventsThisFrame;
 TVector2f LastMousePosition;
 TVector2f MouseMovement;
 bool CursorIsLocked = false;
+float G_MOUSE_WHEEL_DELTA = 0.0f;
 
 ///---------------------------------------------------------------------------------------------------------------------
 MInput* MInput::Instance = nullptr;
@@ -75,6 +76,7 @@ void MInput::DetectInputs()
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::ClearInputs()
 {
+    G_MOUSE_WHEEL_DELTA = 0.0f;
     KeyEventsThisFrame.clear();
 }
 ///---------------------------------------------------------------------------------------------------------------------
@@ -115,12 +117,16 @@ TVector2f MInput::GetMousePosition()
     
     return { static_cast<float>(cursorPos.x), static_cast<float>(cursorPos.y) };
 }
-
+///---------------------------------------------------------------------------------------------------------------------
 TVector2f MInput::GetMouseMovement()
 {
     return MouseMovement;
 }
-
+///---------------------------------------------------------------------------------------------------------------------
+void MInput::UpdateMouseWheelInput(float _delta)
+{
+    G_MOUSE_WHEEL_DELTA += _delta;
+}
 ///---------------------------------------------------------------------------------------------------------------------
 void MInput::DispatchKeyEventsToScenes()
 {
@@ -146,6 +152,11 @@ bool MInput::IsKeyUp(EKeyCode KeyCode)
 bool MInput::IsKeyDown(EKeyCode KeyCode)
 {
     return AreKeyDown[KeyCode];
+}
+///---------------------------------------------------------------------------------------------------------------------
+float MInput::GetMouseWheelDelta()
+{
+    return G_MOUSE_WHEEL_DELTA;
 }
 ///---------------------------------------------------------------------------------------------------------------------
 EKeyCode TranslateWin32KeyToKeyCode(const WPARAM wParam)

@@ -94,6 +94,19 @@ float MMath::Abs(const float _f)
     return fabsf(_f);
 }
 //----------------------------------------------------------------------------------------------------------------------
+float MMath::Lerp(const float _start, const float _end, const float _alpha)
+{
+    return _start + (_end - _start) * _alpha;
+}
+//----------------------------------------------------------------------------------------------------------------------
+float MMath::MoveTowards(float _current, float _target, float _maxDelta)
+{
+    float delta = _target - _current;
+    if (MMath::Abs(delta) <= _maxDelta)
+        return _target;
+    return _current + (delta > 0 ? _maxDelta : -_maxDelta);
+}
+//----------------------------------------------------------------------------------------------------------------------
 int MMath::RandomNumberIntegerInRange(int _min, int _max)
 {
     if (_min == _max) return 0;

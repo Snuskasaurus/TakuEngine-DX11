@@ -39,7 +39,7 @@ inline float GetCameraInputUp()
 ///---------------------------------------------------------------------------------------------------------------------
 void ADebugCamera::InitializeCameraDebug()
 {
-    MDebugGUI::AddWindow("CameraDebug", [this]() { this->DrawCameraDebugWindow(); });
+    MDebugGUI::AddWindow("DebugGamera", [this]() { this->DrawCameraDebugWindow(); });
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void ADebugCamera::UpdateCamera(const float _dt)

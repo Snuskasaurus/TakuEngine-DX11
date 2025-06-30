@@ -37,10 +37,10 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         {
             MInput::HandleKeyUp(wParam);
         } break;
-    case WM_MOUSEMOVE:
+    case WM_MOUSEWHEEL:
         {
-            //xPos = GET_X_LPARAM(lParam); 
-            //yPos = GET_Y_LPARAM(lParam); 
+            short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+            MInput::UpdateMouseWheelInput((float)zDelta);
         } break;
     case WM_SIZE:
         {

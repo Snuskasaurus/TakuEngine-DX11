@@ -128,10 +128,13 @@ public:
     static TVector2f GetMousePosition();
     static TVector2f GetMouseMovement();
 
+    static void UpdateMouseWheelInput(float _delta);
+    
     static void DispatchKeyEventsToScenes();
     
     static bool IsKeyUp(EKeyCode KeyCode);
     static bool IsKeyDown(EKeyCode KeyCode);
+    static float GetMouseWheelDelta();
     
     static void HandleKeyUp(WPARAM wParam);
     static void HandleKeyDown(WPARAM wParam);
