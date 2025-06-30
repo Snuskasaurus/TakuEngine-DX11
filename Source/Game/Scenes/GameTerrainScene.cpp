@@ -34,6 +34,10 @@ void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
     {
         PostQuitMessage(1);
     }
+    else if (_key == EKeyCode::KEY_ENTER)
+    {
+        //HandleCursorTerrainCollision();
+    }
     else if (_key == EKeyCode::KEY_KEYPAD_8)
         SceneLight.AddPitch(5.0f);
     else if (_key == EKeyCode::KEY_KEYPAD_2)
@@ -67,10 +71,8 @@ void CGameTerrainScene::HandleCursorTerrainCollision()
     SelectorMesh->Instances[0].Position = TVector3f::Zero;
     if (collisionResult.Success == true)
     {
-        SelectorMesh->Instances[0].Position = collisionResult.Intersection + collisionResult.Normal;
-        SelectorMesh->Instances[0].Rotator = TRotator::CreateFromUp(collisionResult.Normal);
-        
-        //MDebugDraw::Line(collisionResult.Intersection, collisionResult.Intersection + collisionResult.Normal * 5.0f, TColor::Red);   
+        SelectorMesh->Instances[0].Position = collisionResult.Intersection;
+        SelectorMesh->Instances[0].Rotator = collisionResult.Rotation;
     }
 }
 //---------------------------------------------------------------------------------------------------------------------

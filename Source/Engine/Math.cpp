@@ -252,6 +252,19 @@ CollisionMeshResult MMath::DoCollisionSegmentTriangle(const TVector3f& _segmentS
     result.Intersection = _segmentStart + segment * intersectionDistance;
     result.Normal = TVector3f::Normalize(TVector3f::Cross(edge1, edge2));
     result.Success = true;
+
+    // Create rotation
+    const TVector3f tangent = TVector3f::Normalize(edge1);
+    const TVector3f forward = TVector3f::Normalize(TVector3f::Cross(result.Normal, tangent));
+    const TVector3f right = TVector3f::Normalize(TVector3f::Cross(forward, result.Normal));
+    const DirectX::XMMATRIX rotationMatrix = DirectX::XMMATRIX(
+        {right.x, right.y, right.z},
+        {result.Normal.x, result.Normal.y, result.Normal.z},
+        {forward.x, forward.y, forward.z},
+        DirectX::XMVectorSet(0.f, 0.f, 0.f, 1.f)
+    );
+    result.Rotation = TRotator::CreateFromOrthogonal(result.Normal, forward, right);
+    
     return result;
 }
 
@@ -414,12 +427,23 @@ TMatrix4f TMatrix4f::Inverse(const TMatrix4f& _m)
     return ConvertDXMatrixToMatrix(DirectX::XMMatrixInverse(nullptr, matrix));
 }
 //----------------------------------------------------------------------------------------------------------------------
-TRotator TRotator::CreateFromUp(const TVector3f& _up)
+TRotator TRotator::CreateFromOrthogonal(const TVector3f& _up, const TVector3f& _forward, const TVector3f& _right)
 {
-    // This only works well when _up is not aligned with negative Y (straight down), or results may be unstable due to gimbal lock.
-    const float pitch = asinf(-_up.z);
-    const float yaw = atan2f(_up.x, _up.y);
-    return { pitch, yaw, 0.0f };
+    TRotator rotator;
+
+    rotator.Pitch = asinf(-_forward.y); // forward.y = sin(-pitch)
+    const float cosPitch = cosf(rotator.Pitch);
+    if (fabsf(cosPitch) > 1e-6f)
+    {
+        rotator.Yaw = atan2f(_forward.x, _forward.z);
+        rotator.Roll = atan2f(_right.y, _up.y);
+    }
+    else
+    {
+        rotator.Yaw = atan2f(-_right.z, _right.x);
+        rotator.Roll = 0.0f;
+    }
+    return rotator;
 }
 //----------------------------------------------------------------------------------------------------------------------
 //------------------------------------------- TTransform
