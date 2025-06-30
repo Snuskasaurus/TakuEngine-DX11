@@ -36,6 +36,7 @@ struct alignas(16) b00_ps_buffer_sceneEachFrame
     TVector3f camDir;
     TVector3f lightDir;
     TVector3f lightColor;
+    TVector3f ambientColor;
     float lightAmbientIntensity;
     float lightColorIntensity;
 };

@@ -6,6 +6,7 @@ cbuffer ps_buffer_sceneEachFrame : register(b0)
     float4 b_viewDir;
     float4 b_lightDir;
     float4 b_lightColor;
+    float4 b_lightAmbientColor;
     float b_lightAmbient;
     float b_lightBrightness;
 };
@@ -29,19 +30,25 @@ SamplerState samplerState : register(s0);
 SamplerState SampleStateClamp : register(s1);
 SamplerState SampleStateWrap : register(s2);
 
-float3 ComputePhongLighting(float3 _objectColor, float _spec, float _occlusion, float3 _normal)
+float3 ComputePhongLighting(float3 objectColor, float specularStrength, float occlusion, float3 normal)
 {
-    // Ambient
-    const float3 ambient = b_lightColor.rgb * b_lightAmbient * _objectColor * _occlusion;
-    
+    float3 N = normalize(normal);
+    float3 L = normalize(b_lightDir.rgb);
+    float3 V = normalize(b_viewDir.rgb);
+
+    // Ambient: colored ambient light with occlusion and object albedo
+    float3 ambient = b_lightAmbientColor.rgb * b_lightAmbient * objectColor * occlusion;
+
     // Diffuse
-    const float3 diffuse = max(dot(b_lightDir.rgb, _normal), 0.0) * _objectColor;
+    float NdotL = saturate(dot(N, L));
+    float3 diffuse = b_lightColor.rgb * b_lightBrightness * NdotL * objectColor;
 
     // Specular
-    const float3 halfwayDir = normalize(b_lightDir.rgb + b_viewDir.rgb);
-    const float3 specular = b_lightColor * b_lightBrightness * _spec * pow(max(dot(_normal, halfwayDir), 0.0), 66.0);
+    float3 H = normalize(L + V);
+    float NdotH = saturate(dot(N, H));
+    const float shininess = 64.0;
+    float3 specular = b_lightColor.rgb * b_lightBrightness * specularStrength * pow(NdotH, shininess);
 
-    // Output
     return ambient + diffuse + specular;
 }
 

@@ -155,9 +155,10 @@ void SShaderBufferHolder::FillBuffer_PS_SceneEachFrame(SShaderBufferHolder* _sha
     const SLightInfo& lightInfo = MWorld::GetWorld()->GetCurrentScene()->GetSceneLight().GetSceneLightInfo();
     BufferData.camDir = MWorld::GetWorld()->GetCameraForward();
     BufferData.lightDir = lightInfo.Direction;
-    BufferData.lightColor = { lightInfo.Color.r, lightInfo.Color.g, lightInfo.Color.b };
-    BufferData.lightColorIntensity = lightInfo.ColorIntensity;
-    BufferData.lightAmbientIntensity = lightInfo.AmbientIntensity;
+    BufferData.lightColor = { lightInfo.LightColor.r, lightInfo.LightColor.g, lightInfo.LightColor.b };
+    BufferData.ambientColor = { lightInfo.ShadowColor.r, lightInfo.ShadowColor.g, lightInfo.ShadowColor.b };
+    BufferData.lightColorIntensity = lightInfo.LightIntensity;
+    BufferData.lightAmbientIntensity = lightInfo.ShadowIntensity;
     
 #if DEBUG_DO_CHECK_IN_SHADER_BUFFER
     assert(sizeof(BufferData) == _shaderBufferHolder->SizeBuffer);

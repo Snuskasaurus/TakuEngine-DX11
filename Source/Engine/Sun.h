@@ -5,9 +5,12 @@
 struct SLightInfo
 {
     TVector3f Direction = TVector3f::Zero;
-    TColorf Color = TColorf::White;
-    float AmbientIntensity = 0.0f;
-    float ColorIntensity = 0.0f;
+    
+    TColorf LightColor = { 1.0f, 0.969f, 0.839f };
+    float LightIntensity = 1.25f;
+    
+    TColorf ShadowColor = { 0.169f, 0.176f, 0.29f };
+    float ShadowIntensity = 0.25f;
 };
 
 class CSceneLight
@@ -16,7 +19,7 @@ class CSceneLight
     friend class CGameScene;
     
 public:
-    SLightInfo GetSceneLightInfo() const;
+    SLightInfo GetSceneLightInfo() const { return LightInfo; }
     void AddYaw(float _yaw) { SetYaw(CurrentYaw + _yaw); }
     void AddPitch(float _pitch) { SetPitch(CurrentPitch + _pitch); }
     void SetYaw(float _yaw);
@@ -34,9 +37,7 @@ private:
     float CurrentYaw = 0.0f;
     float CurrentPitch = 0.0f;
     class CDrawable_InstancedMesh* DebugArrowMesh = nullptr;
-    TColorf DiffuseColor = { 0.99215686274f, 0.98431372549f, 0.82745098039f, 1.0f };
-    float Ambient = 0.15f;
-    float Intensity = 0.5f;
+    SLightInfo LightInfo;
     TMatrix4f LightMatrix;
     TVector3f Forward;
 };

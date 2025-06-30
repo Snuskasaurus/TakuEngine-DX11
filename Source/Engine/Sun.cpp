@@ -6,18 +6,6 @@
 #include "Graphics/Drawable.h"
 #include "GameWindow.h"
 
-
- SLightInfo CSceneLight::GetSceneLightInfo() const
-{
-     SLightInfo lightInfo;
-     {
-        lightInfo.AmbientIntensity = Ambient;
-        lightInfo.ColorIntensity = Intensity;
-        lightInfo.Direction = -Forward;
-        lightInfo.Color = DiffuseColor;
-     }
-     return lightInfo;
-}
 void CSceneLight::SetYaw(float _yaw)
 {
      CurrentYaw = _yaw;
@@ -54,4 +42,6 @@ void CSceneLight::OnValueChanged()
 
       const TMatrix4f LightPositionMatrix = TMatrix4f::MatrixTranslation(Position);
       LightMatrix = LightRotationMatrix * LightPositionMatrix;
+     
+     LightInfo.Direction = -Forward;
 }
