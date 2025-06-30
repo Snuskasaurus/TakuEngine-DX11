@@ -27,12 +27,12 @@ void Initialization(HINSTANCE hInstance, HINSTANCE hPrevInstance)
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------
 void Update()
 {
+	const float dt = MTime::GetDeltaTime();
+	
+	MDebugDraw::UpdateDebugDraws(dt);
 	MInput::DetectInputs();
 	MInput::DispatchKeyEventsToScenes();
-	
-	const float dt = MTime::GetDeltaTime();
 	MWorld::UpdateWorld(dt);
-	
 	MInput::ClearInputs();
 }
 ///--------------------------------------------------------------------------------------------------------------------------------------------------------

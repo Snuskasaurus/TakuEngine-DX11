@@ -275,17 +275,25 @@ void MGraphic::RenderFrame_DebugLines()
     G_DEVICE_CONTEXT->PSSetShader(G_PS_SIMPLE_COLOR.Shader, nullptr, 0u);
     G_DEVICE_CONTEXT->IASetInputLayout(G_VS_DEBUG_DRAW.Input);
     
-    const std::vector<SDebugLine>& debugLines = MDebugDraw::GetDebugLines();
     MGraphic::SetVertexAndIndexBuffer(G_DEVICE_CONTEXT, &VertexBuffer, IndexBuffer, sizeof(SInputVertexBuffer));
     
+    const std::vector<SDrawDebugHolder>& DebugDraws = MDebugDraw::GetDebugLines();
+    const UINT nbInstances = (UINT)DebugDraws.size();
+    std::vector<SDebugLine> debugLines;
+    debugLines.reserve(nbInstances);
+    for (auto debugDraw : DebugDraws)
+    {
+        debugLines.push_back(debugDraw.DebugLine);
+    }
+    
     // TODO Julien Rogel (12/03/2025): Try Structured Buffers to avoid filling multiples times the buffers
-    const UINT nbInstances = (UINT)debugLines.size();
     UINT nbInstancesRemainingToDraw = nbInstances;
     while (nbInstancesRemainingToDraw > 0)
     {
         const UINT nbInstancesToDraw = MMath::Min(nbInstancesRemainingToDraw, 416u);
         const UINT startInstances = nbInstances - nbInstancesRemainingToDraw;
-    
+
+        
         SShaderBufferHolder::FillBuffer_VS_DebugLine(&G_VS_BUFFERS[13], debugLines.data(), startInstances, nbInstancesToDraw);
         G_DEVICE_CONTEXT->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
         G_DEVICE_CONTEXT->DrawIndexedInstanced(2u, nbInstancesToDraw + 1u, 0u, 0, 0u);

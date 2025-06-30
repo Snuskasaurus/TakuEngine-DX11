@@ -328,7 +328,7 @@ void MGridSystem::CreateGrid()
         {
             colorLine = TColor::Green;
         }
-        MDebugDraw::Line({tilePosition}, {tilePosition + TVector3f::Up * 20.0f}, colorLine);
+        MDebugDraw::Line({tilePosition}, {tilePosition + TVector3f::Up * 20.0f}, colorLine, 10.0f);
 #endif
 
         // Create forests
@@ -403,7 +403,7 @@ void MGridSystem::CreateGrid()
                 //     case 3: color = TColor(255/2, 255/2, 0); break;
                 //     case 4: color = TColor::Red; break;
                 // }
-                MDebugDraw::Line({tilePosition + tilePositionOffset}, {tilePosition + tilePositionOffset + TVector3f::Up * 2.0f}, color);
+                MDebugDraw::Line({tilePosition + tilePositionOffset}, {tilePosition + tilePositionOffset + TVector3f::Up * 2.0f}, color, 10.0f);
             }
 #endif
         }

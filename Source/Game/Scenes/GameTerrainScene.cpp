@@ -16,10 +16,6 @@ void CGameTerrainScene::OnEvent_Create()
     MWorld::GetWorld()->GetFreeLookCamera().SetCameraPosition({65.0f, 76.0f, 90.0f});
     MWorld::GetWorld()->GetFreeLookCamera().SetCameraRotation({-0.52f, 2.44f, 0.00f});
     
-    MDebugDraw::Line(TVector3f::Zero, TVector3f::Right * 100.0f, TColor::Red);     // +X
-    MDebugDraw::Line(TVector3f::Zero, TVector3f::Up * 100.0f, TColor::Green);      // +Y
-    MDebugDraw::Line(TVector3f::Zero, TVector3f::Forward * 100.0f, TColor::Blue);  // +Z
-    
     assert(TerrainMesh == nullptr);
     TerrainMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_NAME_TERRAIN);
     TerrainMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
@@ -73,6 +69,7 @@ void CGameTerrainScene::HandleCursorTerrainCollision()
     {
         SelectorMesh->Instances[0].Position = collisionResult.Intersection;
         SelectorMesh->Instances[0].Rotator = collisionResult.Rotation;
+        MDebugDraw::Line(collisionResult.Intersection, collisionResult.Intersection + collisionResult.Normal * 10.0f, TColor::White, 0.0f);
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
