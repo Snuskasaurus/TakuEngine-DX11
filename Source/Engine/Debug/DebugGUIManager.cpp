@@ -32,7 +32,7 @@ void MDebugGUI::StartFrameDebugGUI()
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
 
     for (int i = 0; i < Instance->WindowDrawFunctions.size(); ++i)
     {
