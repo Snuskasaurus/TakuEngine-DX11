@@ -46,6 +46,10 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         {
             WindowSizeX = LOWORD(lParam);
             WindowSizeY = HIWORD(lParam);
+            
+            if (wParam != SIZE_MINIMIZED)
+                MGraphic::ResizeScreen();
+            
         } break;
     case WM_DESTROY:
         {

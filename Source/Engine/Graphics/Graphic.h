@@ -41,6 +41,7 @@ public:
     static void InitializeShaders();
     static void PrepareUninitializeGraphic();
     static void UninitializeGraphic();
+    static void ResizeScreen();
 public:
     static void ReportLiveObjects(bool _showDetails);
 public:
@@ -52,20 +53,23 @@ public:
     static void RenderFrame_DebugLines();
 
 public:
-    static void CreateRasterizerState(ID3D11Device* _device, ID3D11RasterizerState** _rasterizerState);
-    static void CreateDeviceAndSwapChain(ID3D11Device**, ID3D11DeviceContext**, IDXGISwapChain**);
-    static void CreateDepthStencil(ID3D11Device*, ID3D11DeviceContext*, SDepthStencilResources&);
+    static void CreateRasterizerState();
+    static void CreateDeviceAndSwapChain();
+    static void ReleaseRenderTargetView();
+    static void CreateDepthStencil();
     static void CreateRenderTargetView();
     static void CreateAndSetSampleStates();
+    static void ReleaseDepthStencil();
+public:
     static void CreateVertexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, void* _vertices, UINT _nbVertices, UINT _sizeStruct);
     static void CreateIndexBuffer(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer** _indexBuffer, TVertexIndex* _indexes, UINT _nbIndex, UINT _sizeStruct);
-    static void SetVertexAndIndexBuffer(ID3D11DeviceContext*, ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer, UINT VertexBufferByteStride);
+    static void SetVertexAndIndexBuffer(ID3D11Buffer** _vertexBuffer, ID3D11Buffer* _indexBuffer, UINT _vertexBufferByteStride);
 public:
-    static void SetPixelShaderTextureViews(ID3D11DeviceContext* _deviceContext, UINT nbTextures, ID3D11ShaderResourceView** _textureViews);
+    static void SetPixelShaderTextureViews(UINT nbTextures, ID3D11ShaderResourceView** _textureViews);
 public:
-    static void SetPrimitiveAndDraw_Instanced(ID3D11DeviceContext*, UINT _indexCountPerInstance, UINT _instanceCount);
-    static void SetRasterizerState(ID3D11DeviceContext* _deviceContext, ID3D11RasterizerState* _rasterizerState);
-    static void ConfigureViewport(ID3D11DeviceContext*);
+    static void SetPrimitiveAndDraw_Instanced(UINT _indexCountPerInstance, UINT _instanceCount);
+    static void SetRasterizerState(ID3D11RasterizerState* _rasterizerState);
+    static void ConfigureViewport();
     static void PresentSwapChain(IDXGISwapChain*);
     static void ClearRenderTarget(ID3D11DeviceContext*, ID3D11RenderTargetView*);
     static void ClearDepthStencil(ID3D11DeviceContext*, ID3D11DepthStencilView*);
