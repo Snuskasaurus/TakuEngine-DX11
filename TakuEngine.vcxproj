@@ -195,6 +195,7 @@
     <ClCompile Include="Source\Engine\Sun.cpp" />
     <ClCompile Include="Source\Engine\TimeManager.cpp" />
     <ClCompile Include="Source\Engine\World.cpp" />
+    <ClCompile Include="Source\Game\InterestPoint.cpp" />
     <ClCompile Include="Source\Game\MGridSystem.cpp" />
     <ClCompile Include="Source\Game\Scenes\GameTerrainScene.cpp" />
     <ClCompile Include="Source\Game\Scenes\GridScene.cpp">
@@ -337,6 +338,7 @@
     <ClInclude Include="Source\Engine\Sun.h" />
     <ClInclude Include="Source\Engine\TimeManager.h" />
     <ClInclude Include="Source\Engine\World.h" />
+    <ClInclude Include="Source\Game\InterestPoint.h" />
     <ClInclude Include="Source\Game\MGridSystem.h" />
     <ClInclude Include="Source\Game\Scenes\GameTerrainScene.h" />
     <ClInclude Include="Source\Game\Scenes\GridScene.h" />

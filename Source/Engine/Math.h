@@ -216,6 +216,11 @@ struct alignas(16) TVector3f
             _v1.x * _v2.y - _v1.y * _v2.x   // Z
         };
     }
+    FORCE_INLINE static float SquareDistance(const TVector3f& _v1, const TVector3f& _v2)
+    {
+        const TVector3f v = _v2 - _v1;
+        return SquareLength(v);
+    }
     FORCE_INLINE static float SquareLength(const TVector3f& _v)
     {
         return _v.x * _v.x

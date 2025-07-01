@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "../../Engine/Scene.h"
+#include "Game/InterestPoint.h"
 
 class CGameTerrainScene final : public CGameScene
 {
@@ -12,6 +13,12 @@ protected:
 
 private:
     void HandleCursorTerrainCollision();
+
+private:
+    FWorldMap WorldMap;
+
+private:
+    TVector3f CursorPosition;
     
 private:
     CDrawable_InstancedMesh* TerrainMesh = nullptr;

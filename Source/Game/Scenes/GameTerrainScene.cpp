@@ -26,7 +26,7 @@ void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
     }
     else if (_key == EKeyCode::KEY_ENTER)
     {
-        //HandleCursorTerrainCollision();
+        WorldMap.CreateInterestPoint(CursorPosition);
     }
     else if (_key == EKeyCode::KEY_KEYPAD_8)
         SceneLight.AddPitch(5.0f);
@@ -41,6 +41,7 @@ void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
 void CGameTerrainScene::OnEvent_Update(const float& _dt)
 {
     HandleCursorTerrainCollision();
+    WorldMap.UpdateWorldMap(_dt, CursorPosition);
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Destroy()
@@ -58,7 +59,8 @@ void CGameTerrainScene::HandleCursorTerrainCollision()
     {
         SelectorMesh->Instances[0].Position = collisionResult.Intersection;
         SelectorMesh->Instances[0].Rotator = collisionResult.Rotation;
-        MDebugDraw::Line(collisionResult.Intersection, collisionResult.Intersection + collisionResult.Normal * 10.0f, TColor::White, 0.0f);
+        CursorPosition = collisionResult.Intersection;
+        MDebugDraw::Line(CursorPosition, CursorPosition + collisionResult.Normal * 10.0f, TColor::White, 0.0f);
     }
 }
 //---------------------------------------------------------------------------------------------------------------------
