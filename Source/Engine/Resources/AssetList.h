@@ -28,6 +28,7 @@ inline const char* G_ASSET_MESH_TILE_2222 = "Tiles/Tile2222";
 
 
 inline const char* G_ASSET_NAME_TERRAIN = "Terrain";
+inline const char* G_ASSET_NAME_WATER = "Water";
 
 inline const char* G_ASSET_TILE_0000 = "Tile0000";
 inline const char* G_ASSET_TILE_1000 = "Tile1000";

@@ -1,4 +1,4 @@
-﻿#include "InterestPoint.h"
+﻿#include "WorldMap.h"
 
 #include "Engine/Debug/DebugDraw.h"
 
