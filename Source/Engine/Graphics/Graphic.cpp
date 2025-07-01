@@ -382,12 +382,21 @@ void MGraphic::PrepareUninitializeGraphic()
 void MGraphic::UninitializeGraphic()
 {
     G_DEPTH_STENCIL_RESOURCES.Release();
+
     G_RASTERIZER_STATE->Release();
+    G_RASTERIZER_STATE = nullptr;
     
     G_BACK_BUFFER_TEXTURE->Release();
+    G_BACK_BUFFER_TEXTURE = nullptr;
+    
     G_BACK_BUFFER_RESOURCE->Release();
+    G_BACK_BUFFER_RESOURCE = nullptr;
+    
     G_RENDER_TARGET_VIEW->Release();
+    G_RENDER_TARGET_VIEW = nullptr;
+    
     G_SWAP_CHAIN->Release();
+    G_SWAP_CHAIN = nullptr;
     
     G_VS_SHADOW.Release();
     G_VS_BASE.Release();
@@ -395,6 +404,7 @@ void MGraphic::UninitializeGraphic()
     G_PS_BASE.Release();
     G_PS_2D_DEBUG.Release();
     G_PS_POST_PROCESS_1.Release();
+    
 
     for (auto VertexShaderBuffer : G_VS_BUFFERS)
     {
@@ -407,17 +417,26 @@ void MGraphic::UninitializeGraphic()
     for (auto samplerState : G_SAMPLER_STATES)
     {
         samplerState->Release();
+        samplerState = nullptr;
     }
     
-    G_DEVICE_CONTEXT->Release();
-    
     G_DEVICE_CONTEXT->Flush();
+    G_DEVICE_CONTEXT->Release();
+    G_DEVICE_CONTEXT = nullptr;
     
 #if DEBUG_DIRECTX_REPORT_AT_QUIT
         ReportLiveObjects(true);
 #endif
     
     G_DEVICE->Release();
+}
+///---------------------------------------------------------------------------------------------------------------------
+void MGraphic::SetFullScreen(bool _isFullScreen)
+{
+    if (G_SWAP_CHAIN == nullptr)
+        return;
+    
+    CHECK_HRESULT(G_SWAP_CHAIN->SetFullscreenState(_isFullScreen, nullptr));
 }
 ///---------------------------------------------------------------------------------------------------------------------
 void MGraphic::ResizeScreen()

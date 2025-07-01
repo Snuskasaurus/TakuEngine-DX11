@@ -22,12 +22,19 @@ struct SDepthStencilResources
     void Release()
     {
         State->Release();
+        State = nullptr;
         Texture->Release();
+        Texture = nullptr;
         View->Release();
+        View = nullptr;
         ResourceView->Release();
+        ResourceView = nullptr;
         ViewLight->Release();
+        ViewLight = nullptr;
         TextureLight->Release();
+        TextureLight = nullptr;
         ResourceViewLight->Release();
+        ResourceViewLight = nullptr;
     }
 };
 
@@ -41,6 +48,7 @@ public:
     static void InitializeShaders();
     static void PrepareUninitializeGraphic();
     static void UninitializeGraphic();
+    static void SetFullScreen(bool _isFullScreen);
     static void ResizeScreen();
 public:
     static void ReportLiveObjects(bool _showDetails);

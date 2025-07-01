@@ -22,6 +22,7 @@ constexpr UINT DefaultWindowPositionY = (UINT)(DefaultWindowSizeY * 0.1);
 UINT WindowSizeX = DefaultWindowSizeX;
 UINT WindowSizeY = DefaultWindowSizeY;
 bool HasWindowFocus = false;
+bool IsFullScreen = false;
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -29,6 +30,27 @@ LRESULT CALLBACK GameWindowProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
     
     switch (msg)
     {
+    case WM_ACTIVATE:
+        {
+            if (LOWORD(wParam) == WA_INACTIVE)
+            {
+                HasWindowFocus = false;
+                MGraphic::SetFullScreen(false);
+            }
+            else
+            {
+                HasWindowFocus = true;
+                
+                if (IsFullScreen == true)
+                    MGraphic::SetFullScreen(true);
+            }
+        } break;
+    case WM_SYSKEYDOWN:
+        if (wParam == VK_RETURN && (lParam & (1 << 29))) // ALT + ENTER
+        {
+            IsFullScreen = !IsFullScreen;
+            MGraphic::SetFullScreen(IsFullScreen);
+        } break;
     case WM_KEYDOWN:
         {
             MInput::HandleKeyDown(wParam);
