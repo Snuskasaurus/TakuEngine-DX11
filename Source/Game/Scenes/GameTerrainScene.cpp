@@ -10,10 +10,6 @@
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Create()
 {
-    assert(WaterMesh == nullptr);
-    WaterMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_NAME_WATER);
-    WaterMesh->Instances.push_back({TVector3f::Up * 5.32f, 0.0f, 0.0f, 0.0f});
-    
     assert(TerrainMesh == nullptr);
     TerrainMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_NAME_TERRAIN);
     TerrainMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
