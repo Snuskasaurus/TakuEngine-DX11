@@ -17,6 +17,10 @@ void FWorldMap::CreateWorldMap()
         auto drawableInstancedMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData(nameAsset.c_str());
         drawableInstancedMesh->Instances.push_back({TilePosition, TRotator()});
     }
+
+    auto drawableInstancedMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData("Table");
+    drawableInstancedMesh->Instances.push_back({TVector3f::Zero, TRotator()});
+    
 }
 
 void FWorldMap::UpdateWorldMap(const float _dt, const TVector3f& _worldPosition)

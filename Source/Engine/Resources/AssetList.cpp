@@ -30,6 +30,10 @@ void LoadDrawables()
 {
      MDrawableResources::CreateDrawableData(G_ASSET_SHAPE_TORUS, {"Shapes/Torus", "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_NORMAL, G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_WHITE, false});
 
+    MDrawableResources::CreateDrawableData("Table", {"World/Table",
+        "", "", G_ASSET_T_NONE_WHITE, G_ASSET_T_NONE_NORMAL,
+        G_ASSET_T_NONE_DARK, G_ASSET_T_NONE_DARK, true});
+    
     for (int i = 0; i < 130; ++i)
     {
         const std::string nameAsset = "WorldTile" + std::to_string(i);
