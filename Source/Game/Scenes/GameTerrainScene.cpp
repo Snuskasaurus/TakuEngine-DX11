@@ -1,6 +1,5 @@
 ﻿#include "GameTerrainScene.h"
 
-#include "../MGridSystem.h"
 #include "../../Engine/GameWindow.h"
 #include "../../Engine/Resources/AssetList.h"
 #include "../../Engine/World.h"
@@ -11,11 +10,13 @@
 void CGameTerrainScene::OnEvent_Create()
 {
     assert(TerrainMesh == nullptr);
-    TerrainMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_NAME_TERRAIN);
-    TerrainMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
+    //TerrainMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_NAME_TERRAIN);
+    //TerrainMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
     
-    SelectorMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_SHAPE_TORUS);
-    SelectorMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
+    //SelectorMesh = AddInstancedMeshToDrawFromDrawableData(G_ASSET_SHAPE_TORUS);
+    //SelectorMesh->Instances.push_back({TVector3f::Zero, 0.0f, 0.0f, 0.0f});
+
+    WorldMap.CreateWorldMap();
 }
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
@@ -40,7 +41,7 @@ void CGameTerrainScene::OnEvent_KeyReleased(EKeyCode _key)
 //---------------------------------------------------------------------------------------------------------------------
 void CGameTerrainScene::OnEvent_Update(const float& _dt)
 {
-    HandleCursorTerrainCollision();
+    //HandleCursorTerrainCollision();
     WorldMap.UpdateWorldMap(_dt, CursorPosition);
 }
 //---------------------------------------------------------------------------------------------------------------------

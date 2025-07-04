@@ -1,6 +1,23 @@
 ﻿#include "InterestPoint.h"
 
+#include "Engine/World.h"
 #include "Engine/Debug/DebugDraw.h"
+
+void FWorldMap::CreateWorldMap()
+{
+    const float distanceTile = 50.0f;
+    
+    for (int i = 0; i < 130; ++i)
+    {
+        const int row = i / 13;
+        const int col = i % 13;
+        const TVector3f TilePosition = { col * -distanceTile, 0.0f, row * -distanceTile };
+        
+        const std::string nameAsset = "WorldTile" + std::to_string(i);
+        auto drawableInstancedMesh = MWorld::GetWorld()->GetCurrentScene()->AddInstancedMeshToDrawFromDrawableData(nameAsset.c_str());
+        drawableInstancedMesh->Instances.push_back({TilePosition, TRotator()});
+    }
+}
 
 void FWorldMap::UpdateWorldMap(const float _dt, const TVector3f& _worldPosition)
 {

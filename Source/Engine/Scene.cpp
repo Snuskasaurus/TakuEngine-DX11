@@ -8,7 +8,6 @@
 #include "Engine/Debug/DebugDraw.h"
 #include "Engine/Resources/DrawableResources.h"
 
-#include "Game/Scenes/GridScene.h"
 #include "Game/Scenes/GameTerrainScene.h"
 
 #include "imgui/imgui.h"
@@ -185,7 +184,6 @@ void CGameScene::ChangeGameScene(const EGameSceneType& _gameSceneType)
     switch (_gameSceneType)
     {
         case None: break;
-        case GridScene:            NewWorldGameScene = new CGridScene; break;
         case GameTerrainScene:     NewWorldGameScene = new CGameTerrainScene; break;
     }
     

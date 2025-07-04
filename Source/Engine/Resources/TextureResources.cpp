@@ -38,7 +38,7 @@ STextureData* MTextureResources::CreateTextureDataFromFileName(const char* _file
 
     STextureData* NewTextureData = new STextureData();
     std::wstringstream TextureFilenameStream;
-    TextureFilenameStream << GAME_DATA_PATH << _filename << ".bmp";
+    TextureFilenameStream << GAME_DATA_PATH << _filename;
     CHECK_HRESULT(CreateWICTextureFromFile(MGraphic::GetDXDevice(), MGraphic::GetDXDeviceContext(), TextureFilenameStream.str().c_str(), &NewTextureData->texture, &NewTextureData->textureView, 0));
     G_TEXTURE_DATA_MAP.insert({ _filename, NewTextureData });
     return NewTextureData;

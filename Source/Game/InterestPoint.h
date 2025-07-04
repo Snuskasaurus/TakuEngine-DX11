@@ -11,6 +11,7 @@ struct FInterestPoint
 class FWorldMap
 {
 public:
+    void CreateWorldMap();
     void UpdateWorldMap(const float _dt, const TVector3f& _worldPosition);
     void CreateInterestPoint(TVector3f _worldPosition);
     FInterestPoint* FindInterestPoint(TVector3f _worldPosition);

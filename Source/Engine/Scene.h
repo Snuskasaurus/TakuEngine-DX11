@@ -10,7 +10,6 @@
 enum EGameSceneType
 {
     None,
-    GridScene,
     GameTerrainScene,
 };
 
